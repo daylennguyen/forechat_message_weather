@@ -1,8 +1,0 @@
-TCSS 143A 	T/TH 	10:10am-12:10pm
-		TH	1:30pm-3:30pm
-TCSS 143B	T/TH	3:40pm-5:40pm
-		TH	5:50pm-7:50pm
-TCSS 390	T	1:30pm-3:30pm
-		T	5:50pm-7:50pm
-
-My office hours: MW 12pm-1pm	
