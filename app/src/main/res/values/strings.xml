@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">TDDevsChat</string>
+
+    <!--SIGN IN ACTIVITY-->
+    <string name="loginRegister_email">Email</string>
+    <string name="loginRegister_password">Password</string>
+    <string name="login_login">Login</string>
+    <string name="loginRegister_register">Register</string>
+    <!--<string name=""></string>-->
+    <!--<string name=""></string>-->
+
+
+    <!--HOME ACTIVITY-->
+    <!--<string name=""></string>-->
+    <!--<string name=""></string>-->
+
+
+    <!--ERROR NOTIFICATIONS-->
+    <string name="loginRegister_missingField">empty field</string>
+    <string name="loginRegister_invalidEmail">invalid email</string>
+
 </resources>
