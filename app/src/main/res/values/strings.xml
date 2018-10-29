@@ -9,6 +9,16 @@
     <!--<string name=""></string>-->
     <!--<string name=""></string>-->
 
+    <!--SIGN IN ACTIVITY-->
+    <string name="register_firstName">First Name</string>
+    <string name="register_lastName">Last Name</string>
+    <string name="register_userName">Nickname/Display Name (optional)</string>
+
+    <string name="register_passwordConfirm">Confirm Password</string>
+
+
+    <!--<string name=""></string>-->
+    <!--<string name=""></string>-->
 
     <!--HOME ACTIVITY-->
     <!--<string name=""></string>-->
@@ -18,5 +28,8 @@
     <!--ERROR NOTIFICATIONS-->
     <string name="loginRegister_missingField">empty field</string>
     <string name="loginRegister_invalidEmail">invalid email</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

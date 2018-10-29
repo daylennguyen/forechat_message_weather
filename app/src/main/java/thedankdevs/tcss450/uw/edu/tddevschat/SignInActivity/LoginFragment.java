@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -115,7 +116,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
             Credentials.Builder credBuilder;
             Credentials credentials;
-
+/*
             switch (viewClicked.getId()) {
                 case R.id.btn_login_login:
                     if (!email.equals("") && !password.equals("") && email.contains("@")) {
@@ -153,8 +154,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     break;
                 default:
                     Log.wtf(TAG, "was something weird clicked?");
-            }
+            }*/
         }
+
     }
 
 
