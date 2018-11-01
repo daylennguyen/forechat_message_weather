@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 152 74.492">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #fff48f;
+        stroke: #9e9e9e;
+        stroke-width: 0.5px;
+      }
+
+      .cls-3 {
+        fill: #be7fd1;
+        font-size: 27px;
+        font-family: Roboto-MediumItalic, Roboto;
+        font-weight: 500;
+        font-style: italic;
+        letter-spacing: 0.125em;
+      }
+
+      .cls-4 {
+        fill: none;
+      }
+
+      .cls-5 {
+        filter: url(#F_reChat);
+      }
+
+      .cls-6 {
+        filter: url(#sunny);
+      }
+    </style>
+    <filter id="sunny" x="19.803" y="29.275" width="36.748" height="36.666" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="F_reChat" x="0" y="20.246" width="152" height="51" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_373" data-name="Group 373" transform="translate(25.422 9.94)">
+    <g id="cloud" transform="translate(6.777 -9.94)">
+      <path id="Path_84" data-name="Path 84" class="cls-1" d="M57.866,22.063A22.406,22.406,0,0,0,16,16.082a17.935,17.935,0,0,0,1.944,35.766H56.819a14.91,14.91,0,0,0,1.047-29.785Z" transform="translate(0 -4)"/>
+    </g>
+    <g class="cls-6" transform="matrix(1, 0, 0, 1, -25.42, -9.94)">
+      <path id="sunny-2" data-name="sunny" class="cls-2" d="M5.778,4.108,4.285,2.624l-1.17,1.17L4.6,5.278ZM3.488,8.8H1v1.659H3.488ZM10.954.55H9.295V3h1.659V.55Zm6.18,3.243-1.17-1.17L14.479,4.108l1.17,1.17ZM14.471,15.157l1.485,1.493,1.17-1.17L15.632,14l-1.161,1.161ZM16.76,8.8v1.659h2.488V8.8ZM10.124,4.656A4.977,4.977,0,1,0,15.1,9.633,4.981,4.981,0,0,0,10.124,4.656Zm-.829,14.06h1.659V16.269H9.295Zm-6.18-3.243,1.17,1.17,1.485-1.493L4.6,13.979Z" transform="translate(28.05 34.98)"/>
+    </g>
+    <g class="cls-5" transform="matrix(1, 0, 0, 1, -25.42, -9.94)">
+      <text id="F_reChat-2" data-name="F  reChat" class="cls-3" transform="translate(76 52.25)"><tspan x="-66.577" y="0" xml:space="preserve">F  reChat</tspan></text>
+    </g>
+    <g id="cloud-2" data-name="cloud" transform="translate(75.525 37.784)">
+      <path id="Path_84-2" data-name="Path 84" class="cls-1" d="M32.372,14.1A12.535,12.535,0,0,0,8.95,10.759a10.034,10.034,0,0,0,1.087,20.009H31.787A8.341,8.341,0,0,0,32.372,14.1Z" transform="translate(0 -4)"/>
+    </g>
+    <g id="cloud-3" data-name="cloud" transform="translate(-10.411 31.092)">
+      <path id="Path_83" data-name="Path 83" class="cls-4" d="M0,0H24.5V24.5H0Z"/>
+      <path id="Path_84-3" data-name="Path 84" class="cls-1" d="M19.757,10.167A7.65,7.65,0,0,0,5.462,8.125a6.124,6.124,0,0,0,.664,12.211H19.4a5.09,5.09,0,0,0,.357-10.169ZM19.4,18.294H6.126a4.084,4.084,0,1,1,0-8.168h.725a5.615,5.615,0,0,1,11.017,1.532v.511H19.4a3.063,3.063,0,0,1,0,6.126Z" transform="translate(0 0.084)"/>
+    </g>
+  </g>
+</svg>
