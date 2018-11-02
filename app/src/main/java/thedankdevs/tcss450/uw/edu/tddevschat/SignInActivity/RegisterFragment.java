@@ -1,4 +1,4 @@
-package thedankdevs.tcss450.uw.edu.tddevschat.RegisterActivity;
+package thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity;
 
 import android.content.Context;
 import android.net.Uri;
