@@ -22,58 +22,86 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 
 /**
+ * <p>This class handles the user input in LoginFragment and validates each field. If all fields are valid
+ * and the server response is ok, then OnFragmentInteractionListener is attached
+ * for onLoginSuccess().</p>
+ *
+ * <p>This class also handles the user event in the case that the Register Button is clicked.
+ * In this case, the OnFragmentInteractionListener is attached to onRegister()</p>
+ *
+ *
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link LoginFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  *
  *
- * @author Michelle Brown
- * @version 26 October 2018
+ * @author Michelle Brown, Bryan Santos
+ * @version 11/05/2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
-    // the fragment initialization parameters
+    /**
+     * The tag used for Logcat messages for this class
+     */
     private static final String TAG = LoginFragment.class.getSimpleName();
+
+    /** Helper object used to make a JSON object of the user's email and password*/
     private Credentials mCredentials;
+
+    /** OnFragmentInteractionListener for this Fragment */
     private OnFragmentInteractionListener mListener;
+
+    /** Inflated view of fragment_login.xml */
     private View mView;
+
+    /**
+     * The EditText field for email
+     */
+    private EditText mEmailField;
+
+    /**
+     * The EditText field for password
+     */
+    private EditText mPasswordField;
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param credentials contains the email and password.
-//     * @return A new instance of fragment LoginFragment.
-//     */
-//    // TODO: Rename and change types and number of parameters
-//    public static LoginFragment newInstance(Credentials credentials) { //TODO: should we include this method?
-//        LoginFragment fragment = new LoginFragment();
-//        Bundle args = new Bundle();
-//        args.putSerializable(ARG_CREDENTIALS, credentials);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-//
-
+    /**
+     * Inflates fragment_login.xml, attaches Register and Login button with
+     * onClick Listeners, and initializes mEmailField and mPasswordField.
+     *
+     * @param inflater LayoutInflater
+     * @param container ViewGroup
+     * @param savedInstanceState Bundle
+     * @return inflated view of fragment_login.xml
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_login, container, false);
 
-        Button b = (Button) mView.findViewById(R.id.btn_login_login);
+        Button b = mView.findViewById(R.id.btn_login_login);
         b.setOnClickListener(this);
-        b = (Button) mView.findViewById(R.id.btn_login_register);
+        b = mView.findViewById(R.id.btn_login_register);
         b.setOnClickListener(this);
+
+        mEmailField = getActivity().findViewById(R.id.et_login_email);
+        mPasswordField = getActivity().findViewById(R.id.et_login_password);
         return mView;
     }
 
-
+    /**
+     * Attaches mListener to appropriate OnFragmentInteraction methods depending
+     * on the button clicked.
+     *
+     * If login button was clicked, it validates the user input and sends a request to the server.
+     * If successful, OnFragmentInteraction is attached to mListener.
+     * @param viewClicked view object that was clicked
+     */
 
     @Override
     public void onClick(View viewClicked) {
@@ -83,10 +111,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mListener.onRegisterClicked();
                 break;
             case R.id.btn_login_login:
-                if (!isLoginValid()) {
+                String email = mEmailField.getText().toString();
+                String password = mPasswordField.getText().toString();
+                if (!isLoginValid(email, password)) {
                     break;
                 }
-                buildLoginServerCredentials();
+                buildLoginServerCredentials(email, password);
                 // mListener is attached in handleLoginOnPost();
                 break;
             default:
@@ -94,40 +124,41 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private boolean isLoginValid() {
+    /**
+     * Validates the strings for email and password. If invalid, an error is set
+     * to each corresponding EditText fields.
+     *
+     * @param email    User input for email
+     * @param password User input for password
+     * @return validity of the email and password
+     */
+    private boolean isLoginValid(String email, String password) {
 
-        EditText email_field = getActivity().findViewById(R.id.et_login_email);
-        EditText password_field = getActivity().findViewById(R.id.et_login_password);
+        EditText[] fields = {mEmailField, mPasswordField};
+        String[] strings = {email, password};
 
-        String email = email_field.getText().toString();
-        String password = password_field.getText().toString();
+        boolean valid = true;
 
-        // if both fields are empty, display error on both fields
-        if (email.length() == 0 && password.length() == 0) {
-            email_field.setError("Please enter your email");
-            password_field.setError("Please enter your password");
-            return false;
-        }
-
-        // set errors individually on fields that are invalid or empty
-        if (email.length() == 0) {
-            email_field.setError("Please enter your email");
-            return false;
-        }
-
-        if (password.length() == 0) {
-            password_field.setError("Please enter your password");
-            return false;
+        for (int i = 0; i < fields.length; i++) {
+            if (strings[i].isEmpty()) {
+                fields[i].setError("This field cannot be empty");
+                valid = false;
+            }
         }
 
         if (!isEmailValid(email)) {
-            email_field.setError("Email must contain a single '@' symbol");
-            return false;
+            mEmailField.setError("Email must contain a single '@' symbol");
+            valid = false;
         }
 
-        return true;
+        return valid;
     }
 
+    /**
+     * Checks if the email contains a single '@' symbol.
+     * @param email email to be validated
+     * @return true if email only has a single '@' symbol
+     */
     private boolean isEmailValid(String email) {
         int count = 0; // character '@' count;
         for (int i = 0; i < email.length(); i++) {
@@ -136,16 +167,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-        if (count == 1) return true;
-        return false;
+        return count == 1;
     }
 
-    private boolean buildLoginServerCredentials() {
-        EditText email_field = getActivity().findViewById(R.id.et_login_email);
-        EditText password_field = getActivity().findViewById(R.id.et_login_password);
+    /**
+     * Builds the URI path to the server.
+     * Also builds the Credentials object with the email and password given by the user
+     * to be used to create the JSON object to be sent in a POST request to the server.
+     *
+     * @param email    User input for email
+     * @param password User input for password
+     */
 
-        String email = email_field.getText().toString();
-        String password = password_field.getText().toString();
+    private void buildLoginServerCredentials(String email, String password) {
 
         //build the web service URL
         mCredentials = new Credentials.Builder(email, password).build();
@@ -165,8 +199,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .onCancelled(this::handleErrorsInTask)
                 .build()
                 .execute();
-
-        return true;
 
 
     }
@@ -194,7 +226,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     private void handleLoginOnPre() {
         mListener.onWaitFragmentInteractionShow();
-        //TODO: disable buttons
     }
 
     /**
