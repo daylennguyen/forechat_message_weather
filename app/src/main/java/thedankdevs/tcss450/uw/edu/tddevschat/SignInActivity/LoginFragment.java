@@ -70,8 +70,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Inflates fragment_login.xml, attaches Register and Login button with
-     * onClick Listeners, and initializes mEmailField and mPasswordField.
+     * Inflates fragment_login.xml, and attaches Register and Login button with
+     * onClick Listeners.
      *
      * @param inflater LayoutInflater
      * @param container ViewGroup
@@ -88,9 +88,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         b.setOnClickListener(this);
         b = mView.findViewById(R.id.btn_login_register);
         b.setOnClickListener(this);
-
-        mEmailField = getActivity().findViewById(R.id.et_login_email);
-        mPasswordField = getActivity().findViewById(R.id.et_login_password);
         return mView;
     }
 
@@ -105,7 +102,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View viewClicked) {
-
+        mEmailField = getActivity().findViewById(R.id.et_login_email);
+        mPasswordField = getActivity().findViewById(R.id.et_login_password);
         switch (viewClicked.getId()) {
             case R.id.btn_login_register:
                 mListener.onRegisterClicked();
