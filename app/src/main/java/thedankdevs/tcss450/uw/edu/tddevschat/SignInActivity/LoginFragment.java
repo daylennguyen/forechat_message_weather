@@ -26,65 +26,151 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
  * Activities that contain this fragment must implement the
  * {@link LoginFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
+ *
  *
  * @author Michelle Brown
  * @version 26 October 2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
+
     // the fragment initialization parameters
-    private static final String ARG_CREDENTIALS = "cred_param";
-
     private static final String TAG = LoginFragment.class.getSimpleName();
-
-    private String mParam1;
-    private String mParam2;
     private Credentials mCredentials;
-
     private OnFragmentInteractionListener mListener;
+    private View mView;
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param credentials contains the email and password.
-     * @return A new instance of fragment LoginFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LoginFragment newInstance(Credentials credentials) { //TODO: should we include this method?
-        LoginFragment fragment = new LoginFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_CREDENTIALS, credentials);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //mParam1 = getArguments().getString(ARG_EMAIL); //TODO: should the credentials be gotten here?
-            //mParam2 = getArguments().getString(ARG_PASSWORD);
-        }
-    }
+//    /**
+//     * Use this factory method to create a new instance of
+//     * this fragment using the provided parameters.
+//     *
+//     * @param credentials contains the email and password.
+//     * @return A new instance of fragment LoginFragment.
+//     */
+//    // TODO: Rename and change types and number of parameters
+//    public static LoginFragment newInstance(Credentials credentials) { //TODO: should we include this method?
+//        LoginFragment fragment = new LoginFragment();
+//        Bundle args = new Bundle();
+//        args.putSerializable(ARG_CREDENTIALS, credentials);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+//
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_login, container, false);
+        mView = inflater.inflate(R.layout.fragment_login, container, false);
 
-        Button b = (Button) v.findViewById(R.id.btn_login_login);
+        Button b = (Button) mView.findViewById(R.id.btn_login_login);
         b.setOnClickListener(this);
-        b = (Button) v.findViewById(R.id.btn_login_register);
+        b = (Button) mView.findViewById(R.id.btn_login_register);
         b.setOnClickListener(this);
-        return v;
+        return mView;
     }
+
+
+
+    @Override
+    public void onClick(View viewClicked) {
+
+        switch (viewClicked.getId()) {
+            case R.id.btn_login_register:
+                mListener.onRegisterClicked();
+                break;
+            case R.id.btn_login_login:
+                if (!isLoginValid()) {
+                    break;
+                }
+                buildLoginServerCredentials();
+                // mListener is attached in handleLoginOnPost();
+                break;
+            default:
+                Log.e(TAG, "Error when button is clicked in Login Fragment");
+        }
+    }
+
+    private boolean isLoginValid() {
+
+        EditText email_field = getActivity().findViewById(R.id.et_login_email);
+        EditText password_field = getActivity().findViewById(R.id.et_login_password);
+
+        String email = email_field.getText().toString();
+        String password = password_field.getText().toString();
+
+        // if both fields are empty, display error on both fields
+        if (email.length() == 0 && password.length() == 0) {
+            email_field.setError("Please enter your email");
+            password_field.setError("Please enter your password");
+            return false;
+        }
+
+        // set errors individually on fields that are invalid or empty
+        if (email.length() == 0) {
+            email_field.setError("Please enter your email");
+            return false;
+        }
+
+        if (password.length() == 0) {
+            password_field.setError("Please enter your password");
+            return false;
+        }
+
+        if (!isEmailValid(email)) {
+            email_field.setError("Email must contain a single '@' symbol");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isEmailValid(String email) {
+        int count = 0; // character '@' count;
+        for (int i = 0; i < email.length(); i++) {
+            if (email.charAt(i) == '@') {
+                count++;
+            }
+        }
+
+        if (count == 1) return true;
+        return false;
+    }
+
+    private boolean buildLoginServerCredentials() {
+        EditText email_field = getActivity().findViewById(R.id.et_login_email);
+        EditText password_field = getActivity().findViewById(R.id.et_login_password);
+
+        String email = email_field.getText().toString();
+        String password = password_field.getText().toString();
+
+        //build the web service URL
+        mCredentials = new Credentials.Builder(email, password).build();
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString(R.string.ep_login))
+                .build();
+
+        //build the JSONObject
+        JSONObject msg = mCredentials.asJSONObject();
+
+        //instantiate and execute the AsyncTask
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::handleLoginOnPre)
+                .onPostExecute(this::handleLoginOnPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build()
+                .execute();
+
+        return true;
+
+
+    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -102,72 +188,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
         mListener = null;
     }
-
-
-
-    @Override
-    public void onClick(View viewClicked) {
-        if (mListener != null) {
-            EditText email_field = getActivity().findViewById(R.id.et_login_email);
-            EditText password_field = getActivity().findViewById(R.id.et_login_password);
-
-            String email = email_field.getText().toString();
-            String password = password_field.getText().toString();
-
-            Credentials.Builder credBuilder;
-            Credentials credentials;
-            switch (viewClicked.getId()) {
-                case R.id.btn_login_register:
-                    mListener.onRegisterClicked();
-                    break;
-                case R.id.btn_login_login:
-                    //Do something here.
-            }
-
-/*
-            switch (viewClicked.getId()) {
-                case R.id.btn_login_login:
-                    if (!email.equals("") && !password.equals("") && email.contains("@")) {
-                        //build credentials
-                        credBuilder = new Credentials.Builder(email, password);
-                        credentials = credBuilder.build();
-                        //build the web service URL
-                        Uri uri = new Uri.Builder()
-                                .scheme("https")
-                                .appendPath(getString(R.string.ep_base_url))
-                                .appendPath(getString(R.string.ep_login))
-                                .build();
-                        //build the JSONObject
-                        JSONObject msg = credentials.asJSONObject();
-                        mCredentials = credentials;
-                        //instantiate and execute the AsyncTask
-                        new SendPostAsyncTask.Builder(uri.toString(), msg)
-                                .onPreExecute(this::handleLoginOnPre)
-                                .onPostExecute(this::handleLoginOnPost)
-                                .onCancelled(this::handleErrorsInTask)
-                                .build().execute();
-//                        mListener.onLoginSuccess(credentials);
-                    } else {
-                        if (email.equals(""))
-                            email_field.setError(getString(R.string.loginRegister_missingField));
-                        if (password.equals(""))
-                            password_field.setError(getString(R.string.loginRegister_missingField));
-                        if (!email.contains("@"))
-                            email_field.setError(getString(R.string.loginRegister_invalidEmail));
-                        Log.d(TAG, "one of the fields was invalid");
-                    }
-                    break;
-                case R.id.btn_login_register:
-                    mListener.onRegisterClicked();
-                    break;
-                default:
-                    Log.wtf(TAG, "was something weird clicked?");
-            }*/
-        }
-
-    }
-
-
 
     /**
      * Handle the setup of the UI before the HTTP call to the webservice.
