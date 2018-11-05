@@ -1,12 +1,11 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.MainActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
@@ -18,7 +17,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
  * @version 1 November 2018
  */
 public class SignInActivity extends AppCompatActivity
-        implements LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener{
+        implements LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnRegisterFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +59,6 @@ public class SignInActivity extends AppCompatActivity
         transaction.commit();
     }
 
-    /**
-     * From {@link RegisterFragment}
-     *
-     * @param uri
-     */
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        openMain(new Credentials.Builder("", "").build()); //TODO get the real credentials
-    }
 
     /**
      * From {@link WaitFragment}
@@ -99,7 +89,12 @@ public class SignInActivity extends AppCompatActivity
 //            fm.popBackStack();
 //        }
         //TODO: look up how to clear an activity
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRegisterSuccess(Credentials c) {
+        openMain(c);
     }
 }

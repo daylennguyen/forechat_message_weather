@@ -116,6 +116,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
             Credentials.Builder credBuilder;
             Credentials credentials;
+            switch (viewClicked.getId()) {
+                case R.id.btn_login_register:
+                    mListener.onRegisterClicked();
+                    break;
+                case R.id.btn_login_login:
+                    //Do something here.
+            }
+
 /*
             switch (viewClicked.getId()) {
                 case R.id.btn_login_login:

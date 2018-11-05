@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+
+<resources tools:ignore="ExtraTranslation" xmlns:tools="http://schemas.android.com/tools">
     <!--ep_base_url-->
-    <!--ep_login-->
+    <string name="base_url">forechat-backend.herokuapp.com</string>
+    <string name="ep_register">register</string>
+
 </resources>
+
+    <!--ep_login-->
