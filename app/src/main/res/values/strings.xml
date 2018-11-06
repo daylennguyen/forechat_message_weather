@@ -6,25 +6,23 @@
     <string name="loginRegister_password">Password</string>
     <string name="login_login">Login</string>
     <string name="loginRegister_register">Register</string>
-    <!--<string name=""></string>-->
-    <!--<string name=""></string>-->
 
-    <!--SIGN IN ACTIVITY-->
     <string name="register_firstName">First Name</string>
     <string name="register_lastName">Last Name</string>
     <string name="register_userName">Username</string>
-
     <string name="register_passwordConfirm">Confirm Password</string>
 
+    <!--<string name=""></string>-->
+    <!--<string name=""></string>-->
 
-    <!--<string name=""></string>-->
-    <!--<string name=""></string>-->
 
     <!--HOME ACTIVITY-->
+    <string name="nav_home">Home</string>
     <string name="nav_contacts">Connections</string>
     <string name="nav_weather">Weather</string>
-    <string name="nav_about">About</string>
     <string name="nav_signout">Sign out</string>
+
+    <string name="action_logout">Logout</string>
     <!--<string name=""></string>-->
 
 
