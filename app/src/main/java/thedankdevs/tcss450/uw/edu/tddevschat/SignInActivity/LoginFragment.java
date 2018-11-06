@@ -1,6 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -202,6 +203,28 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences prefs =
+                getActivity().getSharedPreferences(
+                        getString(R.string.keys_shared_prefs),
+                        Context.MODE_PRIVATE);
+        //retrieve the stored credentials from SharedPrefs
+        if (prefs.contains(getString(R.string.keys_prefs_email)) &&
+                prefs.contains(getString(R.string.keys_prefs_password))) {
+            final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
+            final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
+            //Load the two login EditTexts with the credentials found in SharedPrefs
+            EditText emailEdit = getActivity().findViewById(R.id.et_login_email);
+            emailEdit.setText(email);
+            EditText passwordEdit = getActivity().findViewById(R.id.et_login_password);
+            passwordEdit.setText(password);
+            buildLoginServerCredentials(email, password);
+        }
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -218,6 +241,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
         mListener = null;
     }
+
+
 
     /**
      * Handle the setup of the UI before the HTTP call to the webservice.
@@ -238,6 +263,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             boolean success = resultsJSON.getBoolean("success");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
+                saveCredentials(mCredentials);
                 //Login was successful. Inform the Activity so it can do its thing.
                 mListener.onLoginSuccess(mCredentials);
             } else {
@@ -265,6 +291,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Log.e("ASYNCT_TASK_ERROR", result);
     }
 
+
+
+    private void saveCredentials(final Credentials credentials) {
+        SharedPreferences prefs =
+                getActivity().getSharedPreferences(
+                        getString(R.string.keys_shared_prefs),
+                        Context.MODE_PRIVATE);
+        //Store the credentials in SharedPrefs
+        prefs.edit().putString(getString(R.string.keys_prefs_email), credentials.getEmail()).apply();
+        prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
+    }
 
 
     /**
