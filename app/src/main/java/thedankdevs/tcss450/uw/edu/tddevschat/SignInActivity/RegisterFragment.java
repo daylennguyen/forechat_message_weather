@@ -220,7 +220,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnRegisterFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener{
-        // TODO: Update argument type and name
         void onRegisterSuccess(Credentials c); //Invoked when register was successful.
 
     }
