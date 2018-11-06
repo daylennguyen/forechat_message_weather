@@ -221,7 +221,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             emailEdit.setText(email);
             EditText passwordEdit = getActivity().findViewById(R.id.et_login_password);
             passwordEdit.setText(password);
-            buildLoginServerCredentials();
+            buildLoginServerCredentials(email, password);
         }
     }
 
