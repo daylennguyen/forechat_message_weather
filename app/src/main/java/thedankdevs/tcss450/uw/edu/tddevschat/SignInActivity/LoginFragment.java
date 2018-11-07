@@ -66,6 +66,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     private EditText mPasswordField;
 
+    /**
+     * The unique firebase token
+     */
+    private String mFirebaseToken;
+
     public LoginFragment() {
         // Required empty public constructor
     }
