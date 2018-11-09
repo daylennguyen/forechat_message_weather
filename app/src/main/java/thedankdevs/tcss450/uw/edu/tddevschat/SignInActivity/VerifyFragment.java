@@ -1,6 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity;
 
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,17 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
             }
         }
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof RegisterFragment.OnRegisterFragmentInteractionListener) {
+            mListener = (VerifyFragment.OnVerifyFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
     /**
      * Handle errors that may occur during the AsyncTask.
@@ -131,7 +143,7 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
                     .appendPath(getString((R.string.ep_verify)))
                     .build();
 
-            Log.w("URL for Register", uri.toString());
+            Log.w("URL for Verify", uri.toString());
 
             new SendPostAsyncTask.Builder(uri.toString(), msg)
                     .onPreExecute(this::handleVerifyOnPre)
