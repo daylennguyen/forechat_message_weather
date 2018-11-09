@@ -139,7 +139,6 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath(getString(R.string.base_url))
-                    .appendPath(getString(R.string.ep_register))
                     .appendPath(getString((R.string.ep_verify)))
                     .build();
 
