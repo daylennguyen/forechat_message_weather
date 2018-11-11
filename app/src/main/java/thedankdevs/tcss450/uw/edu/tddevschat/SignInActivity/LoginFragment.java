@@ -266,6 +266,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             Log.d("JSON result",result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
+            String verified = resultsJSON.getString("msg");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
                 saveCredentials(mCredentials);
@@ -275,6 +276,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 //Login was unsuccessful. Don’t switch fragments and inform the user
                 ((TextView) getView().findViewById(R.id.et_login_email))
                         .setError("Login Unsuccessful");
+                if (verified.equals("not verified")) {
+                    ((TextView) getView().findViewById(R.id.et_login_email))
+                            .setError("Not verified.");
+                }
             }
         } catch (JSONException e) {
             //It appears that the web service didn’t return a JSON formatted String

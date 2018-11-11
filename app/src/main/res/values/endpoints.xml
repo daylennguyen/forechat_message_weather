@@ -4,6 +4,7 @@
     <!--ep_base_url-->
     <string name="base_url">forechat-backend.herokuapp.com</string>
     <string name="ep_register">register</string>
+    <string name="ep_verify">verify</string>
     <string name="ep_login">login</string>
 
 </resources>

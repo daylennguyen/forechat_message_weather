@@ -17,7 +17,9 @@ import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
  * @version 1 November 2018
  */
 public class SignInActivity extends AppCompatActivity
-        implements LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnRegisterFragmentInteractionListener{
+        implements LoginFragment.OnFragmentInteractionListener,
+        RegisterFragment.OnRegisterFragmentInteractionListener,
+        VerifyFragment.OnVerifyFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,21 @@ public class SignInActivity extends AppCompatActivity
 
     @Override
     public void onRegisterSuccess(Credentials c) {
-        openMain(c);
+        VerifyFragment verificationFragment = new VerifyFragment();
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_signin_container, verificationFragment)
+                .addToBackStack(null);
+        // Commit the transaction
+        transaction.commit();
+        //openMain(c);
+    }
+
+    @Override
+    public void onVerificationSuccess() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+        //End this Activity and remove it from the Activity back stack.
+        finish();
     }
 }

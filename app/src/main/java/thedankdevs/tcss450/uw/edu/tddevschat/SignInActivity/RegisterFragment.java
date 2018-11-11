@@ -85,7 +85,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
      */
     private void handleRegisterOnPost(String result) {
         try {
-
             Log.d("JSON result register", result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
@@ -131,7 +130,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         EditText password_field = getActivity().findViewById(R.id.et_register_password);
         EditText passConfirm_field = getActivity().findViewById(R.id.et_register_passmatch);
 
-        boolean hasError = false; //Indicator for any of the erros in the EditTexts.
+        boolean hasError = false; //Indicator for any of the errors in the EditTexts.
         if (firstName_field.getText().toString().isEmpty()) {
             hasError = true;
             firstName_field.setError("Your first name is empty!");
