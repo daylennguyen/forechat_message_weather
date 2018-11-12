@@ -207,8 +207,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
-
     @Override
     public void onStart() {
         super.onStart();
@@ -273,7 +271,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mListener.onLoginSuccess(mCredentials);
             } else {
                 String verified = resultsJSON.getString("message");
-                if (verified.equals("NV")) {
+                if (verified.equals("NV")) { //If User's account was not verified, send another one.
                     resendVerificationCode();
                 } else {
                     //Login was unsuccessful. Don’t switch fragments and inform the user
@@ -313,7 +311,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
     }
 
-
+    /**
+     * This method  sends a verification email to the user's email while changing the verification code on
+     * the database for re-verification since the user might have not verified during registration.
+     * @Author  Emmett Kang
+     * @Version 11 November 2018
+     */
     private void resendVerificationCode () {
         Uri uri = new Uri.Builder()
                 .scheme("https")
@@ -321,9 +324,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .appendPath(getString(R.string.ep_resend_vericode))
                 .build();
         //build the JSONObject
-        JSONObject msg = mCredentials.asJSONObject();
+        JSONObject msg = mCredentials.asJSONObject(); //Create a JSONObject for credential.
 
-        //instantiate and execute the AsyncTask
+        //instantiate and execute the AsyncTask for sending new verification code.
         new SendPostAsyncTask.Builder(uri.toString(), msg)
                 .onPreExecute(this::handleSendVCOnPre)
                 .onPostExecute(this::handleSendVCOnPost)
@@ -334,11 +337,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
-
     private void handleSendVCOnPre() {
         mListener.onWaitFragmentInteractionShow();
     }
+
+    /**
+     * Check the result if email was sent.
+     * @param result is from the server side of the if sending email was a success.
+     * @Author  Emmett Kang
+     * @Version 11 November 2018
+     */
     private void handleSendVCOnPost(String result) {
         try {
             Log.d("JSON result after sending veri code",result);
@@ -346,11 +354,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             boolean success = resultsJSON.getBoolean("success");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
-                //Login was successful. Inform the Activity so it can do its thing.
+                //After sending the email, send the user to verification fragment.
                 mListener.onNotVerified(mCredentials);
             } else {
                     ((TextView) getView().findViewById(R.id.et_login_email))
-                            .setError("uh.. Unsuccessful");
+                            .setError("Sending email unsuccessful");
             }
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String

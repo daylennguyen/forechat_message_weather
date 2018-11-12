@@ -22,10 +22,16 @@ import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 /**
- * A simple {@link Fragment} subclass.
+ * This fragment is responsible for verifying user's email address. Once "VERIFY" button
+ * gets clicked, it will activate the webserver part of verification method and verify the
+ * status of the user. This class also provides options for resending verification code to
+ * the same user if they accidentally deleted it.
+ *
+ * @Author Emmett Kang
+ * @version 11 November 2018
  */
 public class VerifyFragment extends Fragment implements View.OnClickListener{
-
+    private Credentials mCredentials;
 
     /** Interaction listener to interact with the activity.*/
     private OnVerifyFragmentInteractionListener mListener;
@@ -38,11 +44,15 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle b = getArguments();
+        mCredentials = (Credentials) b.getSerializable(getString(R.string.key_credential));
         // Inflate the layout for this fragment
        View v = inflater.inflate(R.layout.fragment_verify, container, false);
-        Button registerButton = (Button) v.findViewById(R.id.btn_verify_verify);
-        registerButton.setOnClickListener(this); //Set click listener for the button.
+        Button verifyButton = (Button) v.findViewById(R.id.btn_verify_verify);
+        verifyButton.setOnClickListener(this); //Set click listener for the button.
 
+        Button resendButton = (Button) v.findViewById(R.id.btn_verify_resend);
+        resendButton.setOnClickListener(this); //Set click listener for the button.
        return v;
     }
 
@@ -53,6 +63,10 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
                 case R.id.btn_verify_verify:
                     attemptVerify(); //Try to verify
                     break;
+                case R.id.btn_verify_resend:
+                    resendVerificationCode();
+                    break;
+
             }
         }
 
@@ -95,10 +109,10 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
 
             mListener.onWaitFragmentInteractionHide();
             if (success) {
-                //Register was successful. Inform the Activity so it can do its thing.
-                  mListener.onVerificationSuccess();
+                //verification was successful. Inform the Activity so it can do its thing.
+                  mListener.onVerificationSuccess(mCredentials);
             } else {
-                //Register was unsuccessful. Don’t switch fragments and inform the user
+                //verification was unsuccessful. Don’t switch fragments and inform the user
                 ((TextView) getView().findViewById(R.id.et_verify_code))
                         .setError("Verification Unsuccessful");
             }
@@ -116,7 +130,12 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-
+    /**
+     * This is a helper method to attempt verification. This will get the verification code
+     * and activate the async task to verify if there are any user with the same verification code
+     * to be verified.
+     *
+     */
     private void attemptVerify() {
         EditText verificationCode_field = getActivity().findViewById(R.id.et_verify_code);
         boolean hasError = false; //Indicator for any of the errors in the EditTexts.
@@ -148,8 +167,62 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    /**
+     * When invoked, this method will send a new verification code to the user and
+     * Change the current verification code that is assigned to them to match the new one.
+     */
+    private void resendVerificationCode () {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString(R.string.ep_resend_vericode))
+                .build();
+        //build the JSONObject
+        JSONObject msg = mCredentials.asJSONObject();
+
+        //instantiate and execute the AsyncTask
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::handleSendVCOnPre)
+                .onPostExecute(this::handleSendVCOnPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build()
+                .execute();
+    }
+
+    private void handleSendVCOnPre() {
+        mListener.onWaitFragmentInteractionShow();
+    }
+
+    /**
+     * This asnyc task does not do anything other than returning if there was
+     * a success in sending the email containg the verificatoin code.
+     * @param result is a whether email was sent.
+     */
+    private void handleSendVCOnPost(String result) {
+        try {
+            Log.d("JSON result after sending veri code",result);
+            JSONObject resultsJSON = new JSONObject(result);
+            boolean success = resultsJSON.getBoolean("success");
+            mListener.onWaitFragmentInteractionHide();
+            if (success) {
+            } else {
+                ((TextView) getView().findViewById(R.id.et_login_email))
+                        .setError("uh.. Unsuccessful");
+            }
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+            mListener.onWaitFragmentInteractionHide();
+            ((TextView) getView().findViewById(R.id.et_login_email))
+                    .setError("Verification couldn't be sent");
+        }
+    }
+
     public interface OnVerifyFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener{
-        void onVerificationSuccess();
+        void onVerificationSuccess(Credentials c);
     }
 
 
