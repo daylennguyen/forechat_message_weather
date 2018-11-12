@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
@@ -43,6 +44,20 @@ public class SignInActivity extends AppCompatActivity
     @Override
     public void onLoginSuccess(Credentials credentials) {
         openMain(credentials);
+    }
+
+    @Override
+    public void onNotVerified(Credentials credentials) {
+        VerifyFragment verificationFragment = new VerifyFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(getString(R.string.key_credential), credentials);
+        verificationFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_signin_container, verificationFragment)
+                .addToBackStack(null);
+        // Commit the transaction
+        transaction.commit();
     }
 
     /**

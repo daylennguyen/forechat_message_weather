@@ -155,6 +155,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         } else if (password_field.getText().toString().compareToIgnoreCase(passConfirm_field.getText().toString()) != 0) {
             hasError = true;
             passConfirm_field.setError("Your password does not match!");
+        } else if (!email_field.getText().toString().contains("@")) {
+            hasError = true;
+            email_field.setError("Your email must be a valid email.");
         }
         if (!hasError) {
             //Build the credentials

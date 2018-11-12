@@ -263,26 +263,26 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     private void handleLoginOnPost(String result) {
         try {
-            Log.d("JSON result",result);
+            Log.d("JSON result login",result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
-            String verified = resultsJSON.getString("msg");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
                 saveCredentials(mCredentials);
                 //Login was successful. Inform the Activity so it can do its thing.
                 mListener.onLoginSuccess(mCredentials);
             } else {
-                //Login was unsuccessful. Don’t switch fragments and inform the user
-                ((TextView) getView().findViewById(R.id.et_login_email))
-                        .setError("Login Unsuccessful");
-                if (verified.equals("not verified")) {
+                String verified = resultsJSON.getString("message");
+                if (verified.equals("NV")) {
+                    resendVerificationCode();
+                } else {
+                    //Login was unsuccessful. Don’t switch fragments and inform the user
                     ((TextView) getView().findViewById(R.id.et_login_email))
-                            .setError("Not verified.");
+                            .setError("Login Unsuccessful");
                 }
             }
         } catch (JSONException e) {
-            //It appears that the web service didn’t return a JSON formatted String
+            //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
             Log.e("JSON_PARSE_ERROR", result
                     + System.lineSeparator()
@@ -314,6 +314,56 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
 
+    private void resendVerificationCode () {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString(R.string.ep_resend_vericode))
+                .build();
+        //build the JSONObject
+        JSONObject msg = mCredentials.asJSONObject();
+
+        //instantiate and execute the AsyncTask
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::handleSendVCOnPre)
+                .onPostExecute(this::handleSendVCOnPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build()
+                .execute();
+
+
+    }
+
+
+
+    private void handleSendVCOnPre() {
+        mListener.onWaitFragmentInteractionShow();
+    }
+    private void handleSendVCOnPost(String result) {
+        try {
+            Log.d("JSON result after sending veri code",result);
+            JSONObject resultsJSON = new JSONObject(result);
+            boolean success = resultsJSON.getBoolean("success");
+            mListener.onWaitFragmentInteractionHide();
+            if (success) {
+                //Login was successful. Inform the Activity so it can do its thing.
+                mListener.onNotVerified(mCredentials);
+            } else {
+                    ((TextView) getView().findViewById(R.id.et_login_email))
+                            .setError("uh.. Unsuccessful");
+            }
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+            mListener.onWaitFragmentInteractionHide();
+            ((TextView) getView().findViewById(R.id.et_login_email))
+                    .setError("Verification couldn't be sent");
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -322,6 +372,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     public interface OnFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener {
         void onLoginSuccess(Credentials credentials);
+        void onNotVerified(Credentials credentials);
         void onRegisterClicked();
     }
 }

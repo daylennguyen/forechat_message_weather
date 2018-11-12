@@ -15,8 +15,9 @@
     <string name="register_verify_text">Enter the verification code from your email:</string>
     <string name="register_verify">Verify</string>
     <string name="register_verify_hint">Verification Code</string>
-    <string name="register_verify_explain">To complete your registration, please enter your email verification code!</string>
+    <string name="register_verify_explain">To complete your registration, please check your email!</string>
     <string name="register_verify_title">ALMOST THERE!</string>
+
 
     <!--<string name=""></string>-->
     <!--<string name=""></string>-->

@@ -39,9 +39,7 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
        View v = inflater.inflate(R.layout.fragment_verify, container, false);
-
         Button registerButton = (Button) v.findViewById(R.id.btn_verify_verify);
         registerButton.setOnClickListener(this); //Set click listener for the button.
 
@@ -53,7 +51,6 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_verify_verify:
-                    //if button is a register button from register fragment,
                     attemptVerify(); //Try to verify
                     break;
             }
@@ -92,7 +89,7 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
     private void handleVerifyOnPost(String result) {
         try {
 
-            Log.d("JSON result verify", result);
+            Log.d("JSON result verify: ", result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
 
@@ -100,7 +97,6 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
             if (success) {
                 //Register was successful. Inform the Activity so it can do its thing.
                   mListener.onVerificationSuccess();
-                    Log.w("YASS", "YEEEEEHAW");
             } else {
                 //Register was unsuccessful. Don’t switch fragments and inform the user
                 ((TextView) getView().findViewById(R.id.et_verify_code))
