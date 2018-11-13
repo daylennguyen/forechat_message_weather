@@ -9,6 +9,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
@@ -16,12 +17,12 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ConnectionFragment.OnFragmentInteractionListener} interface
+ * {@link ConnectionFragment.OnConnectionFragmentInteractionListener} interface
  * to handle interaction events.
  *
  * @author Michelle Brown
  */
-public class ConnectionFragment extends Fragment {
+public class ConnectionFragment extends Fragment implements View.OnClickListener {
 
     private String mEmail;
     private String mUsername;
@@ -31,7 +32,7 @@ public class ConnectionFragment extends Fragment {
 
     private View mChatButton;
 
-    private OnFragmentInteractionListener mListener;
+    private OnConnectionFragmentInteractionListener mListener;
 
     public ConnectionFragment() {}
 
@@ -52,6 +53,8 @@ public class ConnectionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_connection, container, false);
+        Button chatButton = (Button) v.findViewById(R.id.btn_connection_openchat);
+        chatButton.setOnClickListener(this);
         mChatButton = v.findViewById(R.id.btn_connection_openchat);
         return v;
     }
@@ -72,8 +75,8 @@ public class ConnectionFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnConnectionFragmentInteractionListener) {
+            mListener = (OnConnectionFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -86,9 +89,15 @@ public class ConnectionFragment extends Fragment {
         mListener = null;
     }
 
-    public void onButtonPressed(Uri uri) {
+ 
+    @Override
+    public void onClick(View v) {
         if (mListener != null) {
-            mListener.onOpenChatInteraction(mChatID, mEmail);
+            switch (v.getId()) {
+                case R.id.btn_connection_openchat:
+                    mListener.onOpenChatInteraction(mChatID, mEmail);
+                    break;
+            }
         }
     }
 

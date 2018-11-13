@@ -133,7 +133,9 @@ public class SignInActivity extends AppCompatActivity
 //            fm.popBackStack();
 //        }
         //TODO: look up how to clear an activity
+
         Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra(getString(R.string.key_credential), credentials);
         startActivity(intent);
         //End this Activity and remove it from the Activity back stack.
         finish();

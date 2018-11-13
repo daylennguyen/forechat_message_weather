@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity
         HomeFragment.OnFragmentInteractionListener,
         WeatherFragment.OnFragmentInteractionListener,
         ConnectionsFragment.OnListFragmentInteractionListener,
-        ConnectionFragment.OnFragmentInteractionListener,
+        ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener
 {
 
@@ -52,7 +52,7 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+/*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +60,7 @@ public class HomeActivity extends AppCompatActivity
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
 //        SharedPreferences prefs =
 //                getSharedPreferences(
@@ -167,7 +167,15 @@ public class HomeActivity extends AppCompatActivity
                     .addToBackStack(null);
             // Commit the transaction
             transaction.commit();
+        } else if (id == R.id.nav_chat) {
+            ChatFragment chatFragment = new ChatFragment();
+            FragmentTransaction transaction = getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_home_container, chatFragment)
+                    .addToBackStack(null);
+            transaction.commit();
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -305,6 +313,8 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
-        //TODO: open chat fragment here
+        ChatFragment chatFragment = new ChatFragment();
+        loadFragment(chatFragment);
+        //Where is this coming from??
     }
 }
