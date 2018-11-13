@@ -4,12 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -50,6 +47,14 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        if(savedInstanceState == null) {
+            if (findViewById(R.id.frame_home_container) != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.frame_home_container, new HomeFragment())
+                        .commit();
+            }
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 /*
@@ -124,12 +129,7 @@ public class HomeActivity extends AppCompatActivity
             HomeFragment homeFragment = new HomeFragment();
             Bundle args = new Bundle();
             homeFragment.setArguments(args);
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_home_container, homeFragment)
-                    .addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            loadFragment(homeFragment);
         } else if  (id == R.id.nav_connections) {
             /*Uri uri = new Uri.Builder()
                     .scheme("https")
@@ -145,10 +145,10 @@ public class HomeActivity extends AppCompatActivity
             //Send dummy data
             ArrayList<Connection> connections = new ArrayList<>();
             for(int i = 0; i < 5; i++) {
-                connections.add(new Connection.Builder("email"+ i +"@fake.com", "DankDev")
+                connections.add(new Connection.Builder("email@fake.com", "DankDev")
                         .addFirstName("John")
                         .addLastName("Doe")
-                        .addChatID(1)
+                        //.addChatID(1)
                         .build());
             }
             //open fragment
@@ -157,25 +157,16 @@ public class HomeActivity extends AppCompatActivity
             Fragment frag = new ConnectionsFragment();
             frag.setArguments(args);
             loadFragment(frag);
+
         } else if (id == R.id.nav_weather) {
             WeatherFragment weatherFragment = new WeatherFragment();
             Bundle args = new Bundle();
             weatherFragment.setArguments(args);
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_home_container, weatherFragment)
-                    .addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            loadFragment(weatherFragment);
         } else if (id == R.id.nav_chat) {
             ChatFragment chatFragment = new ChatFragment();
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_home_container, chatFragment)
-                    .addToBackStack(null);
-            transaction.commit();
+            loadFragment(chatFragment);
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -313,6 +304,7 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
+        //TODO: show wait fragment and connect to endpoints-------------------------------------------
         ChatFragment chatFragment = new ChatFragment();
         loadFragment(chatFragment);
         //Where is this coming from??

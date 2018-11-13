@@ -30,8 +30,6 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     private String mLastName;
     private int mChatID;
 
-    private View mChatButton;
-
     private OnConnectionFragmentInteractionListener mListener;
 
     public ConnectionFragment() {}
@@ -54,8 +52,12 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_connection, container, false);
         Button chatButton = (Button) v.findViewById(R.id.btn_connection_openchat);
+        if (mChatID > 0) {
+            chatButton.setText(R.string.connection_chatinitialized);
+        } else {
+            chatButton.setText(R.string.connection_chatuninitialized);
+        }
         chatButton.setOnClickListener(this);
-        mChatButton = v.findViewById(R.id.btn_connection_openchat);
         return v;
     }
 
@@ -107,7 +109,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnConnectionFragmentInteractionListener {
         void onOpenChatInteraction(int chatID, String email);
     }
 }
