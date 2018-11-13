@@ -17,6 +17,7 @@ public class Connection implements Serializable {
     private final String mUsername;
     private final String mFirstName;
     private final String mLastName;
+    private final int mChatID;
 
     /**
      * Helper class for building Connections.
@@ -29,6 +30,7 @@ public class Connection implements Serializable {
         private final String mUsername;
         private String mFirstName = "";
         private String mLastName = "";
+        private int mChatID = -1;
 
 
         /**
@@ -43,7 +45,7 @@ public class Connection implements Serializable {
         }
 
         /**
-         * Add an optional something to the connection.
+         * Add an optional last name to the connection.
          * @param val an optional first name for the connection
          * @return the Builder of this Connection
          */
@@ -53,12 +55,22 @@ public class Connection implements Serializable {
         }
 
         /**
-         * Add an optional something to the connection.
+         * Add an optional last name to the connection.
          * @param val an optional last name for the connection
          * @return the Builder of this Connection
          */
         public Builder addLastName(final String val) {
             mLastName = val;
+            return this;
+        }
+
+        /**
+         * Add an optional chatID to the connection.
+         * @param val an optional chatID for the connection
+         * @return the Builder of this Connection
+         */
+        public Builder addChatID(final int val) {
+            mChatID = val;
             return this;
         }
 
@@ -83,6 +95,7 @@ public class Connection implements Serializable {
         this.mUsername = builder.mUsername;
         this.mFirstName = builder.mFirstName;
         this.mLastName = builder.mLastName;
+        this.mChatID = builder.mChatID;
     }
 
     public String getEmail() {
@@ -99,5 +112,9 @@ public class Connection implements Serializable {
 
     public String getLastName() {
         return mLastName;
+    }
+
+    public int getChatID() {
+        return mChatID;
     }
 }

@@ -148,6 +148,7 @@ public class HomeActivity extends AppCompatActivity
                 connections.add(new Connection.Builder("email"+ i +"@fake.com", "DankDev")
                         .addFirstName("John")
                         .addLastName("Doe")
+                        .addChatID(1)
                         .build());
             }
             //open fragment
@@ -271,8 +272,7 @@ public class HomeActivity extends AppCompatActivity
 
 
     /**
-     * Does something when something was clicked in
-     * {@link HomeFragment} or {@link ConnectionFragment}
+     * Does something when something was clicked in {@link HomeFragment}
      * @param uri
      */
     @Override
@@ -298,4 +298,12 @@ public class HomeActivity extends AppCompatActivity
         loadFragment(connectionFragment);
     }
 
+    /**
+     * Does something when something was clicked in {@link ConnectionFragment}
+     * @param chatID
+     */
+    @Override
+    public void onOpenChatInteraction(int chatID, String email) {
+        //TODO: open chat fragment here
+    }
 }

@@ -27,6 +27,7 @@ public class ConnectionFragment extends Fragment {
     private String mUsername;
     private String mFirstName;
     private String mLastName;
+    private int mChatID;
 
     private View mChatButton;
 
@@ -42,6 +43,7 @@ public class ConnectionFragment extends Fragment {
             mUsername = getArguments().getString(getString(R.string.key_connection_username));
             mFirstName = getArguments().getString(getString(R.string.key_connection_first));
             mLastName = getArguments().getString(getString(R.string.key_connection_last));
+            mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
         }
     }
 
@@ -84,10 +86,9 @@ public class ConnectionFragment extends Fragment {
         mListener = null;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri); //TODO: pass something useful
+            mListener.onOpenChatInteraction(mChatID, mEmail);
         }
     }
 
@@ -98,7 +99,6 @@ public class ConnectionFragment extends Fragment {
      * activity.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onOpenChatInteraction(int chatID, String email);
     }
 }
