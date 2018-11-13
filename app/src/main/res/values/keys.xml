@@ -8,4 +8,10 @@
     <string name="keys_prefs_email">traffic_light_wont_let_me_through</string>
     <string name="keys_prefs_password">see_the_city_see_the_zoo</string>
 
+    <!--Connections-->
+    <string name="key_connection_email">connection email</string>
+    <string name="key_connection_username">connection username</string>
+    <string name="key_connection_first">connection first</string>
+    <string name="key_connection_last">connection last</string>
+
 </resources>
