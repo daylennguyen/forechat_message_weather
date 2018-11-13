@@ -31,6 +31,9 @@
     <string name="nav_signout">Sign out</string>
     <string name="nav_chat">Chat</string>
     <string name="action_logout">Logout</string>
+
+    <string name="connection_chatinitialized">Open Chat</string>
+    <string name="connection_chatuninitialized">New Chat</string>
     <!--<string name=""></string>-->
 
 

@@ -48,11 +48,12 @@ public class ConnectionsFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mConnections = (ArrayList<Connection>) getArguments().getSerializable(ARG_CONNECTIONS_LIST);
+            mConnections = (ArrayList) getArguments().getSerializable(ARG_CONNECTIONS_LIST);
         }
     }
 

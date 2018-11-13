@@ -128,12 +128,6 @@ public class SignInActivity extends AppCompatActivity
     }
 
     private void openMain(Credentials credentials) {
-//        FragmentManager fm = getSupportFragmentManager();
-//        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-//            fm.popBackStack();
-//        }
-        //TODO: look up how to clear an activity
-
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(getString(R.string.key_credential), credentials);
         startActivity(intent);
