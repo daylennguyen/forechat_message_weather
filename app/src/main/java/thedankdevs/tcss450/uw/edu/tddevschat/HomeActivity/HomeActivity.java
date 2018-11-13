@@ -294,6 +294,7 @@ public class HomeActivity extends AppCompatActivity
         args.putSerializable(getString(R.string.key_connection_username), item.getUsername());
         args.putSerializable(getString(R.string.key_connection_first), item.getFirstName());
         args.putSerializable(getString(R.string.key_connection_last), item.getLastName());
+        args.putSerializable(getString(R.string.key_connection_chatID), item.getChatID());
         connectionFragment.setArguments(args);
         loadFragment(connectionFragment);
     }
