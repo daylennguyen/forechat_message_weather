@@ -29,7 +29,7 @@
     <string name="nav_contacts">Connections</string>
     <string name="nav_weather">Weather</string>
     <string name="nav_signout">Sign out</string>
-
+    <string name="nav_chat">Chat</string>
     <string name="action_logout">Logout</string>
     <!--<string name=""></string>-->
 
