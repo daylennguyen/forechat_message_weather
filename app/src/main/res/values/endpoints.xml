@@ -3,8 +3,16 @@
 <resources tools:ignore="ExtraTranslation" xmlns:tools="http://schemas.android.com/tools">
     <!--ep_base_url-->
     <string name="base_url">forechat-backend.herokuapp.com</string>
+
     <string name="ep_register">register</string>
     <string name="ep_login">login</string>
+
+    <string name="ep_connections">connections</string>
+    <string name="ep_getConnections">getConnections</string>
+    <!--<string name="ep_"></string>-->
+
+    <string name="ep_messaging">messaging</string>
+    <!--<string name="ep_"></string>-->
 
 </resources>
 

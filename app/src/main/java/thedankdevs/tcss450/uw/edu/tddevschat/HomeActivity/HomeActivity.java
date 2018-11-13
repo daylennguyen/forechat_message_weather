@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,13 +20,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.dummy.DummyContent;
-import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.utils.GetAsyncTask;
+
+/**
+ *
+ *
+ */
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        WeatherFragment.OnFragmentInteractionListener, ConnectionFragment.OnListFragmentInteractionListener,
-        HomeFragment.OnFragmentInteractionListener{
+        HomeFragment.OnFragmentInteractionListener,
+        WeatherFragment.OnFragmentInteractionListener,
+        ConnectionsFragment.OnListFragmentInteractionListener,
+        ConnectionFragment.OnFragmentInteractionListener,
+        WaitFragment.OnFragmentInteractionListener
+{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +95,8 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -93,7 +115,6 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -110,15 +131,32 @@ public class HomeActivity extends AppCompatActivity
             // Commit the transaction
             transaction.commit();
         } else if  (id == R.id.nav_connections) {
-            ConnectionFragment connectionFragment = new ConnectionFragment();
+            /*Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(getString(R.string.base_url))
+                    .appendPath(getString(R.string.ep_connections))
+                    .appendPath(getString(R.string.ep_getConnections)) //TODO: get correct endpoints
+                    .build();
+            new GetAsyncTask.Builder(uri.toString())
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleConnectionsGetOnPostExecute)
+                    .build().execute();
+                    */
+            //Send dummy data
+            ArrayList<Connection> connections = new ArrayList<>();
+            for(int i = 0; i < 5; i++) {
+                connections.add(new Connection.Builder("email"+ i +"@fake.com", "DankDev")
+                        .addFirstName("John")
+                        .addLastName("Doe")
+                        .build());
+            }
+            //open fragment
             Bundle args = new Bundle();
-            connectionFragment.setArguments(args);
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_home_container, connectionFragment)
-                    .addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
+            Fragment frag = new ConnectionsFragment();
+            frag.setArguments(args);
+            onWaitFragmentInteractionHide();
+            loadFragment(frag);
         } else if (id == R.id.nav_weather) {
             WeatherFragment weatherFragment = new WeatherFragment();
             Bundle args = new Bundle();
@@ -135,6 +173,70 @@ public class HomeActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+
+    private void handleConnectionsGetOnPostExecute(String result) {
+        //parse JSON
+        try {
+            JSONObject root = new JSONObject(result);
+            if (root.has("response")) {
+                JSONObject response = root.getJSONObject("response");
+                if (response.has("data")) {
+                    JSONArray data = response.getJSONArray("data");
+                    ArrayList<Connection> connections = new ArrayList<>();
+                    for(int i = 0; i < data.length(); i++) {
+                        JSONObject jsonConnection = data.getJSONObject(i);
+                        connections.add(new Connection.Builder(jsonConnection.getString("email"),
+                                jsonConnection.getString("username"))
+                                .addFirstName(jsonConnection.getString("firstName"))
+                                .addLastName(jsonConnection.getString("lastName"))
+                                .build());
+                    }
+                    Bundle args = new Bundle();
+                    args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
+                    Fragment frag = new ConnectionsFragment();
+                    frag.setArguments(args);
+                    onWaitFragmentInteractionHide();
+                    loadFragment(frag);
+                } else {
+                    Log.e("ERROR!", "No data array");
+                    //notify user
+                    onWaitFragmentInteractionHide();
+                }
+            } else {
+                Log.e("ERROR!", "No response");
+                //notify user
+                onWaitFragmentInteractionHide();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("ERROR!", e.getMessage());
+            //notify user
+            onWaitFragmentInteractionHide();
+        }
+    }
+
+
+
+
+    @Override
+    public void onWaitFragmentInteractionShow() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_home_container, new WaitFragment(), "WAIT")
+                .addToBackStack(null)
+                .commit();
+    }
+    @Override
+    public void onWaitFragmentInteractionHide() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentByTag("WAIT"))
+                .commit();
+    }
+
 
 
 
@@ -157,14 +259,44 @@ public class HomeActivity extends AppCompatActivity
 
 
 
+    private void loadFragment(Fragment frag) {
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_home_container, frag)
+                .addToBackStack(null);
+        // Commit the transaction
+        transaction.commit();
+    }
 
+
+
+
+    /**
+     * Does something when something was clicked in
+     * {@link HomeFragment} or {@link ConnectionFragment}
+     * @param uri
+     */
     @Override
     public void onFragmentInteraction(Uri uri) {
         //TODO do something
     }
 
+    /**
+     * Opens a Connection fragment for the corresponding connection
+     * that was clicked on in {@link ConnectionsFragment}
+     *
+     * @param item
+     */
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-        //TODO do something
+    public void onListFragmentInteraction(Connection item) {
+        ConnectionFragment connectionFragment = new ConnectionFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(getString(R.string.key_connection_email), item.getEmail());
+        args.putSerializable(getString(R.string.key_connection_username), item.getUsername());
+        args.putSerializable(getString(R.string.key_connection_first), item.getFirstName());
+        args.putSerializable(getString(R.string.key_connection_last), item.getLastName());
+        connectionFragment.setArguments(args);
+        loadFragment(connectionFragment);
     }
+
 }

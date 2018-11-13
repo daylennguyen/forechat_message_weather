@@ -1,4 +1,4 @@
-package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
+package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,23 +6,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.ConnectionFragment.OnListFragmentInteractionListener;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.dummy.DummyContent.DummyItem;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment.OnListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Connection} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ *
+ * @author Michelle Brown
  */
-public class MyConnectionRecyclerViewAdapter extends RecyclerView.Adapter<MyConnectionRecyclerViewAdapter.ViewHolder> {
+public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyConnectionsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Connection> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyConnectionRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyConnectionsRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -30,15 +31,14 @@ public class MyConnectionRecyclerViewAdapter extends RecyclerView.Adapter<MyConn
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_connection, parent, false);
+                .inflate(R.layout.fragment_connections, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mUsername.setText(mValues.get(position).getUsername());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,22 +57,18 @@ public class MyConnectionRecyclerViewAdapter extends RecyclerView.Adapter<MyConn
         return mValues.size();
     }
 
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mUsername;
+        public Connection mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mUsername = (TextView) view.findViewById(R.id.tv_connectionslist_username);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
     }
 }
