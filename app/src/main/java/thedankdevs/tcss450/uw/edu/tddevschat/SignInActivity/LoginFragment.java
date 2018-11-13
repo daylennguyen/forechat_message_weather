@@ -207,8 +207,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
-
     @Override
     public void onStart() {
         super.onStart();
@@ -263,7 +261,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     private void handleLoginOnPost(String result) {
         try {
-            Log.d("JSON result",result);
+            Log.d("JSON result login",result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
             mListener.onWaitFragmentInteractionHide();
@@ -272,12 +270,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 //Login was successful. Inform the Activity so it can do its thing.
                 mListener.onLoginSuccess(mCredentials);
             } else {
-                //Login was unsuccessful. Don’t switch fragments and inform the user
-                ((TextView) getView().findViewById(R.id.et_login_email))
-                        .setError("Login Unsuccessful");
+                String verified = resultsJSON.getString("message");
+                if (verified.equals("NV")) { //If User's account was not verified, send another one.
+                    resendVerificationCode();
+                } else {
+                    //Login was unsuccessful. Don’t switch fragments and inform the user
+                    ((TextView) getView().findViewById(R.id.et_login_email))
+                            .setError("Login Unsuccessful");
+                }
             }
         } catch (JSONException e) {
-            //It appears that the web service didn’t return a JSON formatted String
+            //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
             Log.e("JSON_PARSE_ERROR", result
                     + System.lineSeparator()
@@ -308,6 +311,66 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
     }
 
+    /**
+     * This method  sends a verification email to the user's email while changing the verification code on
+     * the database for re-verification since the user might have not verified during registration.
+     * @Author  Emmett Kang
+     * @Version 11 November 2018
+     */
+    private void resendVerificationCode () {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString(R.string.ep_resend_vericode))
+                .build();
+        //build the JSONObject
+        JSONObject msg = mCredentials.asJSONObject(); //Create a JSONObject for credential.
+
+        //instantiate and execute the AsyncTask for sending new verification code.
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::handleSendVCOnPre)
+                .onPostExecute(this::handleSendVCOnPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build()
+                .execute();
+
+
+    }
+
+    private void handleSendVCOnPre() {
+        mListener.onWaitFragmentInteractionShow();
+    }
+
+    /**
+     * Check the result if email was sent.
+     * @param result is from the server side of the if sending email was a success.
+     * @Author  Emmett Kang
+     * @Version 11 November 2018
+     */
+    private void handleSendVCOnPost(String result) {
+        try {
+            Log.d("JSON result after sending veri code",result);
+            JSONObject resultsJSON = new JSONObject(result);
+            boolean success = resultsJSON.getBoolean("success");
+            mListener.onWaitFragmentInteractionHide();
+            if (success) {
+                //After sending the email, send the user to verification fragment.
+                mListener.onNotVerified(mCredentials);
+            } else {
+                    ((TextView) getView().findViewById(R.id.et_login_email))
+                            .setError("Sending email unsuccessful");
+            }
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+            mListener.onWaitFragmentInteractionHide();
+            ((TextView) getView().findViewById(R.id.et_login_email))
+                    .setError("Verification couldn't be sent");
+        }
+    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -317,6 +380,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     public interface OnFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener {
         void onLoginSuccess(Credentials credentials);
+        void onNotVerified(Credentials credentials);
         void onRegisterClicked();
     }
 }

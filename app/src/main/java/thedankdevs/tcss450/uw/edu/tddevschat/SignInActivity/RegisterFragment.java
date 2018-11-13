@@ -85,7 +85,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
      */
     private void handleRegisterOnPost(String result) {
         try {
-
             Log.d("JSON result register", result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
@@ -94,11 +93,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             if (success) {
                 //Register was successful. Inform the Activity so it can do its thing.
                 mListener.onRegisterSuccess(mCredentials);
-
             } else {
+                String details = resultsJSON.getString("detail");
                 //Register was unsuccessful. Don’t switch fragments and inform the user
                 ((TextView) getView().findViewById(R.id.et_register_email))
-                        .setError("Register Unsuccessful");
+                        .setError(details);
             }
 
         } catch (JSONException e) {
@@ -131,7 +130,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         EditText password_field = getActivity().findViewById(R.id.et_register_password);
         EditText passConfirm_field = getActivity().findViewById(R.id.et_register_passmatch);
 
-        boolean hasError = false; //Indicator for any of the erros in the EditTexts.
+        boolean hasError = false; //Indicator for any of the errors in the EditTexts.
         if (firstName_field.getText().toString().isEmpty()) {
             hasError = true;
             firstName_field.setError("Your first name is empty!");
@@ -156,6 +155,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         } else if (password_field.getText().toString().compareToIgnoreCase(passConfirm_field.getText().toString()) != 0) {
             hasError = true;
             passConfirm_field.setError("Your password does not match!");
+        } else if (!email_field.getText().toString().contains("@")) {
+            hasError = true;
+            email_field.setError("Your email must be a valid email.");
         }
         if (!hasError) {
             //Build the credentials
