@@ -155,7 +155,6 @@ public class HomeActivity extends AppCompatActivity
             args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
             Fragment frag = new ConnectionsFragment();
             frag.setArguments(args);
-            onWaitFragmentInteractionHide();
             loadFragment(frag);
         } else if (id == R.id.nav_weather) {
             WeatherFragment weatherFragment = new WeatherFragment();
