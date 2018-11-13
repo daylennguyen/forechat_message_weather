@@ -148,6 +148,7 @@ public class HomeActivity extends AppCompatActivity
                 connections.add(new Connection.Builder("email"+ i +"@fake.com", "DankDev")
                         .addFirstName("John")
                         .addLastName("Doe")
+                        .addChatID(1)
                         .build());
             }
             //open fragment
@@ -279,6 +280,15 @@ public class HomeActivity extends AppCompatActivity
 
 
     /**
+     * Does something when something was clicked in {@link HomeFragment}
+     * @param uri
+     */
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        //TODO do something
+    }
+
+    /**
      * Opens a Connection fragment for the corresponding connection
      * that was clicked on in {@link ConnectionsFragment}
      *
@@ -292,20 +302,17 @@ public class HomeActivity extends AppCompatActivity
         args.putSerializable(getString(R.string.key_connection_username), item.getUsername());
         args.putSerializable(getString(R.string.key_connection_first), item.getFirstName());
         args.putSerializable(getString(R.string.key_connection_last), item.getLastName());
+        args.putSerializable(getString(R.string.key_connection_chatID), item.getChatID());
         connectionFragment.setArguments(args);
         loadFragment(connectionFragment);
     }
 
-
-
+    /**
+     * Does something when something was clicked in {@link ConnectionFragment}
+     * @param chatID
+     */
     @Override
-    public void onConnectionFragmentInteraction() {
-        ChatFragment chatFragment = new ChatFragment();
-        loadFragment(chatFragment);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onOpenChatInteraction(int chatID, String email) {
         ChatFragment chatFragment = new ChatFragment();
         loadFragment(chatFragment);
         //Where is this coming from??

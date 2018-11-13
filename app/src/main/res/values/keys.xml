@@ -13,5 +13,6 @@
     <string name="key_connection_username">connection username</string>
     <string name="key_connection_first">connection first</string>
     <string name="key_connection_last">connection last</string>
+    <string name="key_connection_chatID">connection chatID</string>
 
 </resources>

@@ -28,6 +28,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     private String mUsername;
     private String mFirstName;
     private String mLastName;
+    private int mChatID;
 
     private View mChatButton;
 
@@ -43,6 +44,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
             mUsername = getArguments().getString(getString(R.string.key_connection_username));
             mFirstName = getArguments().getString(getString(R.string.key_connection_first));
             mLastName = getArguments().getString(getString(R.string.key_connection_last));
+            mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
         }
     }
 
@@ -87,19 +89,13 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         mListener = null;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-             //TODO: pass something useful
-        }
-    }
-
+ 
     @Override
     public void onClick(View v) {
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_connection_openchat:
-                    mListener.onConnectionFragmentInteraction();
+                    mListener.onOpenChatInteraction(mChatID, mEmail);
                     break;
             }
         }
@@ -111,8 +107,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnConnectionFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onConnectionFragmentInteraction();
+    public interface OnFragmentInteractionListener {
+        void onOpenChatInteraction(int chatID, String email);
     }
 }
