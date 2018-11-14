@@ -19,7 +19,10 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.function.Consumer;
+
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
@@ -30,11 +33,13 @@ public class ChatFragment extends Fragment {
 
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private static final String TAG = "CHAT_FRAG";
-    private static final String CHAT_ID = "1";
+  //  private static final String CHAT_ID = "1";
     private TextView mMessageOutputTextView;
     private EditText mMessageInputEditText;
     private String mEmail;
     private String mSendUrl;
+    private int mChatID;
+    private Credentials mCredentials;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -44,6 +49,11 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //mEmail = getArguments().getString(getString(R.string.key_connection_email));
+
+        mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
+        mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
+        mEmail = mCredentials.getEmail();
 
         View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
         mMessageOutputTextView = rootLayout.findViewById(R.id.tv_chat_display);
@@ -72,15 +82,23 @@ public class ChatFragment extends Fragment {
                 .appendPath(getString(R.string.ep_messaging_send))
                 .build()
                 .toString();
+
+        Log.w("HERE? ", mSendUrl);
+
     }
 
     private void handleSendClick(final View theButton) {
         String msg = mMessageInputEditText.getText().toString();
+        Log.w("YASS ", String.valueOf(mChatID));
+        Log.w("YASS ", mEmail);
+        Log.w("YASS ", msg);
+
         JSONObject messageJson = new JSONObject();
+
         try {
             messageJson.put("email", mEmail);
             messageJson.put("message", msg);
-            messageJson.put("chatId", CHAT_ID);
+            messageJson.put("chatID", mChatID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -92,11 +110,14 @@ public class ChatFragment extends Fragment {
 
     private void endOfSendMsgTask(final String result) {
         try {
+            Log.w("IS IT HERE", result);
             //This is the result from the web service
             JSONObject res = new JSONObject(result);
+
             if (res.has("success") && res.getBoolean("success")) {
                 //The web service got our message. Time to clear out the input EditText
                 mMessageInputEditText.setText("");
+
                 //its up to you to decide if you want to send the message to the output here
 //or wait for the message to come back from the web service.
             }
@@ -120,6 +141,7 @@ public class ChatFragment extends Fragment {
             getActivity().unregisterReceiver(mFirebaseMessageReciever);
         }
     }
+
     /**
      * A BroadcastReceiver setup to listen for messages sent from
      MyFirebaseMessagingService

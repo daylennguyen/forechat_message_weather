@@ -28,7 +28,9 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Connection
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.GetAsyncTask;
+import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 /**
  *
@@ -40,13 +42,16 @@ public class HomeActivity extends AppCompatActivity
         WeatherFragment.OnFragmentInteractionListener,
         ConnectionsFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
-        WaitFragment.OnFragmentInteractionListener
-{
+        WaitFragment.OnFragmentInteractionListener {
 
+    private Credentials mCredential;
+    private  int mChatID = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
+
         if(savedInstanceState == null) {
             if (findViewById(R.id.frame_home_container) != null) {
                 getSupportFragmentManager().beginTransaction()
@@ -305,8 +310,107 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
         //TODO: show wait fragment and connect to endpoints-------------------------------------------
-        ChatFragment chatFragment = new ChatFragment();
-        loadFragment(chatFragment);
+        Bundle bundle = new Bundle();
+        createNewChat();
+       /* ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(bundle);
+        bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
+        bundle.putSerializable(getString(R.string.key_connection_email), email);
+        bundle.putSerializable(getString(R.string.key_credential), mCredential);
+        loadFragment(chatFragment);*/
         //Where is this coming from??
     }
+
+    private void createNewChat() {
+        JSONObject chatName = new JSONObject();
+        try {
+            chatName.put("name", "messaging room");
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_messaging)))
+                .appendPath(getString(R.string.ep_messaging_new))
+                .build();
+        Log.w("URL for create new chat:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), chatName)
+                .onPostExecute(this::handleNewChatPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleNewChatPost(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray temp = resultsJSON.getJSONArray("newChatID");
+            JSONObject tempContent = temp.getJSONObject(0);
+            mChatID = tempContent.getInt("chatid");
+            Log.w("CHATID", String.valueOf(mChatID));
+            loadNewChat();
+
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+        }
+    }
+
+    private void addChatters(int chatID, String email) {
+        JSONObject chatterInfo = new JSONObject();
+        Log.w("Adding", email);
+        Log.w("Adding", String.valueOf(chatID));
+        try {
+            chatterInfo.put("chatID", chatID);
+            chatterInfo.put("email", email);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_messaging)))
+                .appendPath(getString(R.string.ep_messaging_add))
+                .build();
+        Log.w("URL for create new chat:", uri.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
+                .onPostExecute(this::handleAddChattersPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleAddChattersPost(String result) {
+        try {
+            Log.w("JSON result adding peeps", result);
+            JSONObject resultsJSON = new JSONObject(result);
+            boolean didIt = resultsJSON.getBoolean("success");
+            if (didIt) {
+                Log.w("Adding", "YAY WE DID IT");
+            } else {
+                Log.w("Adding", "DARN IT, IT DIDN'T WORK");
+            }
+
+        } catch (JSONException e){
+
+        }
+    }
+
+    private void loadNewChat() {
+        addChatters(mChatID, "mcb35@uw.edu");
+        addChatters(mChatID, mCredential.getEmail());
+        ChatFragment chatFragment = new ChatFragment();
+        Bundle bundle = new Bundle();
+        chatFragment.setArguments(bundle);
+        bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
+        //   bundle.putSerializable(getString(R.string.key_connection_email), email);
+        bundle.putSerializable(getString(R.string.key_credential), mCredential);
+        loadFragment(chatFragment);
+
+
+    }
+
 }

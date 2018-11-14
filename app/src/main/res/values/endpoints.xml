@@ -16,6 +16,9 @@
 
     <string name="ep_messaging">messaging</string>
     <string name="ep_messaging_send">send</string>
+    <string name="ep_messaging_new">new</string>
+    <string name="ep_messaging_add">add</string>
+
     <!--<string name="ep_"></string>-->
 
 </resources>
