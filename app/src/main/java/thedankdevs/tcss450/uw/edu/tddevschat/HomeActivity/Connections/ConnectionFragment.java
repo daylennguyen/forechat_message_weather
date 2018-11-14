@@ -1,11 +1,8 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +29,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
 
     private View mChatButton;
 
-    private OnConnectionFragmentInteractionListener mListener;
+    protected OnConnectionFragmentInteractionListener mListener;
 
     public ConnectionFragment() {}
 
@@ -53,7 +50,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_connection, container, false);
-        Button chatButton = (Button) v.findViewById(R.id.btn_connection_openchat);
+        Button chatButton = v.findViewById(R.id.btn_connection_openchat);
         chatButton.setOnClickListener(this);
         mChatButton = v.findViewById(R.id.btn_connection_openchat);
         return v;
@@ -107,7 +104,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnConnectionFragmentInteractionListener {
         void onOpenChatInteraction(int chatID, String email);
     }
 }
