@@ -3,19 +3,34 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorLightestGrey</item>
-        <item name="colorPrimaryDark">@color/colorDarkestGrey</item>
-        <item name="colorAccent">@color/colorMedPurple</item>
-        <item name="android:colorBackground">@android:color/background_light</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorLightPurple</item>
+        <item name="colorPrimaryDark">@color/colorDarkestGrey</item>
+        <item name="colorAccent">@color/colorMedPurple</item>
+        <item name="android:statusBarColor">@color/colorLightPurple</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:windowBackground">@color/colorLightestGrey</item>
+        <item name="android:navigationBarColor">@color/colorLightPurple</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <!--<style name="AppTheme.NoActionBar">-->
+    <!--<item name="windowActionBar">false</item>-->
+    <!--<item name="windowNoTitle">true</item>-->
+    <!--<item name="android:statusBarColor">@color/colorMedPurple</item>-->
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <!--</style>-->
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:navigationBarColor">@color/colorLightPurple</item>
+
+
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:navigationBarColor">@color/colorLightPurple</item>
+
+
+    </style>
 
 </resources>

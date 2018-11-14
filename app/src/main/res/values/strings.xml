@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TDDevsChat</string>
+    <string name="app_name">forechat</string>
 
     <!--SIGN IN ACTIVITY-->
     <string name="loginRegister_email">Email</string>
@@ -50,5 +50,6 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="todo">TODO</string>
 
 </resources>
