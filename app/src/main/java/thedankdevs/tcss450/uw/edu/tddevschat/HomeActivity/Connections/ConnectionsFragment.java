@@ -6,12 +6,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
@@ -24,7 +24,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  *
  * @author Michelle Brown
  */
-public class ConnectionsFragment extends Fragment {
+public class ConnectionsFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     private ArrayList<Connection> mConnections;
     public static final String ARG_CONNECTIONS_LIST = "connections list";
@@ -72,6 +72,7 @@ public class ConnectionsFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             recyclerView.setAdapter(new MyConnectionsRecyclerViewAdapter(mConnections, mListener));
+
         }
         return view;
     }
@@ -92,6 +93,16 @@ public class ConnectionsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        return false;
     }
 
 
