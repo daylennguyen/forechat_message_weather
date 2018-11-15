@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +20,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.function.Consumer;
+import java.util.Objects;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
@@ -48,13 +49,19 @@ public class ChatFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //mEmail = getArguments().getString(getString(R.string.key_connection_email));
 
-        mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
-        mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
-        mEmail = mCredentials.getEmail();
+        if (getArguments() != null) {
+            mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
+        }
+        if (getArguments() != null) {
+            mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
+        }
+        if (mCredentials != null) {
+            mEmail = mCredentials.getEmail();
+        }
 
         View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -69,7 +76,7 @@ public class ChatFragment extends Fragment {
     public void onStart() {
         super.onStart();
         SharedPreferences prefs =
-                getActivity().getSharedPreferences(
+                Objects.requireNonNull(getActivity()).getSharedPreferences(
                         getString(R.string.keys_shared_prefs),
                         Context.MODE_PRIVATE);
         if (prefs.contains(getString(R.string.keys_prefs_email))) {
@@ -135,13 +142,13 @@ public class ChatFragment extends Fragment {
             mFirebaseMessageReciever = new FirebaseMessageReciever();
         }
         IntentFilter iFilter = new IntentFilter(MyFirebaseMessagingService.RECEIVED_NEW_MESSAGE);
-        getActivity().registerReceiver(mFirebaseMessageReciever, iFilter);
+        Objects.requireNonNull(getActivity()).registerReceiver(mFirebaseMessageReciever, iFilter);
     }
     @Override
     public void onPause() {
         super.onPause();
         if (mFirebaseMessageReciever != null){
-            getActivity().unregisterReceiver(mFirebaseMessageReciever);
+            Objects.requireNonNull(getActivity()).unregisterReceiver(mFirebaseMessageReciever);
         }
     }
 
@@ -156,7 +163,7 @@ public class ChatFragment extends Fragment {
             Log.i("FCM Chat Frag", "start onRecieve");
             if(intent.hasExtra("DATA")) {
                 String data = intent.getStringExtra("DATA");
-                JSONObject jObj = null;
+                JSONObject jObj;
                 try {
                     jObj = new JSONObject(data);
                     if(jObj.has("message") && jObj.has("sender")) {
