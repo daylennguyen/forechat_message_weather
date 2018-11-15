@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -117,16 +120,29 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_login_login:
                 String email = mEmailField.getText().toString();
                 String password = mPasswordField.getText().toString();
-                if (!isLoginValid(email, password)) {
+                getFirebaseToken(email, password);
+              /*  if (!isLoginValid(email, password)) {
                     break;
                 }
-                buildLoginServerCredentials(email, password);
+                buildLoginServerCredentials(email, password);*/
                 // mListener is attached in handleLoginOnPost();
                 break;
             default:
                 Log.e(TAG, "Error when button is clicked in Login Fragment");
         }
     }
+
+
+    private void doLogin(String email, String password) {
+        Boolean valid = isLoginValid(email, password);
+        if (valid) {
+            buildLoginServerCredentials(email, password);
+        } else {
+            Log.w("Login Valid", "It ain't valid fam");
+        }
+
+    }
+
 
     /**
      * Validates the strings for email and password. If invalid, an error is set
@@ -191,10 +207,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .scheme("https")
                 .appendPath(getString(R.string.base_url))
                 .appendPath(getString(R.string.ep_login))
+                .appendPath(getString(R.string.ep_with_token))
                 .build();
 
         //build the JSONObject
         JSONObject msg = mCredentials.asJSONObject();
+
+        try {
+            msg.put("token", mFirebaseToken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         //instantiate and execute the AsyncTask
         new SendPostAsyncTask.Builder(uri.toString(), msg)
@@ -224,7 +248,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             emailEdit.setText(email);
             EditText passwordEdit = getActivity().findViewById(R.id.et_login_password);
             passwordEdit.setText(password);
-            buildLoginServerCredentials(email, password);
+            getFirebaseToken(email, password);
+            //buildLoginServerCredentials(email, password);
+
         }
     }
 
@@ -237,6 +263,28 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    private void getFirebaseToken(final String email, final String password) {
+        mListener.onWaitFragmentInteractionShow();
+        //add this app on this device to listen for the topic all
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
+        //the call to getInstanceId happens asynchronously. task is an onCompleteListener
+        //similar to a promise in JS.
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM: ", "getInstanceId failed", task.getException());
+                        mListener.onWaitFragmentInteractionHide();
+                        return;
+                    }
+                    // Get new Instance ID token
+                    mFirebaseToken = task.getResult().getToken();
+                    Log.d("FCM: ", mFirebaseToken);
+                    //the helper method that initiates login service
+                    doLogin(email, password);
+                });
+                //no code here. wait for the Task to complete.
     }
 
     @Override
@@ -354,6 +402,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             boolean success = resultsJSON.getBoolean("success");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
+
                 //After sending the email, send the user to verification fragment.
                 mListener.onNotVerified(mCredentials);
             } else {

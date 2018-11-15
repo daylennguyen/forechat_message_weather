@@ -32,6 +32,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 public class ChatFragment extends Fragment {
 
     private FirebaseMessageReciever mFirebaseMessageReciever;
+
     private static final String TAG = "CHAT_FRAG";
   //  private static final String CHAT_ID = "1";
     private TextView mMessageOutputTextView;
@@ -56,8 +57,10 @@ public class ChatFragment extends Fragment {
         mEmail = mCredentials.getEmail();
 
         View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
+
         mMessageOutputTextView = rootLayout.findViewById(R.id.tv_chat_display);
         mMessageInputEditText = rootLayout.findViewById(R.id.et_chat_message);
+
         rootLayout.findViewById(R.id.btn_chat_send).setOnClickListener(this::handleSendClick);
         return rootLayout;
     }
@@ -159,7 +162,7 @@ public class ChatFragment extends Fragment {
                     if(jObj.has("message") && jObj.has("sender")) {
                         String sender = jObj.getString("sender");
                         String msg = jObj.getString("message");
-                        mMessageOutputTextView.append(sender + ":" + msg);
+                        mMessageOutputTextView.append(sender + ": " + msg);
                         mMessageOutputTextView.append(System.lineSeparator());
                         mMessageOutputTextView.append(System.lineSeparator());
                         Log.i("FCM Chat Frag", sender + " " + msg);

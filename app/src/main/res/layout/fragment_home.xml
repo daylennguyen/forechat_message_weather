@@ -15,8 +15,9 @@
         android:layout_width="342dp"
         android:layout_height="216dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
         android:src="@drawable/ic_logo_full_appname"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="73dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

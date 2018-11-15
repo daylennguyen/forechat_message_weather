@@ -3,6 +3,7 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -17,10 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
@@ -245,20 +249,7 @@ public class HomeActivity extends AppCompatActivity
 
 
     private void logout() {
-        SharedPreferences prefs =
-                getSharedPreferences(
-                        getString(R.string.keys_shared_prefs),
-                        Context.MODE_PRIVATE);
-        //remove the saved credentials from StoredPrefs
-        prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
-        prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
-        //close the app
-        finishAndRemoveTask();
-        //or close this activity and bring back the Login
-        // Intent i = new Intent(this, MainActivity.class);
-        // startActivity(i);
-        // End this Activity and remove it from the Activity back stack.
-        // finish();
+        new DeleteTokenAsyncTask().execute();
     }
 
 
@@ -310,8 +301,13 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
         //TODO: show wait fragment and connect to endpoints-------------------------------------------
-        Bundle bundle = new Bundle();
-        createNewChat();
+        chatID = 25;
+        if (chatID == -1) {
+            createNewChat();
+        } else {
+            mChatID = chatID;
+            loadNewChat();
+        }
        /* ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
@@ -334,6 +330,7 @@ public class HomeActivity extends AppCompatActivity
                 .appendPath(getString((R.string.ep_messaging)))
                 .appendPath(getString(R.string.ep_messaging_new))
                 .build();
+
         Log.w("URL for create new chat:", uri.toString());
         new SendPostAsyncTask.Builder(uri.toString(), chatName)
                 .onPostExecute(this::handleNewChatPost)
@@ -348,6 +345,8 @@ public class HomeActivity extends AppCompatActivity
             JSONObject tempContent = temp.getJSONObject(0);
             mChatID = tempContent.getInt("chatid");
             Log.w("CHATID", String.valueOf(mChatID));
+            addChatters(mChatID, "mcb35@uw.edu");
+            addChatters(mChatID, mCredential.getEmail());
             loadNewChat();
 
         } catch (JSONException e) {
@@ -400,17 +399,51 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void loadNewChat() {
-        addChatters(mChatID, "mcb35@uw.edu");
-        addChatters(mChatID, mCredential.getEmail());
         ChatFragment chatFragment = new ChatFragment();
         Bundle bundle = new Bundle();
-        chatFragment.setArguments(bundle);
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
         //   bundle.putSerializable(getString(R.string.key_connection_email), email);
         bundle.putSerializable(getString(R.string.key_credential), mCredential);
+
+        chatFragment.setArguments(bundle);
         loadFragment(chatFragment);
 
 
+    }
+
+    // Deleting the InstanceId (Firebase token) must be done asynchronously. Good thing
+// we have something that allows us to do that.
+    class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            onWaitFragmentInteractionShow();
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+//since we are already doing stuff in the background, go ahead
+//and remove the credentials from shared prefs here.
+            SharedPreferences prefs =
+                    getSharedPreferences(
+                            getString(R.string.keys_shared_prefs),
+                            Context.MODE_PRIVATE);
+            prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+            prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+            try {
+//this call must be done asynchronously.
+                FirebaseInstanceId.getInstance().deleteInstanceId();
+            } catch (IOException e) {
+                Log.e("FCM", "Delete error!");
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+//close the app
+            finishAndRemoveTask();
+        }
     }
 
 }
