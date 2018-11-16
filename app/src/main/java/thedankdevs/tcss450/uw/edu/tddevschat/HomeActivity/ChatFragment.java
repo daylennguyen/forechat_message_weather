@@ -155,17 +155,25 @@ public class ChatFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Log.i("FCM Chat Frag", "start onRecieve");
             if(intent.hasExtra("DATA")) {
+
                 String data = intent.getStringExtra("DATA");
+                Log.w("FCM DATA", data);
                 JSONObject jObj = null;
                 try {
                     jObj = new JSONObject(data);
                     if(jObj.has("message") && jObj.has("sender")) {
                         String sender = jObj.getString("sender");
                         String msg = jObj.getString("message");
-                        mMessageOutputTextView.append(sender + ": " + msg);
-                        mMessageOutputTextView.append(System.lineSeparator());
-                        mMessageOutputTextView.append(System.lineSeparator());
-                        Log.i("FCM Chat Frag", sender + " " + msg);
+                        String chatID = jObj.getString("chatID");
+                        Log.w("YASS", chatID);
+                        Log.w("FCM YAAAA", chatID);
+                        int cid = Integer.parseInt(chatID);
+                        if (cid == mChatID) {
+                            Log.i("FCM Chat Frag", sender + " " + msg);
+                            mMessageOutputTextView.append(sender + ": " + msg);
+                            mMessageOutputTextView.append(System.lineSeparator());
+                            mMessageOutputTextView.append(System.lineSeparator());
+                        }
                     }
                 } catch (JSONException e) {
                     Log.e("JSON PARSE", e.toString());
