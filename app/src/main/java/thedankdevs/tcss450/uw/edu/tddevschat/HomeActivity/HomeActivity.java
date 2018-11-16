@@ -129,7 +129,6 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new HomeFragment();
                 break;
             case R.id.nav_connections:
-                fragment = new HomeFragment();
                 ArrayList<Connection> connections = new ArrayList<>();
                 for (int i = 0; i < 5; i++) {
                     connections.add(new Connection.Builder("email@fake.com", "DankDev")
@@ -139,14 +138,13 @@ public class HomeActivity extends AppCompatActivity
                             .build());
                 }
                 args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
-                Fragment frag = new ConnectionsFragment();
-                frag.setArguments(args);
+                fragment = new ConnectionsFragment();
+                fragment.setArguments(args);
                 break;
             case R.id.nav_weather:
                 fragment = new WeatherDateFragment();
                 break;
             case R.id.nav_chat:
-                fragment = new ChatFragment();
                 break;
             case R.id.nav_settings:
                 fragment = new SettingsFragment();
@@ -280,10 +278,55 @@ public class HomeActivity extends AppCompatActivity
             createNewChat();
         } else {
             mChatID = chatID;
-            loadNewChat();
+            loadOldChats();
+            //loadNewChat();
         }
         /*Snippet 3 placed on end*/
 
+    }
+
+    private void loadOldChats() {
+        JSONObject chatterInfo = new JSONObject();
+        try {
+            chatterInfo.put("email", mCredential.getEmail());
+            chatterInfo.put("chatID", mChatID);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_messaging)))
+                .appendPath(getString(R.string.ep_getAllMessages))
+                .build();
+
+        Log.w("URL for getting all chat:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
+                .onPostExecute(this::handleOldChatPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+
+    }
+
+    private void handleOldChatPost(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray temp = resultsJSON.getJSONArray("messages");
+            Log.w("here?", temp.toString());
+
+            Bundle bundle = new Bundle();
+
+            bundle.putString(getString(R.string.key_json_array), temp.toString());
+            loadNewChat(bundle);
+
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+        }
     }
 
     private void createNewChat() {
@@ -316,7 +359,10 @@ public class HomeActivity extends AppCompatActivity
             Log.w("CHATID", String.valueOf(mChatID));
             addChatters(mChatID, "mcb35@uw.edu");
             addChatters(mChatID, mCredential.getEmail());
-            loadNewChat();
+
+
+            Bundle bundle = new Bundle();
+            loadNewChat(bundle);
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -367,13 +413,11 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    private void loadNewChat() {
+    private void loadNewChat(Bundle bundle) {
         ChatFragment chatFragment = new ChatFragment();
-        Bundle bundle = new Bundle();
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
         //   bundle.putSerializable(getString(R.string.key_connection_email), email);
         bundle.putSerializable(getString(R.string.key_credential), mCredential);
-
         chatFragment.setArguments(bundle);
         loadFragment(chatFragment);
     }

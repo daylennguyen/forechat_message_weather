@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,6 +61,28 @@ public class ChatFragment extends Fragment {
 
         mMessageOutputTextView = rootLayout.findViewById(R.id.tv_chat_display);
         mMessageInputEditText = rootLayout.findViewById(R.id.et_chat_message);
+
+        JSONArray pastChat;
+        String pastChatString = getArguments().getString(getString(R.string.key_json_array));
+        Log.w("YASSS", pastChatString);
+        if (pastChatString != null) {
+            try {
+                 pastChat = new JSONArray(pastChatString);
+
+                for (int i = pastChat.length()-1; i >= 0; i--) {
+                    JSONObject message = pastChat.getJSONObject(i);
+                    String sender = message.getString("email");
+                    String msg = message.getString("message");
+                    mMessageOutputTextView.append(sender + ": " + msg);
+                    mMessageOutputTextView.append(System.lineSeparator());
+                    mMessageOutputTextView.append(System.lineSeparator());
+                }
+            } catch (JSONException e) {
+                Log.w("cant make it", "DARN IT");
+            }
+        }
+
+
 
         rootLayout.findViewById(R.id.btn_chat_send).setOnClickListener(this::handleSendClick);
         return rootLayout;
