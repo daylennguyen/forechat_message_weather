@@ -19,6 +19,7 @@ public class Connection implements Serializable {
     private final String mLastName;
     private final int mChatID;
 
+
     /**
      * Helper class for building Connections.
      *
