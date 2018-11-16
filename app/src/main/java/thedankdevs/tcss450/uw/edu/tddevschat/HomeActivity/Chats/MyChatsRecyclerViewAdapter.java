@@ -6,11 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment.OnListFragmentInteractionListener;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
-
 import java.util.List;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment.OnListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
@@ -65,7 +64,7 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mName = (TextView) view.findViewById(R.id.tv_chatslist_name);
+            mName = view.findViewById(R.id.tv_chatslist_name);
         }
     }
 }

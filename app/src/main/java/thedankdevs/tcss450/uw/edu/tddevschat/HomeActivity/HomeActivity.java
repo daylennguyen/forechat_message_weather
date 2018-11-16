@@ -31,11 +31,11 @@ import java.util.Objects;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.dummy.WeatherData;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
@@ -47,7 +47,6 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener,
         WeatherDateFragment.OnListFragmentInteractionListener,
-//        WeatherFragment.OnFragmentInteractionListener,
         ConnectionsFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener {
@@ -123,12 +122,13 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         Bundle args = new Bundle();
         Fragment fragment = new HomeFragment();
-
+        /*depending on the ID of the nav_item, route them to the appropriate fragment*/
         switch (item.getItemId()) {
             case R.id.nav_home:
                 fragment = new HomeFragment();
                 break;
             case R.id.nav_connections:
+                /*Retrieve the list of connections*/
                 ArrayList<Connection> connections = new ArrayList<>();
                 for (int i = 0; i < 5; i++) {
                     connections.add(new Connection.Builder("email@fake.com", "DankDev")
@@ -137,6 +137,8 @@ public class HomeActivity extends AppCompatActivity
                             .addChatID(1)
                             .build());
                 }
+
+                /*add them to the args to be passed to the fragment*/
                 args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
                 fragment = new ConnectionsFragment();
                 fragment.setArguments(args);
@@ -152,9 +154,14 @@ public class HomeActivity extends AppCompatActivity
             default:
 
         }
+
+        /*Send the args to the fragment before displaying*/
         fragment.setArguments(args);
+        /*display the fragment*/
         loadFragment(fragment);
         /* Snippet 2 removed and placed at end. */
+
+        /*after we display the fragment, close the drawer*/
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -205,6 +212,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onWaitFragmentInteractionShow() {
+        /*displays the wait fragment to the user, meaning that something is loading*/
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.frame_home_container, new WaitFragment(), "WAIT")
@@ -214,18 +222,20 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onWaitFragmentInteractionHide() {
+        /*remove the wait fragment that is displayed; meaning that something is done loading*/
         getSupportFragmentManager()
                 .beginTransaction()
                 .remove(Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag("WAIT")))
                 .commit();
     }
 
-
+    /*Signs the user out of the current account*/
     private void logout() {
         new DeleteTokenAsyncTask().execute();
     }
 
 
+    /*Helper method to load an instance of the given fragment into the current activity*/
     private void loadFragment(Fragment frag) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
@@ -272,7 +282,7 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
-        //TODO: show wait fragment and connect to endpoints-------------------------------------------
+        /*TODO: show wait fragment and connect to endpoints------*/
         chatID = 25;
         if (chatID == -1) {
             createNewChat();
@@ -284,6 +294,7 @@ public class HomeActivity extends AppCompatActivity
         /*Snippet 3 placed on end*/
     }
 
+    /*Retrieves the previous chats the user was apart of*/
     private void loadOldChats() {
         JSONObject chatterInfo = new JSONObject();
         try {
@@ -422,7 +433,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWeatherListItemFragmentInteraction(WeatherData.WeatherDate item) {
+    public void onWeatherListItemFragmentInteraction(WeatherDate item) {
 
     }
 
