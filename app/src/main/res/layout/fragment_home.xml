@@ -8,15 +8,18 @@
     android:background="@color/colorLightGrey"
     tools:context=".HomeActivity.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="342dp"
-        android:layout_height="216dp"
+        android:layout_width="331dp"
+        android:layout_height="213dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
+        android:background="@color/common_google_signin_btn_text_light_focused"
+        android:padding="11dp"
         android:src="@drawable/ic_logo_full_appname"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

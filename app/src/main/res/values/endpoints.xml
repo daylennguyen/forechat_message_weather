@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources tools:ignore="ExtraTranslation" xmlns:tools="http://schemas.android.com/tools">
-    <!--ep_base_url-->
+    <!--________________Base url________________________________-->
     <string name="base_url">forechat-backend.herokuapp.com</string>
 
+
+    <!--________________User Registration and login________________-->
+    <string name="ep_login">login</string>
     <string name="ep_register">register</string>
     <string name="ep_verify">verify</string>
     <string name="ep_reverify">reverify</string>
     <string name="ep_resend_vericode">resendvericode</string>
-    <string name="ep_login">login</string>
+
+
     <string name="ep_with_token">with_token</string>
     <string name="ep_getAllMessages">getAllMessages</string>
     <string name="ep_connections">connections</string>
     <string name="ep_getConnections">getConnections</string>
     <!--<string name="ep_"></string>-->
 
+    <!--________________Messaging________________-->
     <string name="ep_messaging">messaging</string>
     <string name="ep_messaging_send">send</string>
     <string name="ep_messaging_new">new</string>
     <string name="ep_messaging_add">add</string>
 
-    <!--<string name="ep_"></string>-->
+    <!--________________Weather________________-->
+    <string name="ep_weather">weather</string>
 
 </resources>
 

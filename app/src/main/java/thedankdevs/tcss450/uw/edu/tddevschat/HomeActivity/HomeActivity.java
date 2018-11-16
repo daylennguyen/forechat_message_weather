@@ -35,7 +35,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFra
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.dummy.DummyContent;
+import thedankdevs.tcss450.uw.edu.tddevschat.dummy.WeatherData;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
@@ -282,7 +282,6 @@ public class HomeActivity extends AppCompatActivity
             //loadNewChat();
         }
         /*Snippet 3 placed on end*/
-
     }
 
     private void loadOldChats() {
@@ -423,7 +422,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWeatherListItemFragmentInteraction(DummyContent.DummyItem item) {
+    public void onWeatherListItemFragmentInteraction(WeatherData.WeatherDate item) {
 
     }
 

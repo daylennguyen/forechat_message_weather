@@ -12,19 +12,19 @@ import java.util.List;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment.OnListFragmentInteractionListener;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
-import thedankdevs.tcss450.uw.edu.tddevschat.dummy.DummyContent.DummyItem;
+import thedankdevs.tcss450.uw.edu.tddevschat.dummy.WeatherData.WeatherDate;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link WeatherDate} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyWeatherDateRecyclerViewAdapter extends RecyclerView.Adapter<MyWeatherDateRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<WeatherDate> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    MyWeatherDateRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    MyWeatherDateRecyclerViewAdapter(List<WeatherDate> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -38,17 +38,15 @@ public class MyWeatherDateRecyclerViewAdapter extends RecyclerView.Adapter<MyWea
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
-//        holder.mAvgTxtView.setText("avg");
-        holder.mDateTxtView.setText(R.string.date_sampl_weath);
-        holder.mLoTxtView.setText(R.string.lo_sampl_weath);
-        holder.mHiTxtView.setText(R.string.hi_sampl_weath);
-        holder.mAvgTxtView.setText(R.string.avg_sampl_weath);
-        holder.mConditionTxtView.setText(R.string.condi_sampl_weath);
-//        holder.mImg.set
+
+        holder.mDateTxtView.setText(mValues.get(position).mDateTxtView);
+        holder.mLoTxtView.setText(String.format("Lo: %s", Double.toString(mValues.get(position).mLoTxtView)));
+        holder.mHiTxtView.setText(String.format("Hi: %s", Double.toString(mValues.get(position).mHiTxtView)));
+        holder.mAvgTxtView.setText(String.format("Avg:%s", Double.toString(mValues.get(position).mAvgTxtView)));
+        holder.mConditionTxtView.setText(mValues.get(position).mConditionTxtView);
+        /*TODO set the img for the weather*/
         holder.mView.setOnClickListener(v -> {
             if (null != mListener) {
                 // Notify the active callbacks interface (the activity, if the
@@ -71,7 +69,7 @@ public class MyWeatherDateRecyclerViewAdapter extends RecyclerView.Adapter<MyWea
         final TextView mAvgTxtView;
         final TextView mConditionTxtView;
         final ImageView mImg;
-        DummyItem mItem;
+        WeatherDate mItem;
 
         public ViewHolder(View view) {
             super(view);
