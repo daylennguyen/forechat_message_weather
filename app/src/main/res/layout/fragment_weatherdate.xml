@@ -16,16 +16,15 @@
 
         <ImageView
             android:id="@+id/weather_img"
-            android:layout_width="65dp"
+            android:layout_width="78dp"
             android:layout_height="78dp"
-            android:contentDescription="@string/weather_image"
-            android:src="@drawable/c02d" />
+            android:layout_margin="10dp"
+            android:contentDescription="@string/weather_image" />
 
         <LinearLayout
             android:id="@+id/Day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="6dp">

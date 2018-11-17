@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="32dp"
     android:layout_marginTop="16dp"
     android:layout_marginRight="32dp"
     android:background="@color/colorLightestGrey"
-    android:orientation="horizontal">
-
-    <Button
-        android:id="@+id/button"
-        style="@style/Widget.AppCompat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:text="+" />
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tv_chatslist_name"
+        android:id="@+id/tv_chatslist_chatName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/colorDarkPurple"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_chatslist_chatReceiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:gravity="center"
+        android:paddingTop="0dp"
+        android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceListItem" />
 
 </LinearLayout>

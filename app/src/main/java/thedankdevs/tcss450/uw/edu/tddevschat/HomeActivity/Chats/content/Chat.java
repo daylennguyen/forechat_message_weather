@@ -14,18 +14,70 @@ import java.util.ArrayList;
  */
 public class Chat implements Serializable {
 
-    private final String mName;
+    private final String mChatName;
     private final int mChatID;
     private ArrayList<String> mMemberEmails;
 
     private Chat(String name, int chatID, String firstMemberEmail) {
-        this.mName = name;
+        mMemberEmails = new ArrayList<>();
+        this.mChatName = name;
         this.mChatID = chatID;
         this.mMemberEmails.add(firstMemberEmail);
     }
 
-    public String getName() {
-        return mName;
+    /**
+     * Helper class for building Connections.
+     *
+     * @author Michelle Brown
+     */
+    public static class Builder {
+
+        private final String mChatName;
+        private final int mChatID;
+        private ArrayList<String> mMemberEmails;
+
+
+        /**
+         * Constructs a new Builder.
+         *
+         * @param chatName
+         * @param firstMemberEmail email
+         * @param chatID
+         */
+        public Builder(String chatName, String firstMemberEmail, int chatID) {
+            mMemberEmails = new ArrayList<>();
+            this.mChatName = chatName;
+            this.mMemberEmails.add(firstMemberEmail);
+            this.mChatID = chatID;
+        }
+
+
+
+        /*
+         * Add an optional something to the connection.
+         * @param val an optional something for the connection
+         * @return the Builder of this Connection
+         */
+/*        public Builder addSomething(final String val) {
+            mSomething = val;
+            return this;
+        }*/
+
+        public Chat build() {
+            return new Chat(this);
+        }
+
+    }
+
+    private Chat(final Chat.Builder builder) {
+        this.mMemberEmails = builder.mMemberEmails;
+        this.mChatID = builder.mChatID;
+        this.mChatName = builder.mChatName;
+    }
+
+
+    public String getChatName() {
+        return mChatName;
     }
 
     public int getChatID() {

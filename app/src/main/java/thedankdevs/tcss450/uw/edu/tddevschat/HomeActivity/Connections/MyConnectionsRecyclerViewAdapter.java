@@ -6,11 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment.OnListFragmentInteractionListener;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
-
-import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Connection} and makes a call to the
@@ -67,7 +67,7 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mUsername = (TextView) view.findViewById(R.id.tv_connectionslist_username);
+            mUsername = view.findViewById(R.id.tv_connectionslist_username);
         }
 
     }
