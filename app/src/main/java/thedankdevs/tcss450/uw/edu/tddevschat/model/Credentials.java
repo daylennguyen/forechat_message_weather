@@ -21,6 +21,7 @@ public class Credentials implements Serializable {
     private final String mUsername;
     private final String mPassword;
 
+    private int mMemberID;
     private String mFirstName;
     private String mLastName;
     private String mEmail;
@@ -35,6 +36,7 @@ public class Credentials implements Serializable {
         private final String mPassword;
         private final String mEmail;
 
+        private int mMemberID;
         private String mFirstName = "";
         private String mLastName = "";
         private String mUsername = "";
@@ -51,6 +53,17 @@ public class Credentials implements Serializable {
         public Builder(String email, String password) {
             mEmail = email;
             mPassword = password;
+        }
+
+
+        /**
+         * Add an optional first name.
+         * @param val an optional first name
+         * @return
+         */
+        public Builder addMemberID(final int val) {
+            mMemberID = val;
+            return this;
         }
 
 
@@ -98,6 +111,7 @@ public class Credentials implements Serializable {
     private Credentials(final Builder builder) {
         mUsername = builder.mUsername;
         mPassword = builder.mPassword;
+        mMemberID = builder.mMemberID;
         mFirstName = builder.mFirstName;
         mLastName = builder.mLastName;
         mEmail = builder.mEmail;
@@ -117,6 +131,14 @@ public class Credentials implements Serializable {
      */
     public String getPassword() {
         return mPassword;
+    }
+
+    /**
+     * Get the memberID
+     * @return the memberID
+     */
+    public int getMemberID() {
+        return mMemberID;
     }
 
     /**
