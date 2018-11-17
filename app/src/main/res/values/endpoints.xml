@@ -36,6 +36,11 @@
     <string name="ep_weather_icon">https://www.weatherbit.io/static/img/icons/</string>
     <string name="ep_weather_icon_file_ext">.png/</string>
 
+
+    <!--_______________Search_________________-->
+    <string name="ep_search">search</string>
+    <string name="ep_contacts">contacts</string>
+
 </resources>
 
     <!--ep_login-->
