@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment.OnListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment.OnListFragmentInteractionListener;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
@@ -20,13 +20,13 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  *
  * @author Michelle Brown
  */
-public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyConnectionsRecyclerViewAdapter.ViewHolder> {
+public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionListRecyclerViewAdapter.ViewHolder> {
 
     private List<Connection> mConnections;
     private final List<Connection> mCopyConnections;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyConnectionsRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
+    public ConnectionListRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
         mConnections = items;
         mListener = listener;
         mCopyConnections = new ArrayList<>();
@@ -37,6 +37,7 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
 
 
     }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -72,6 +73,7 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
         if (text.isEmpty()) {
             mConnections.addAll(mCopyConnections);
             return true;
+            //return true;
         }
         text = text.toLowerCase();
         for (Connection c : mCopyConnections) {
@@ -92,6 +94,24 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
                 c.getUsername().toLowerCase().contains(text) ||
                 c.getEmail().toLowerCase().contains(text);
     }
+
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (obj == this) {
+//            return true;
+//        }
+//        if (!(obj instanceof RecyclerView.Adapter)) {
+//            return false;
+//        }
+//
+//        ConnectionListRecyclerViewAdapter theOther = (ConnectionListRecyclerViewAdapter) obj;
+//        return mConnections.equals(theOther.mConnections);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(mConnections);
+//    }
 
 
 

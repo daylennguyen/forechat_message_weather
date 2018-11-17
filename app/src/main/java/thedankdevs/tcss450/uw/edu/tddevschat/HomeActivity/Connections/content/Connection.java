@@ -21,7 +21,7 @@ public class Connection implements Serializable {
 
 
     /**
-     * Helper class for building ConnectionsFragment.
+     * Helper class for building ConnectionListFragment.
      *
      * @author Michelle Brown
      */
