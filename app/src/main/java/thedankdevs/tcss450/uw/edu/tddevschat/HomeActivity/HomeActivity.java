@@ -133,22 +133,8 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new HomeFragment();
                 break;
             case R.id.nav_connections:
-                /*Retrieve the list of connections*/
-                ArrayList<Connection> connections = new ArrayList<>();
-                for (int i = 0; i < 5; i++) {
-                    connections.add(new Connection.Builder("email@fake.com", "DankDev")
-                            .addFirstName("John")
-                            .addLastName("Doe")
-                            .addChatID(1)
-                            .build());
-                }
-
-                /*add them to the args to be passed to the fragment*/
-                args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
-                fragment = new ConnectionsFragment();
-                fragment.setArguments(args);
+                loadConnections();
                 break;
-
             case R.id.nav_weather:
                 fragment = new WeatherDateFragment();
                 break;
@@ -176,44 +162,62 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
-    private void handleConnectionsGetOnPostExecute(String result) {
-        //parse JSON
+    private void loadConnections() {
+        JSONObject memberInfo = new JSONObject();
         try {
-            JSONObject root = new JSONObject(result);
-            if (root.has("response")) {
-                JSONObject response = root.getJSONObject("response");
-                if (response.has("data")) {
-                    JSONArray data = response.getJSONArray("data");
-                    ArrayList<Connection> connections = new ArrayList<>();
-                    for (int i = 0; i < data.length(); i++) {
-                        JSONObject jsonConnection = data.getJSONObject(i);
-                        connections.add(new Connection.Builder(jsonConnection.getString("email"),
-                                jsonConnection.getString("username"))
-                                .addFirstName(jsonConnection.getString("firstName"))
-                                .addLastName(jsonConnection.getString("lastName"))
-                                .build());
-                    }
-                    Bundle args = new Bundle();
-                    args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
-                    Fragment frag = new ConnectionsFragment();
-                    frag.setArguments(args);
-                    onWaitFragmentInteractionHide();
-                    loadFragment(frag);
-                } else {
-                    Log.e("ERROR!", "No data array");
-                    //notify user
-                    onWaitFragmentInteractionHide();
-                }
-            } else {
-                Log.e("ERROR!", "No response");
-                //notify user
-                onWaitFragmentInteractionHide();
-            }
+            memberInfo.put("memberID", /*mCredential.getMemberID()*/75);
         } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("ERROR!", e.getMessage());
-            //notify user
-            onWaitFragmentInteractionHide();
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_connections)))
+                .appendPath(getString(R.string.ep_getConnections))
+                .build();
+        Log.w("URL for getting all connections:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), memberInfo)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleConnectionsOnPostExecute)
+                .onCancelled(error -> Log.e("ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+    private void handleConnectionsOnPostExecute(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray jsonConnections = resultsJSON.getJSONArray("connections");
+            ArrayList<Connection> myConnections = new ArrayList<>();
+            Bundle args = new Bundle();
+            for (int i = 0; i < jsonConnections.length(); i++) {
+                JSONObject connection = jsonConnections.getJSONObject(i);
+                String first = connection.getString("firstname");
+                String last = connection.getString("lastname");
+                String username = connection.getString("username");
+                String email = connection.getString("email");
+                int chatid;
+                try {
+                    chatid = connection.getInt("chatid");
+                } catch (JSONException e) {
+                    chatid = -1;
+                }
+                myConnections.add(new Connection.Builder(email, username)
+                        .addFirstName(first)
+                        .addLastName(last)
+                        .addChatID(chatid)
+                        .build());
+            }
+            args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, myConnections);
+
+            Fragment fragment = new ConnectionsFragment();
+            fragment.setArguments(args);
+            loadFragment(fragment);
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
         }
     }
 
@@ -292,7 +296,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onOpenChatInteraction(int chatID, String email) {
         /*TODO: show wait fragment and connect to endpoints------*/
-        chatID = 25;
+        //chatID = 25;
         if (chatID == -1) {
             createNewChat();
         } else {

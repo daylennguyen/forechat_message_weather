@@ -23,7 +23,9 @@ public class Credentials implements Serializable {
     private final String mUsername;
     private final String mPassword;
 
-    private String mMemberId;
+
+    private int mMemberID;
+
     private String mFirstName;
     private String mLastName;
     private String mEmail;
@@ -37,7 +39,7 @@ public class Credentials implements Serializable {
 
         private final String mPassword;
         private final String mEmail;
-        private String mMemberId;
+        private int mMemberID;
         private String mFirstName = "";
         private String mLastName = "";
         private String mUsername = "";
@@ -54,6 +56,17 @@ public class Credentials implements Serializable {
         public Builder(String email, String password) {
             mEmail = email;
             mPassword = password;
+        }
+
+
+        /**
+         * Add an optional first name.
+         * @param val an optional first name
+         * @return
+         */
+        public Builder addMemberID(final int val) {
+            mMemberID = val;
+            return this;
         }
 
 
@@ -88,10 +101,6 @@ public class Credentials implements Serializable {
             return this;
         }
 
-        public Builder addMemberId(final String val) {
-            mMemberId = val;
-            return this;
-        }
 
         public Credentials build() {
             return new Credentials(this);
@@ -129,6 +138,14 @@ public class Credentials implements Serializable {
     }
 
     /**
+     * Get the memberID
+     * @return the memberID
+     */
+    public int getMemberID() {
+        return mMemberID;
+    }
+
+    /**
      * Get the first name or the empty string if no first name was provided.
      * @return the first name or the empty string if no first name was provided.
      */
@@ -152,9 +169,6 @@ public class Credentials implements Serializable {
         return mEmail;
     }
 
-    public String getMemberId() {
-        return mMemberId;
-    }
 
     /**
      * Get all of the fields in a single JSON object. Note, if no values were provided for the
