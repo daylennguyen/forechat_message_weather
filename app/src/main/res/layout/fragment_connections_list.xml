@@ -10,6 +10,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".HomeActivity.Connections.ConnectionsFragment"
-    tools:listitem="@layout/fragment_connections" >
+    tools:listitem="@layout/fragment_connections" />
 
-</android.support.v7.widget.RecyclerView>

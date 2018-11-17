@@ -21,7 +21,7 @@ public class Connection implements Serializable {
 
 
     /**
-     * Helper class for building Connections.
+     * Helper class for building ConnectionsFragment.
      *
      * @author Michelle Brown
      */
@@ -117,5 +117,13 @@ public class Connection implements Serializable {
 
     public int getChatID() {
         return mChatID;
+    }
+
+    @Override
+    public String toString() {
+        String formatted = String.format("First Name: %s | Last Name: %s | Username: %s | " +
+                "Email: %s", this.mFirstName, mLastName, mUsername, mEmail);
+
+        return formatted;
     }
 }
