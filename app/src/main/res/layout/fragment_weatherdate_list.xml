@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -20,7 +21,7 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorBluePurple"
+                android:background="@color/colorDarkPurple"
                 android:fontFamily="@font/roboto"
                 android:lineSpacingExtra="8sp"
                 android:text="@string/_16_day_weather_forecast"
@@ -32,7 +33,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/colorBluePurple"
+                android:background="@color/colorDarkPurple"
                 android:orientation="horizontal"
                 android:paddingBottom="5dp">
 
@@ -58,14 +59,32 @@
 
     </android.support.v7.widget.CardView>
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/weatherlist"
-        android:name="thedankdevs.tcss450.uw.edu.tddevschat.WeatherDateFragment"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        tools:context=".HomeActivity.Weather.WeatherDateFragment"
-        tools:listitem="@layout/fragment_weatherdate" />
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:clickable="true"
+            android:focusable="true"
+            app:backgroundTint="@color/colorMedPurple"
+            app:elevation="16dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/colorLightPurple"
+            app:srcCompat="@drawable/ic_location"
+            app:useCompatPadding="true" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/weatherlist"
+            android:name="thedankdevs.tcss450.uw.edu.tddevschat.WeatherDateFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            tools:context=".HomeActivity.Weather.WeatherDateFragment"
+            tools:listitem="@layout/fragment_weatherdate" />
+    </FrameLayout>
+
 </LinearLayout>

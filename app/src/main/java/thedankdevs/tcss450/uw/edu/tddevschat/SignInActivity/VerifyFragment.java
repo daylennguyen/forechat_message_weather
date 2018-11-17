@@ -48,10 +48,10 @@ public class VerifyFragment extends Fragment implements View.OnClickListener{
         mCredentials = (Credentials) b.getSerializable(getString(R.string.key_credential));
         // Inflate the layout for this fragment
        View v = inflater.inflate(R.layout.fragment_verify, container, false);
-        Button verifyButton = (Button) v.findViewById(R.id.btn_verify_verify);
+        Button verifyButton = v.findViewById(R.id.btn_verify_verify);
         verifyButton.setOnClickListener(this); //Set click listener for the button.
 
-        Button resendButton = (Button) v.findViewById(R.id.btn_verify_resend);
+        Button resendButton = v.findViewById(R.id.btn_verify_resend);
         resendButton.setOnClickListener(this); //Set click listener for the button.
        return v;
     }

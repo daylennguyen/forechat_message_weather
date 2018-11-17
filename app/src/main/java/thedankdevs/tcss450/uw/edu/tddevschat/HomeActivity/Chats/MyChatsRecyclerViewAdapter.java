@@ -1,4 +1,4 @@
-package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
+package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,22 +8,21 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment.OnListFragmentInteractionListener;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment.OnListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Connection} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Chat} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- *
- * @author Michelle Brown
+ * TODO: Replace the implementation with code for your data type.
  */
-public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyConnectionsRecyclerViewAdapter.ViewHolder> {
+public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Connection> mValues;
+    private final List<Chat> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyConnectionsRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
+    public MyChatsRecyclerViewAdapter(List<Chat> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -31,14 +30,14 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_connections, parent, false);
+                .inflate(R.layout.fragment_chats, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = (mValues).get(position);
-        holder.mUsername.setText(mValues.get(position).getUsername());
+        holder.mItem = mValues.get(position);
+        holder.mName.setText(mValues.get(position).getName());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,18 +56,15 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
         return mValues.size();
     }
 
-
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mUsername;
-        public Connection mItem;
+        public final TextView mName;
+        public Chat mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mUsername = view.findViewById(R.id.tv_connectionslist_username);
+            mName = view.findViewById(R.id.tv_chatslist_name);
         }
-
     }
 }
