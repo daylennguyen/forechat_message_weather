@@ -5,11 +5,12 @@
     android:id="@+id/list"
     android:name="thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
+    android:layout_gravity="center_vertical"
     app:layoutManager="LinearLayoutManager"
     tools:context=".HomeActivity.Chats.ChatsFragment"
-    tools:listitem="@layout/fragment_chats" >
+    tools:listitem="@layout/fragment_chats">
 
 </android.support.v7.widget.RecyclerView>

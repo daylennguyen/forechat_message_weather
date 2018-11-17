@@ -56,6 +56,7 @@ public class ChatFragment extends Fragment {
         mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
         mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
         mEmail = mCredentials.getEmail();
+        getActivity().setTitle("Chat number " + mChatID);
 
         View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -64,7 +65,6 @@ public class ChatFragment extends Fragment {
 
         JSONArray pastChat;
         String pastChatString = getArguments().getString(getString(R.string.key_json_array));
-        Log.w("YASSS", pastChatString);
         if (pastChatString != null) {
             try {
                  pastChat = new JSONArray(pastChatString);
@@ -188,8 +188,6 @@ public class ChatFragment extends Fragment {
                         String sender = jObj.getString("sender");
                         String msg = jObj.getString("message");
                         String chatID = jObj.getString("chatID");
-                        Log.w("YASS", chatID);
-                        Log.w("FCM YAAAA", chatID);
                         int cid = Integer.parseInt(chatID);
                         if (cid == mChatID) {
                             Log.i("FCM Chat Frag", sender + " " + msg);

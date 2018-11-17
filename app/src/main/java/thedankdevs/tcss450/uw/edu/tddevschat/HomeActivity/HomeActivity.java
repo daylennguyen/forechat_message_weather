@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
@@ -47,6 +49,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener,
         WeatherDateFragment.OnListFragmentInteractionListener,
+        ChatsFragment.OnChatsListFragmentInteractionListener,
         ConnectionsFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener {
@@ -123,6 +126,8 @@ public class HomeActivity extends AppCompatActivity
         Bundle args = new Bundle();
         Fragment fragment = new HomeFragment();
         /*depending on the ID of the nav_item, route them to the appropriate fragment*/
+
+        boolean loadingFromDifferentMethods = false;
         switch (item.getItemId()) {
             case R.id.nav_home:
                 fragment = new HomeFragment();
@@ -143,10 +148,13 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new ConnectionsFragment();
                 fragment.setArguments(args);
                 break;
+
             case R.id.nav_weather:
                 fragment = new WeatherDateFragment();
                 break;
             case R.id.nav_chat:
+                loadAllChats();
+                loadingFromDifferentMethods = true;
                 break;
             case R.id.nav_settings:
                 fragment = new SettingsFragment();
@@ -154,13 +162,13 @@ public class HomeActivity extends AppCompatActivity
             default:
 
         }
-
-        /*Send the args to the fragment before displaying*/
-        fragment.setArguments(args);
-        /*display the fragment*/
-        loadFragment(fragment);
-        /* Snippet 2 removed and placed at end. */
-
+        if (!loadingFromDifferentMethods) {
+            /*Send the args to the fragment before displaying*/
+            fragment.setArguments(args);
+            /*display the fragment*/
+            loadFragment(fragment);
+            /* Snippet 2 removed and placed at end. */
+        }
         /*after we display the fragment, close the drawer*/
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -208,7 +216,6 @@ public class HomeActivity extends AppCompatActivity
             onWaitFragmentInteractionHide();
         }
     }
-
 
     @Override
     public void onWaitFragmentInteractionShow() {
@@ -266,6 +273,8 @@ public class HomeActivity extends AppCompatActivity
     public void onListFragmentInteraction(Connection item) {
         ConnectionFragment connectionFragment = new ConnectionFragment();
         Bundle args = new Bundle();
+
+        //Could this be just one item being sent?
         args.putSerializable(getString(R.string.key_connection_email), item.getEmail());
         args.putSerializable(getString(R.string.key_connection_username), item.getUsername());
         args.putSerializable(getString(R.string.key_connection_first), item.getFirstName());
@@ -289,7 +298,6 @@ public class HomeActivity extends AppCompatActivity
         } else {
             mChatID = chatID;
             loadOldChats();
-            //loadNewChat();
         }
         /*Snippet 3 placed on end*/
     }
@@ -342,7 +350,7 @@ public class HomeActivity extends AppCompatActivity
     private void createNewChat() {
         JSONObject chatName = new JSONObject();
         try {
-            chatName.put("name", "messaging room");
+            chatName.put("name", mCredential.getFirstName() + " & " );
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
@@ -424,6 +432,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void loadNewChat(Bundle bundle) {
+        Log.w("WHAT IS THIS", String.valueOf(mChatID));
         ChatFragment chatFragment = new ChatFragment();
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
         //   bundle.putSerializable(getString(R.string.key_connection_email), email);
@@ -436,6 +445,75 @@ public class HomeActivity extends AppCompatActivity
     public void onWeatherListItemFragmentInteraction(WeatherDate item) {
 
     }
+
+    @Override
+    public void onChatsListFragmentInteraction(Chat item) {
+        ChatFragment chatFragment = new ChatFragment();
+        Bundle args = new Bundle();
+        mChatID = item.getChatID();
+        loadOldChats();
+
+    }
+
+
+    private void loadAllChats() {
+
+        JSONObject chatterInfo = new JSONObject();
+
+        try {
+            chatterInfo.put("email", mCredential.getEmail());
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_messaging)))
+                .appendPath(getString(R.string.ep_getAllChats))
+                .build();
+
+        Log.w("URL for getting all chat:", uri.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
+                .onPostExecute(this::handleAllChatsPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+
+    }
+
+
+    private void handleAllChatsPost(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray listOfAllChats = resultsJSON.getJSONArray("chats");
+
+            ArrayList<Chat> allExistingChats = new ArrayList<>();
+
+            Bundle args = new Bundle();
+
+            for (int i = 0; i < listOfAllChats.length(); i++) {
+                JSONObject chatRoom = listOfAllChats.getJSONObject(i);
+                String chatName = chatRoom.getString("name");
+                String receiver = chatRoom.getString("email");
+                int chatid = chatRoom.getInt("chatid");
+                allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
+            }
+            args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
+
+            Fragment fragment = new ChatsFragment();
+            fragment.setArguments(args);
+            loadFragment(fragment);
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+        }
+    }
+
+
 
     // Deleting the InstanceId (Firebase token) must be done asynchronously. Good thing
     // we have something that allows us to do that.

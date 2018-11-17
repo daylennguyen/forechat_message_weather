@@ -11,6 +11,7 @@
     <string name="ep_verify">verify</string>
     <string name="ep_reverify">reverify</string>
     <string name="ep_resend_vericode">resendvericode</string>
+    <string name="ep_getAllChats">getAllChats</string>
 
 
     <string name="ep_with_token">with_token</string>
