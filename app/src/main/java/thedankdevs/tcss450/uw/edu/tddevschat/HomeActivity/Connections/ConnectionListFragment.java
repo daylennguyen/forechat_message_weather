@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,17 +33,26 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  *
- * @author Michelle Brown
+ * @author Michelle Brown, Bryan Santos
+ * @version 11/17/2018
  */
 public class ConnectionListFragment extends Fragment implements SearchView.OnQueryTextListener {
 
+    /**
+     * List of existing connections used by mLocalAdapter
+     */
     private ArrayList<Connection> mConnections;
     public static final String ARG_CONNECTIONS_LIST = "connections list";
+
+    /** Adapter for existing connections */
     private ConnectionListRecyclerViewAdapter mLocalAdapter;
+
+    /** Adapter used for sending post requests to server to retrieve global connections
+     * when user is searching for users that they are not currently connected with*/
     private ConnectionListRecyclerViewAdapter mGlobalAdapter;
-    private ConnectionListRecyclerViewAdapter mCurrentAdapter;
+
+    /** Used as a field to change adapters between local and global */
     private RecyclerView mRecyclerView;
-    private TextView mNoResultsTextView;
 
     private int mColumnCount = 1;
 
@@ -72,10 +80,17 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             mConnections = (ArrayList) getArguments().getSerializable(ARG_CONNECTIONS_LIST);
+
         }
 
     }
 
+    /**
+     * Uses menu of parent. Sets search view visible to user. Also sets
+     * QueryTextListener to this class.
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -101,15 +116,14 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+            /*
+                set local adapter to be the primary list used so that this list
+                is displayed first and so that search is looked through this list first
+             */
 
             mLocalAdapter = new ConnectionListRecyclerViewAdapter(mConnections, mListener);
-            Log.d(getClass().getSimpleName(), "Is my local adapter null: " + (mLocalAdapter == null));
-            mCurrentAdapter = mLocalAdapter;
-            mRecyclerView.setAdapter(mCurrentAdapter);
-
-//            mNoResultsTextView = view.findViewById(R.id.tv_connectionList_noResult);
-//            mNoResultsTextView.setVisibility(View.GONE);
-
+            mGlobalAdapter = null;
+            mRecyclerView.setAdapter(mLocalAdapter);
 
 
         }
@@ -141,39 +155,53 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
 
     @Override
     public boolean onQueryTextChange(String text) {
-
-        boolean existsLocally = mCurrentAdapter.filter(text);
-
+        text = text.toLowerCase();
+        boolean existsLocally = mLocalAdapter.filter(text);
         if (!existsLocally) {
-            // make post request to search through database that current user is not connected with
-            Log.d(getClass().getSimpleName(), "I'm sending a post request");
-            requestForAllContacts(text);
-        } else {
-            mCurrentAdapter = mLocalAdapter;
-            mRecyclerView.setAdapter(mCurrentAdapter);
+
+            /*
+                since global adapter was previously initialized and that list
+                contains the text query, just set adapter to this
+             */
+            if (mGlobalAdapter != null && mGlobalAdapter.filter(text)) {
+                Log.d(getClass().getSimpleName(), "I am setting mGlobalAdapter to be my adapter");
+                mRecyclerView.setAdapter(mGlobalAdapter);
+            }
+            /*
+                otherwise, make post request to search through database
+                that current user is not connected with
+             */
+            else {
+
+                Log.d(getClass().getSimpleName(), "I'm sending a post request");
+                requestForAllContacts(text);
+            }
+
+            /*
+                if local adapter contains the textQuery and globalAdapter was previously set,
+                reset the adapter to local
+             */
+
+        } else if (existsLocally && !mRecyclerView.getAdapter().equals(mLocalAdapter)) {
+
+            mRecyclerView.setAdapter(mLocalAdapter);
         }
 
-//        } else if (!mCurrentAdapter.equals(mLocalAdapter)) {
-//            mCurrentAdapter = mLocalAdapter;
-//            mRecyclerView.setAdapter(mCurrentAdapter);
-//        }
-
-
-//        if (mNoResultsTextView.isShown()) {
-//            mNoResultsTextView.setVisibility(View.GONE);
-//        }
-
-
-
-
-
-
-        return true;
+        Log.d(getClass().getSimpleName(), "current Adapter: " + mRecyclerView.getAdapter());
+        Log.d(getClass().getSimpleName(), "is my equals method working:" +
+                " check with LocalAdapter: " + mRecyclerView.getAdapter().equals(mLocalAdapter));
+        return false;
     }
 
+    /**
+     * Helper method to send post request to web service to retrieve all connections
+     * from the database based on the text query.
+     * @param text search query
+     */
     private void requestForAllContacts(String text) {
         Uri uri = new Uri.Builder()
                 .scheme("https")
+                .authority(getString(R.string.base_url))
                 .appendPath(getString(R.string.ep_search))
                 .appendPath(getString(R.string.ep_contacts))
                 .build();
@@ -181,15 +209,24 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         JSONObject searchAllContacts = new JSONObject();
         try {
             searchAllContacts.put("values", text);
+            Log.d(getClass().getSimpleName(), "JSON request: " + searchAllContacts.toString());
         } catch (JSONException e) {
             Log.e(getClass().getSimpleName(), "JSON object creation failed: " + e);
         }
 
         new SendPostAsyncTask.Builder(uri.toString(), searchAllContacts)
-                .onPostExecute(this::handleOnPost);
+                .onCancelled(this::handleErrorsInTask)
+                .onPostExecute(this::handleOnSearchPost)
+                .build()
+                .execute();
     }
 
-    private void handleOnPost(final String result) {
+    private void handleErrorsInTask(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+    }
+
+
+    private void handleOnSearchPost(final String result) {
         Log.d(getClass().getSimpleName(), "I am handling Post Response");
         try {
             JSONObject jsonResults = new JSONObject(result);
@@ -214,19 +251,20 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
                     globalConnections.add(c);
 
                 }
+
                 mGlobalAdapter = new ConnectionListRecyclerViewAdapter(globalConnections, mListener);
-                mCurrentAdapter = mGlobalAdapter;
-                mRecyclerView.setAdapter(mCurrentAdapter);
+                mRecyclerView.setAdapter(mGlobalAdapter);
+
+
                 Log.d(getClass().getSimpleName(), "Successfully parsed JSON: " + globalConnections);
             } else {
-                mNoResultsTextView.setVisibility(View.VISIBLE);
-                mNoResultsTextView.setText("No results found");
+                Log.d(getClass().getSimpleName(), "Not successful!!!! Fault coming from programmer");
             }
         } catch (JSONException e) {
             Log.e(getClass().getSimpleName(), "Post Response failed to be parsed: " + e);
         }
 
-        Log.e(getClass().getSimpleName(), "I'm done handling post response");
+        Log.d(getClass().getSimpleName(), "I'm done handling post response");
     }
 
 
