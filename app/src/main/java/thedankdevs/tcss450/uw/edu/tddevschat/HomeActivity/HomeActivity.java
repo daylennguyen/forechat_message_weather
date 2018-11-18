@@ -17,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -56,20 +58,34 @@ public class HomeActivity extends AppCompatActivity
 
     private Credentials mCredential;
     private int mChatID = 0;
+    private String theOtherReceiverEmail;
+    private String theOtherReceiverUsername;
+    private String defaultChatName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
+        Fragment fragment;
+        if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
+            mChatID = getIntent().getExtras().getInt(getString(R.string.keys_intent_notification_chatID));
+            loadOldChats();
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.frame_home_container, new HomeFragment())
+                    .commit();
+        }
 
+
+        /*
         if (savedInstanceState == null) {
             if (findViewById(R.id.frame_home_container) != null) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.frame_home_container, new HomeFragment())
                         .commit();
             }
-        }
+        }*/
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,7 +98,11 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.tv_drawerheader_username);
+        nav_user.setText(mCredential.getUsername());
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -287,15 +307,18 @@ public class HomeActivity extends AppCompatActivity
      * @param chatID
      */
     @Override
-    public void onOpenChatInteraction(int chatID, String email) {
+    public void onOpenChatInteraction(int chatID, String email, String username) {
+        theOtherReceiverUsername = username;
         /*TODO: show wait fragment and connect to endpoints------*/
-        //chatID = 25;
         if (chatID == -1) {
+            theOtherReceiverEmail = email;
             createNewChat();
         } else {
             mChatID = chatID;
             loadOldChats();
+
         }
+        Log.w("WTF", String.valueOf(chatID));
         /*Snippet 3 placed on end*/
     }
 
@@ -328,11 +351,13 @@ public class HomeActivity extends AppCompatActivity
         try {
             JSONObject resultsJSON = new JSONObject(result);
             JSONArray temp = resultsJSON.getJSONArray("messages");
-            Log.w("here?", temp.toString());
+            JSONObject grabTitle = resultsJSON.getJSONObject("chatName");
+            String chatTitle = grabTitle.getString("name");
 
             Bundle bundle = new Bundle();
 
             bundle.putString(getString(R.string.key_json_array), temp.toString());
+            bundle.putString(getString(R.string.key_chat_Title), chatTitle);
             loadNewChat(bundle);
 
         } catch (JSONException e) {
@@ -347,7 +372,8 @@ public class HomeActivity extends AppCompatActivity
     private void createNewChat() {
         JSONObject chatName = new JSONObject();
         try {
-            chatName.put("name", mCredential.getFirstName() + " & " );
+            defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsername;
+            chatName.put("name", defaultChatName);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
@@ -372,11 +398,12 @@ public class HomeActivity extends AppCompatActivity
             JSONObject tempContent = temp.getJSONObject(0);
             mChatID = tempContent.getInt("chatid");
             Log.w("CHATID", String.valueOf(mChatID));
-            addChatters(mChatID, "mcb35@uw.edu");
+            addChatters(mChatID, theOtherReceiverEmail);
             addChatters(mChatID, mCredential.getEmail());
 
 
             Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.key_chat_Title), defaultChatName);
             loadNewChat(bundle);
 
         } catch (JSONException e) {
@@ -445,8 +472,6 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onChatsListFragmentInteraction(Chat item) {
-        ChatFragment chatFragment = new ChatFragment();
-        Bundle args = new Bundle();
         mChatID = item.getChatID();
         loadOldChats();
 
@@ -492,7 +517,7 @@ public class HomeActivity extends AppCompatActivity
             for (int i = 0; i < listOfAllChats.length(); i++) {
                 JSONObject chatRoom = listOfAllChats.getJSONObject(i);
                 String chatName = chatRoom.getString("name");
-                String receiver = chatRoom.getString("email");
+                String receiver = chatRoom.getString("username");
                 int chatid = chatRoom.getInt("chatid");
                 allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
             }
