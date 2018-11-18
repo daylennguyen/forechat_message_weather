@@ -55,9 +55,12 @@ public class HomeActivity extends AppCompatActivity
         ConnectionListFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener {
-
+    /**Current user information **/
     private Credentials mCredential;
+    /**ChatId to be updated to load which chatID.**/
     private int mChatID = 0;
+
+    /**Fields to be set when new chat is created**/
     private String theOtherReceiverEmail;
     private String theOtherReceiverUsername;
     private String defaultChatName;
@@ -67,11 +70,12 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
-        Fragment fragment;
+
+        //If notification received, then load all chats.
         if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
             mChatID = getIntent().getExtras().getInt(getString(R.string.keys_intent_notification_chatID));
-            loadOldChats();
-        } else {
+            loadAllMessages();
+        } else { // load default fragment.
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.frame_home_container, new HomeFragment())
                     .commit();
@@ -97,10 +101,11 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView nav_user = (TextView)hView.findViewById(R.id.tv_drawerheader_username);
-        nav_user.setText(mCredential.getUsername());
+        nav_user.setText(mCredential.getUsername()); //Set the header username.
         navigationView.setNavigationItemSelectedListener(this);
 
     }
@@ -315,7 +320,7 @@ public class HomeActivity extends AppCompatActivity
             createNewChat();
         } else {
             mChatID = chatID;
-            loadOldChats();
+            loadAllMessages();
 
         }
         Log.w("WTF", String.valueOf(chatID));
@@ -323,7 +328,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /*Retrieves the previous chats the user was apart of*/
-    private void loadOldChats() {
+
+    /**
+     * Retrieves the previous messages that chatID has.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void loadAllMessages() {
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -341,15 +352,22 @@ public class HomeActivity extends AppCompatActivity
 
         Log.w("URL for getting all chat:", uri.toString());
         new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
-                .onPostExecute(this::handleOldChatPost)
+                .onPostExecute(this::handleAllMessagesPost)
                 .onCancelled(error -> Log.e("ERROR EMMETT", error))
                 .build().execute();
 
     }
 
-    private void handleOldChatPost(String result) {
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void handleAllMessagesPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
+
             JSONArray temp = resultsJSON.getJSONArray("messages");
             JSONObject grabTitle = resultsJSON.getJSONObject("chatName");
             String chatTitle = grabTitle.getString("name");
@@ -358,7 +376,7 @@ public class HomeActivity extends AppCompatActivity
 
             bundle.putString(getString(R.string.key_json_array), temp.toString());
             bundle.putString(getString(R.string.key_chat_Title), chatTitle);
-            loadNewChat(bundle);
+            loadChatFragment(bundle);
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -369,9 +387,15 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method creates new chat sessions.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void createNewChat() {
         JSONObject chatName = new JSONObject();
         try {
+            //Create default chat name for current user and user to be chatting.
             defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsername;
             chatName.put("name", defaultChatName);
         } catch (JSONException e) {
@@ -391,6 +415,14 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment while
+     * adding users to the new chat room.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void handleNewChatPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
@@ -404,7 +436,7 @@ public class HomeActivity extends AppCompatActivity
 
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_chat_Title), defaultChatName);
-            loadNewChat(bundle);
+            loadChatFragment(bundle);
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -415,6 +447,13 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Add the users to a certain chatroom through chatID.
+     * @param chatID chatroom identifier.
+     * @param email user's email to be added.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void addChatters(int chatID, String email) {
         JSONObject chatterInfo = new JSONObject();
         Log.w("Adding", email);
@@ -439,6 +478,12 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Receive and show if succeeded through logcat.
+     * @param result JSON file
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void handleAddChattersPost(String result) {
         try {
             Log.w("JSON result adding peeps", result);
@@ -449,13 +494,20 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 Log.w("Adding", "DARN IT, IT DIDN'T WORK");
             }
-
         } catch (JSONException e) {
 
         }
     }
 
-    private void loadNewChat(Bundle bundle) {
+
+    /**
+     * Receive bundle from other methods, send necessary information, and
+     * load the chat fragment.
+     * @param bundle Information chat fragment to open.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void loadChatFragment(Bundle bundle) {
         Log.w("WHAT IS THIS", String.valueOf(mChatID));
         ChatFragment chatFragment = new ChatFragment();
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
@@ -473,13 +525,17 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChatsListFragmentInteraction(Chat item) {
         mChatID = item.getChatID();
-        loadOldChats();
+        loadAllMessages();
 
     }
 
 
+    /**
+     * Load all chats that user associates with.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
     private void loadAllChats() {
-
         JSONObject chatterInfo = new JSONObject();
 
         try {
@@ -505,15 +561,22 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
     private void handleAllChatsPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
             JSONArray listOfAllChats = resultsJSON.getJSONArray("chats");
-
+            //Chatroom information to be displayed.
             ArrayList<Chat> allExistingChats = new ArrayList<>();
 
             Bundle args = new Bundle();
 
+            //Iterate through the JSONarray and create chat objects to display.
             for (int i = 0; i < listOfAllChats.length(); i++) {
                 JSONObject chatRoom = listOfAllChats.getJSONObject(i);
                 String chatName = chatRoom.getString("name");
@@ -522,7 +585,7 @@ public class HomeActivity extends AppCompatActivity
                 allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
             }
             args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
-
+            //Create chats list fragment and display.
             Fragment fragment = new ChatsFragment();
             fragment.setArguments(args);
             loadFragment(fragment);
