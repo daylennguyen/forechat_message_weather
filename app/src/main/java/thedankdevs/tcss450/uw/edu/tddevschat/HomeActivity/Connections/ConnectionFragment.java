@@ -94,7 +94,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_connection_openchat:
-                    mListener.onOpenChatInteraction(mChatID, mEmail);
+                    mListener.onOpenChatInteraction(mChatID, mEmail, mUsername);
                     break;
             }
         }
@@ -107,6 +107,6 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
      * activity.
      */
     public interface OnConnectionFragmentInteractionListener {
-        void onOpenChatInteraction(int chatID, String email);
+        void onOpenChatInteraction(int chatID, String email, String username);
     }
 }

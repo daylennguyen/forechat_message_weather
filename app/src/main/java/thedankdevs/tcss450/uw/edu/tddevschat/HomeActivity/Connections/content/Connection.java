@@ -17,7 +17,7 @@ public class Connection implements Serializable {
     private final String mUsername;
     private final String mFirstName;
     private final String mLastName;
-    private final int mChatID;
+    private  int mChatID;
 
 
     /**
@@ -119,6 +119,9 @@ public class Connection implements Serializable {
         return mChatID;
     }
 
+    public void setChatID(int chatID ) {
+        mChatID = chatID;
+    }
     @Override
     public String toString() {
         String formatted = String.format("First Name: %s | Last Name: %s | Username: %s | " +

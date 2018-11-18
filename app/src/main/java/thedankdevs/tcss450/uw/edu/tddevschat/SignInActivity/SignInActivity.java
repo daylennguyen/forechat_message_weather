@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
@@ -23,10 +24,24 @@ public class SignInActivity extends AppCompatActivity
         RegisterFragment.OnRegisterFragmentInteractionListener,
         VerifyFragment.OnVerifyFragmentInteractionListener {
 
+    private boolean mLoadFromChatNotification = false;
+    private static final String TAG = SignInActivity.class.getSimpleName();
+    private String mChatIDfromNotification;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().containsKey("type")) {
+                Log.d(TAG, "type of message: " + getIntent().getExtras().getString("type"));
+                Log.d(TAG, "chatID from notification: " + getIntent().getExtras().getString("chatID"));
+
+                mLoadFromChatNotification = getIntent().getExtras().getString("type").equals("contact");
+                mChatIDfromNotification = getIntent().getExtras().getString("chatID");
+            } else {
+                Log.d(TAG, "NO MESSAGE");
+            }
+        }
         if(savedInstanceState == null) {
             if (findViewById(R.id.frame_signin_container) != null) {
                 getSupportFragmentManager().beginTransaction()
@@ -123,6 +138,10 @@ public class SignInActivity extends AppCompatActivity
     private void openMain(Credentials credentials) {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(getString(R.string.key_credential), credentials);
+        intent.putExtra(getString(R.string.keys_intent_notification_msg), mLoadFromChatNotification);
+        if (mChatIDfromNotification != null) {
+            intent.putExtra(getString(R.string.keys_intent_notification_chatID), Integer.parseInt(mChatIDfromNotification));
+        }
         startActivity(intent);
         //End this Activity and remove it from the Activity back stack.
         finish();

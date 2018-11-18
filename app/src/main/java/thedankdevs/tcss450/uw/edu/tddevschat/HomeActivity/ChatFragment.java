@@ -39,6 +39,7 @@ public class ChatFragment extends Fragment {
     private TextView mMessageOutputTextView;
     private EditText mMessageInputEditText;
     private String mEmail;
+    private String mUsername;
     private String mSendUrl;
     private int mChatID;
     private Credentials mCredentials;
@@ -56,7 +57,9 @@ public class ChatFragment extends Fragment {
         mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
         mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
         mEmail = mCredentials.getEmail();
-        getActivity().setTitle("Chat number " + mChatID);
+        mUsername = mCredentials.getUsername();
+        String title = getArguments().getString(getString(R.string.key_chat_Title));
+        getActivity().setTitle(title);
 
         View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -71,7 +74,7 @@ public class ChatFragment extends Fragment {
 
                 for (int i = pastChat.length()-1; i >= 0; i--) {
                     JSONObject message = pastChat.getJSONObject(i);
-                    String sender = message.getString("email");
+                    String sender = message.getString("username");
                     String msg = message.getString("message");
                     mMessageOutputTextView.append(sender + ": " + msg);
                     mMessageOutputTextView.append(System.lineSeparator());
@@ -122,7 +125,7 @@ public class ChatFragment extends Fragment {
         JSONObject messageJson = new JSONObject();
 
         try {
-            messageJson.put("email", mEmail);
+            messageJson.put("username", mUsername);
             messageJson.put("message", msg);
             messageJson.put("chatID", mChatID);
         } catch (JSONException e) {

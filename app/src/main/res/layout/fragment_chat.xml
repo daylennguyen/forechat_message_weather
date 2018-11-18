@@ -1,49 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout6"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="bottom"
+    android:orientation="vertical"
     tools:context=".HomeActivity.ChatFragment">
 
-    <TextView
-        android:id="@+id/tv_chat_display"
-        android:layout_width="0dp"
-        android:layout_height="495dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/et_chat_message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/et_chat_message"
-        android:layout_width="309dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_chat_display"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="10dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_chat_send"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:backgroundTint="@color/colorMedPurple"
+        android:outlineProvider="background"
+        android:paddingTop="15dp">
 
-    <ImageButton
-        android:id="@+id/btn_chat_send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_menu_send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_chat_display" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-</android.support.constraint.ConstraintLayout>
+            <EditText
+                android:id="@+id/et_chat_message"
+                style="@android:style/Widget.AutoCompleteTextView"
+                android:layout_width="287dp"
+                android:layout_height="wrap_content"
+                android:autofillHints="@string/enter_a_message"
+                android:backgroundTint="@color/colorMedGrey"
+                android:ems="10"
+                android:fontFamily="@font/roboto"
+                android:hint="@string/enter_a_message"
+                android:inputType="textLongMessage"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btn_chat_send"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/btn_chat_send"
+                style="@android:style/Widget.Material.ImageButton"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:contentDescription="@string/send_button"
+                android:elevation="10dp"
+                android:src="@drawable/ic_menu_send"
+                android:tint="@color/colorDarkPurple"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chat_display" />
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

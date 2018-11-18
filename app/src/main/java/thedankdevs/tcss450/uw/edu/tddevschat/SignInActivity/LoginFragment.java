@@ -65,6 +65,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private EditText mEmailField;
     private String mEmail;
 
+    private String mUsername;
     /**
      * The EditText field for password
      */
@@ -180,6 +181,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             JSONObject resultsJSON = new JSONObject(result);
             JSONObject jsonMemberID = resultsJSON.getJSONObject("memberID");
             mMemberID = jsonMemberID.getInt("memberid");
+            mUsername = jsonMemberID.getString("username");
             Log.d("VALUE OF MEMBERID", String.valueOf(mMemberID));
             getFirebaseToken();
         } catch (JSONException e) {
@@ -265,6 +267,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Log.d("MEMBERID", String.valueOf(mMemberID));
         mCredentials = new Credentials.Builder(email, password)
                 .addMemberID(mMemberID)
+                .addUsername(mUsername)
                 .build();
         Uri uri = new Uri.Builder()
                 .scheme("https")
