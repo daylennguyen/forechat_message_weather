@@ -26,7 +26,7 @@ public class Chat implements Serializable {
     }
 
     /**
-     * Helper class for building Connections.
+     * Helper class for building ConnectionListFragment.
      *
      * @author Michelle Brown
      */

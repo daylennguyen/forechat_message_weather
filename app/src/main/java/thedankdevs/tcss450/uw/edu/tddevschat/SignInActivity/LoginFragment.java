@@ -70,6 +70,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private EditText mPasswordField;
 
     /**
+     * The retrieved id of the member
+     */
+    private int mMemberID;
+
+    /**
      * The unique firebase token
      */
     private String mFirebaseToken;
@@ -120,6 +125,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_login_login:
                 String email = mEmailField.getText().toString();
                 String password = mPasswordField.getText().toString();
+                getMemberID(email);
                 getFirebaseToken(email, password);
               /*  if (!isLoginValid(email, password)) {
                     break;
@@ -130,6 +136,55 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             default:
                 Log.e(TAG, "Error when button is clicked in Login Fragment");
         }
+    }
+
+    /**
+     * Gets the id of the current user by their supplied email using an Asynchronous task.
+     *
+     * @param email
+     */
+    private void getMemberID(String email) {
+        JSONObject memberInfo = new JSONObject();
+        try {
+            memberInfo.put("email", email);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString(R.string.ep_member))
+                .appendPath(getString(R.string.ep_getID))
+                .build();
+        Log.w("URL for getting memberID of user:", uri.toString());
+        mListener.onWaitFragmentInteractionShow();
+        new SendPostAsyncTask.Builder(uri.toString(), memberInfo)
+                .onPreExecute(this::handleIDOnPre)
+                .onPostExecute(this::handleIDOnPostExecute)
+                .onCancelled(error -> Log.e("ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+    private void handleIDOnPre() { mListener.onWaitFragmentInteractionShow(); }
+
+    /**
+     * Handles what happens after a Post request is made to get the memberID
+     *
+     * @param result
+     */
+    private void handleIDOnPostExecute(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            //JSONObject jsonMemberID = resultsJSON.getJSONObject("memberID");
+            mMemberID = resultsJSON.getInt("memberid");
+            Log.d("VALUE OF MEMBERID", String.valueOf(mMemberID));
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("Could not retrieve memberID", e.getMessage());
+            //TODO: how do i make sure that we can still get the memberID, or just quit?
+        }
+        mListener.onWaitFragmentInteractionHide();
     }
 
 
@@ -202,7 +257,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private void buildLoginServerCredentials(String email, String password) {
 
         //build the web service URL
-        mCredentials = new Credentials.Builder(email, password).build();
+        mCredentials = new Credentials.Builder(email, password)
+                .addMemberID(mMemberID)
+                .build();
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.base_url))
@@ -314,6 +371,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             boolean success = resultsJSON.getBoolean("success");
             mListener.onWaitFragmentInteractionHide();
             if (success) {
+
                 saveCredentials(mCredentials);
                 //Login was successful. Inform the Activity so it can do its thing.
                 mListener.onLoginSuccess(mCredentials);

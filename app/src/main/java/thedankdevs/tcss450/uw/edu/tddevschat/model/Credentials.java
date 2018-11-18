@@ -1,9 +1,10 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.model;
 
-import android.text.Editable;
 import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
@@ -18,8 +19,12 @@ import java.io.Serializable;
 public class Credentials implements Serializable {
     private static final long serialVersionUID = -1634677417576883013L;
 
+
     private final String mUsername;
     private final String mPassword;
+
+
+    private int mMemberID;
 
     private String mFirstName;
     private String mLastName;
@@ -34,7 +39,7 @@ public class Credentials implements Serializable {
 
         private final String mPassword;
         private final String mEmail;
-
+        private int mMemberID;
         private String mFirstName = "";
         private String mLastName = "";
         private String mUsername = "";
@@ -51,6 +56,17 @@ public class Credentials implements Serializable {
         public Builder(String email, String password) {
             mEmail = email;
             mPassword = password;
+        }
+
+
+        /**
+         * Add an optional first name.
+         * @param val an optional first name
+         * @return
+         */
+        public Builder addMemberID(final int val) {
+            mMemberID = val;
+            return this;
         }
 
 
@@ -85,6 +101,7 @@ public class Credentials implements Serializable {
             return this;
         }
 
+
         public Credentials build() {
             return new Credentials(this);
         }
@@ -101,6 +118,7 @@ public class Credentials implements Serializable {
         mFirstName = builder.mFirstName;
         mLastName = builder.mLastName;
         mEmail = builder.mEmail;
+        mMemberID = builder.mMemberID;
     }
 
     /**
@@ -117,6 +135,14 @@ public class Credentials implements Serializable {
      */
     public String getPassword() {
         return mPassword;
+    }
+
+    /**
+     * Get the memberID
+     * @return the memberID
+     */
+    public int getMemberID() {
+        return mMemberID;
     }
 
     /**
@@ -143,6 +169,7 @@ public class Credentials implements Serializable {
         return mEmail;
     }
 
+
     /**
      * Get all of the fields in a single JSON object. Note, if no values were provided for the
      * optional fields via the Builder, the JSON object will include the empty string for those
@@ -161,6 +188,7 @@ public class Credentials implements Serializable {
             msg.put("first", getFirstName());
             msg.put("last", getLastName());
             msg.put("email", getEmail());
+            msg.put("memberId", getMemberID());
         } catch (JSONException e) {
             Log.wtf("CREDENTIALS", "Error creating JSON: " + e.getMessage());
         }
