@@ -146,6 +146,14 @@ public class Credentials implements Serializable {
     }
 
     /**
+     * Get the memberID
+     * @return the memberID
+     */
+    public void setMemberID(int id) {
+        mMemberID = id;
+    }
+
+    /**
      * Get the first name or the empty string if no first name was provided.
      * @return the first name or the empty string if no first name was provided.
      */

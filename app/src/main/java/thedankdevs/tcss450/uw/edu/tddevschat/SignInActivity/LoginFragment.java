@@ -63,11 +63,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * The EditText field for email
      */
     private EditText mEmailField;
+    private String mEmail;
 
     /**
      * The EditText field for password
      */
     private EditText mPasswordField;
+    private String mPassword;
 
     /**
      * The retrieved id of the member
@@ -123,10 +125,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mListener.onRegisterClicked();
                 break;
             case R.id.btn_login_login:
-                String email = mEmailField.getText().toString();
-                String password = mPasswordField.getText().toString();
-                getMemberID(email);
-                getFirebaseToken(email, password);
+                String mEmail = mEmailField.getText().toString();
+                String mPassword = mPasswordField.getText().toString();
+                getMemberID();//CHANGED
+                //getFirebaseToken(); //THIS IS NOW DONE AFTER getMemberID
+                    //to guarantee that we get the memberID before we continue.
               /*  if (!isLoginValid(email, password)) {
                     break;
                 }
@@ -140,13 +143,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Gets the id of the current user by their supplied email using an Asynchronous task.
-     *
-     * @param email
      */
-    private void getMemberID(String email) {
+    private void getMemberID() {
         JSONObject memberInfo = new JSONObject();
+        Log.d("VALUE OF EMAIL", mEmail);
         try {
-            memberInfo.put("email", email);
+            memberInfo.put("email", mEmail);
+            Log.d("JSON BODY", memberInfo.toString());
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
@@ -165,7 +168,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .build().execute();
     }
 
-    private void handleIDOnPre() { mListener.onWaitFragmentInteractionShow(); }
+    private void handleIDOnPre() { mListener.onWaitFragmentInteractionShow(); Log.d("GETTING MEMBERID", "pre");}
 
     /**
      * Handles what happens after a Post request is made to get the memberID
@@ -175,9 +178,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private void handleIDOnPostExecute(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
-            //JSONObject jsonMemberID = resultsJSON.getJSONObject("memberID");
-            mMemberID = resultsJSON.getInt("memberid");
+            JSONObject jsonMemberID = resultsJSON.getJSONObject("memberID");
+            mMemberID = jsonMemberID.getInt("memberid");
             Log.d("VALUE OF MEMBERID", String.valueOf(mMemberID));
+            getFirebaseToken();
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -188,10 +192,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private void doLogin(String email, String password) {
-        Boolean valid = isLoginValid(email, password);
+    private void doLogin(/*String email, String password*/) {
+        Boolean valid = isLoginValid(mEmail, mPassword);
         if (valid) {
-            buildLoginServerCredentials(email, password);
+            buildLoginServerCredentials(mEmail, mPassword);
         } else {
             Log.w("Login Valid", "It ain't valid fam");
         }
@@ -257,6 +261,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private void buildLoginServerCredentials(String email, String password) {
 
         //build the web service URL
+        //getMemberID(email);
+        Log.d("MEMBERID", String.valueOf(mMemberID));
         mCredentials = new Credentials.Builder(email, password)
                 .addMemberID(mMemberID)
                 .build();
@@ -298,14 +304,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         //retrieve the stored credentials from SharedPrefs
         if (prefs.contains(getString(R.string.keys_prefs_email)) &&
                 prefs.contains(getString(R.string.keys_prefs_password))) {
-            final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
-            final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
+            mEmail = prefs.getString(getString(R.string.keys_prefs_email), "");
+            mPassword = prefs.getString(getString(R.string.keys_prefs_password), "");
             //Load the two login EditTexts with the credentials found in SharedPrefs
             EditText emailEdit = getActivity().findViewById(R.id.et_login_email);
-            emailEdit.setText(email);
+            emailEdit.setText(mEmail);
             EditText passwordEdit = getActivity().findViewById(R.id.et_login_password);
-            passwordEdit.setText(password);
-            getFirebaseToken(email, password);
+            passwordEdit.setText(mPassword);
+            getMemberID(); //CHANGED
+            //getFirebaseToken(email, password); //THIS IS NOW DONE AFTER getMemberID
+                //to guarantee that we get the memberID before we continue.
             //buildLoginServerCredentials(email, password);
 
         }
@@ -322,7 +330,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void getFirebaseToken(final String email, final String password) {
+    private void getFirebaseToken(/*final String email, final String password*/) {
         mListener.onWaitFragmentInteractionShow();
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic("all");
@@ -339,7 +347,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     mFirebaseToken = task.getResult().getToken();
                     Log.d("FCM: ", mFirebaseToken);
                     //the helper method that initiates login service
-                    doLogin(email, password);
+                    doLogin();
                 });
                 //no code here. wait for the Task to complete.
     }
