@@ -168,7 +168,7 @@ public class HomeActivity extends AppCompatActivity
     private void loadConnections() {
         JSONObject memberInfo = new JSONObject();
         try {
-            memberInfo.put("memberID", /*mCredential.getMemberID()*/75);
+            memberInfo.put("memberID", mCredential.getMemberID());
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
