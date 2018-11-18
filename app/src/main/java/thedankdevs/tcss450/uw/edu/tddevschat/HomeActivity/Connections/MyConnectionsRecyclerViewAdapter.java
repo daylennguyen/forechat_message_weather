@@ -1,11 +1,13 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment.OnListFragmentInteractionListener;
@@ -20,12 +22,20 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  */
 public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyConnectionsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Connection> mValues;
+    private List<Connection> mConnections;
+    private final List<Connection> mCopyConnections;
     private final OnListFragmentInteractionListener mListener;
 
     public MyConnectionsRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+        mConnections = items;
         mListener = listener;
+        mCopyConnections = new ArrayList<>();
+        mCopyConnections.addAll(mConnections);
+
+        Log.d("CONNECTION", "mConnections: " + mConnections);
+        Log.d("CONNECTION", "mCopyConnections: " + mCopyConnections);
+
+
     }
 
     @Override
@@ -37,8 +47,8 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = (mValues).get(position);
-        holder.mUsername.setText(mValues.get(position).getUsername());
+        holder.mItem = (mConnections).get(position);
+        holder.mUsername.setText(mConnections.get(position).getUsername());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +64,33 @@ public class MyConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mConnections.size();
+    }
+
+    public boolean filter(String text) {
+        mConnections.clear();
+        if (text.isEmpty()) {
+            mConnections.addAll(mCopyConnections);
+            return true;
+        }
+        text = text.toLowerCase();
+        for (Connection c : mCopyConnections) {
+            if (containsText(c, text)) {
+                mConnections.add(c);
+            }
+        }
+
+        notifyDataSetChanged();
+
+        // if this returns false, should make post request to server
+        return !mConnections.isEmpty();
+    }
+
+    private boolean containsText(Connection c, String text) {
+        return c.getFirstName().toLowerCase().contains(text) ||
+                c.getLastName().toLowerCase().contains(text) ||
+                c.getUsername().toLowerCase().contains(text) ||
+                c.getEmail().toLowerCase().contains(text);
     }
 
 
