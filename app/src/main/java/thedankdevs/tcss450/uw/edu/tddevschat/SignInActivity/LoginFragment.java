@@ -126,8 +126,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mListener.onRegisterClicked();
                 break;
             case R.id.btn_login_login:
-                String mEmail = mEmailField.getText().toString();
-                String mPassword = mPasswordField.getText().toString();
+                mEmail = mEmailField.getText().toString();
+                mPassword = mPasswordField.getText().toString();
                 getMemberID();//CHANGED
                 //getFirebaseToken(); //THIS IS NOW DONE AFTER getMemberID
                     //to guarantee that we get the memberID before we continue.
