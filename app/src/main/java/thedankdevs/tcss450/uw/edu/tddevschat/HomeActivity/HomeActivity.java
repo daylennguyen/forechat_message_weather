@@ -31,7 +31,7 @@ import java.util.Objects;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
@@ -50,7 +50,7 @@ public class HomeActivity extends AppCompatActivity
         HomeFragment.OnFragmentInteractionListener,
         WeatherDateFragment.OnListFragmentInteractionListener,
         ChatsFragment.OnChatsListFragmentInteractionListener,
-        ConnectionsFragment.OnListFragmentInteractionListener,
+        ConnectionListFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener {
 
@@ -73,6 +73,7 @@ public class HomeActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // [ Snippet 1 ] now on bottom
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -98,6 +99,8 @@ public class HomeActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home, menu);
+        MenuItem search = menu.findItem(R.id.action_search_contacts);
+        search.setVisible(false);
         return true;
     }
 
@@ -207,11 +210,11 @@ public class HomeActivity extends AppCompatActivity
                         .addChatID(chatid)
                         .build());
             }
-            args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, myConnections);
+            args.putSerializable(ConnectionListFragment.ARG_CONNECTIONS_LIST, myConnections);
 
-            Fragment fragment = new ConnectionsFragment();
-            fragment.setArguments(args);
-            loadFragment(fragment);
+            Fragment connectionListFragment = new ConnectionListFragment();
+            connectionListFragment.setArguments(args);
+            loadFragment(connectionListFragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -258,18 +261,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     /**
-     * Does something when something was clicked in {@link HomeFragment}
-     *
-     * @param uri uniform resource identifier
-     */
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        //TODO do something
-    }
-
-    /**
      * Opens a Connection fragment for the corresponding connection
-     * that was clicked on in {@link ConnectionsFragment}
+     * that was clicked on in {@link ConnectionListFragment}
      *
      * @param item the connection selected
      */
@@ -604,8 +597,8 @@ public class HomeActivity extends AppCompatActivity
             }
             //open fragment
             Bundle args = new Bundle();
-            args.putSerializable(ConnectionsFragment.ARG_CONNECTIONS_LIST, connections);
-            Fragment frag = new ConnectionsFragment();
+            args.putSerializable(ConnectionListFragment.ARG_CONNECTIONS_LIST, connections);
+            Fragment frag = new ConnectionListFragment();
             frag.setArguments(args);
             loadFragment(frag);
 

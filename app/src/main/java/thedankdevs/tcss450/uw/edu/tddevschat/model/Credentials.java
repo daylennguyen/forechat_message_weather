@@ -118,7 +118,7 @@ public class Credentials implements Serializable {
         mFirstName = builder.mFirstName;
         mLastName = builder.mLastName;
         mEmail = builder.mEmail;
-        mMemberId = builder.mMemberId;
+        mMemberID = builder.mMemberID;
     }
 
     /**
@@ -196,7 +196,7 @@ public class Credentials implements Serializable {
             msg.put("first", getFirstName());
             msg.put("last", getLastName());
             msg.put("email", getEmail());
-            msg.put("memberId", getMemberId());
+            msg.put("memberId", getMemberID());
         } catch (JSONException e) {
             Log.wtf("CREDENTIALS", "Error creating JSON: " + e.getMessage());
         }

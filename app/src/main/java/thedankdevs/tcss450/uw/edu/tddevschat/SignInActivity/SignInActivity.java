@@ -2,22 +2,15 @@ package thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
-import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 /**
  * Activities that contain this fragment must implement the
@@ -113,7 +106,7 @@ public class SignInActivity extends AppCompatActivity
                 .beginTransaction()
                 .add(R.id.frame_signin_container, new WaitFragment(), "WAIT")
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     /**
