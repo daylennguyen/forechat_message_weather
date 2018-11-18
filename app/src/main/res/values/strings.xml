@@ -136,5 +136,7 @@
     <string name="settings_txt">Settings</string>
     <string name="default_state">WA</string>
     <string name="default_city">TACOMA</string>
+    <string name="send_button">Send button</string>
+    <string name="enter_a_message">Enter a Message</string>
 
 </resources>
