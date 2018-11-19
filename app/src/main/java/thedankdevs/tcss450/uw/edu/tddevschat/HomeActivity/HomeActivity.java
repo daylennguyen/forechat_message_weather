@@ -151,6 +151,8 @@ public class HomeActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        setTitle("Main Page");
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
 
         //If notification received, then load all chats.
@@ -333,19 +335,25 @@ public class HomeActivity extends AppCompatActivity
         boolean loadingFromDifferentMethods = false;
         switch (item.getItemId()) {
             case R.id.nav_home:
+                setTitle("Main Page");
                 fragment = new HomeFragment();
                 break;
             case R.id.nav_connections:
+                setTitle("Connections");
                 loadConnections();
                 break;
             case R.id.nav_weather:
+
+                setTitle("Weather");
                 args.putDouble(LATITUDE_KEY, mCurrentLocation.getLatitude());
                 args.putDouble(LONGITUDE_KEY, mCurrentLocation.getLongitude());
                 fragment = new WeatherDateFragment();
                 fragment.setArguments(args);
                 break;
             case R.id.nav_chat:
+                setTitle("Chat");
                 loadAllChats();
+                onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
             case R.id.nav_settings:
@@ -766,6 +774,7 @@ public class HomeActivity extends AppCompatActivity
             //Create chats list fragment and display.
             Fragment fragment = new ChatsFragment();
             fragment.setArguments(args);
+            onWaitFragmentInteractionHide();
             loadFragment(fragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
