@@ -44,6 +44,12 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle("Connections");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment

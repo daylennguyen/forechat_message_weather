@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -47,7 +48,7 @@ public class WeatherDateFragment extends Fragment {
         NOTE: State is the state abbreviation.
     */
     private String mState, mCity;
-
+    private double mLon, mLat;
     /*TODO: implement listener for date selection*/
     private OnListFragmentInteractionListener mListener;
 
@@ -65,9 +66,11 @@ public class WeatherDateFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Send request for weather data
-        getCurrentWeatherData();
+
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            Bundle LocationData = getArguments();
+            Coordinates_getCurrentWeatherData(LocationData.getDouble(HomeActivity.LATITUDE_KEY), LocationData.getDouble(HomeActivity.LONGITUDE_KEY));
+            /*mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);*/
         }
     }
 
@@ -81,6 +84,11 @@ public class WeatherDateFragment extends Fragment {
             // This is the result from the web service
             currentWeatherData = new ArrayList<>();
             JSONObject res = new JSONObject(result);
+
+            // retrieve the city and state of the current user from the
+            // latitude and longitude
+            mState = res.getString("state_code");
+            mCity = res.getString("city_name");
             // response will contain a json array containing 16 day forecast
             // each index, 1 day
             JSONArray data = res.getJSONArray("data");
@@ -121,6 +129,9 @@ public class WeatherDateFragment extends Fragment {
             e.printStackTrace();
         } finally {
 
+            //display the location correlating to the data we are displaying
+            ((TextView) getView().findViewById(R.id.city_head_textview)).setText(mCity);
+            ((TextView) getView().findViewById(R.id.state_head_textview)).setText(mState);
             /*After retrieving the data, make it visible and remove the wait-fragment*/
             myRV.setAdapter(new MyWeatherDateRecyclerViewAdapter(currentWeatherData, mListener));
             mListener.onWaitFragmentInteractionHide();
@@ -134,19 +145,20 @@ public class WeatherDateFragment extends Fragment {
 
 
     */
-    private void getCurrentWeatherData(final String StateAbbreviation, final String City) {
-        mState = StateAbbreviation;
-        mCity = City;
+    private void Coordinates_getCurrentWeatherData(final double Latitude, final double Longitude) {
+        mLon = Longitude;
+        mLat = Latitude;
         String mSendUrl = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.base_url))
                 .appendPath(getString(R.string.ep_weather))
+                .appendPath(getString(R.string.ep_weather_bycoordinate))
                 .build()
                 .toString();
         JSONObject request = new JSONObject();
         try {
-            request.put("city", City.toUpperCase());
-            request.put("state", StateAbbreviation.toUpperCase());
+            request.put("lon", mLon);
+            request.put("lat", mLat);
         } catch (JSONException e) {
             Log.d(TAG, e.toString());
             e.printStackTrace();
@@ -161,10 +173,10 @@ public class WeatherDateFragment extends Fragment {
 
     }
 
-    /*overload, if no args are provided then default to tacoma WA*/
-    private void getCurrentWeatherData() {
-        this.getCurrentWeatherData(getString(R.string.default_state), getString(R.string.default_city));
-    }
+//    /*overload, if no args are provided then default to uwt location*/
+//    private void Coordinates_getCurrentWeatherData() {
+//        this.Coordinates_getCurrentWeatherData(47.2446, 122.4376);
+//    }
 
     /*Executed after on create, we set the adapter if the current weather data has already been retrieved*/
     @Override
@@ -182,12 +194,6 @@ public class WeatherDateFragment extends Fragment {
             }
             if (currentWeatherData != null)
                 myRV.setAdapter(new MyWeatherDateRecyclerViewAdapter(currentWeatherData, mListener));
-
-            //display the location correlating to the data we are displaying
-            ((TextView) view.findViewById(R.id.city_head_textview)).setText(mCity);
-            ((TextView) view.findViewById(R.id.state_head_textview)).setText(mState);
-
-
         }
 
         return view;

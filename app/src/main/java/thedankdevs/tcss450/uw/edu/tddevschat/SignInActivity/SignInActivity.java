@@ -24,18 +24,22 @@ public class SignInActivity extends AppCompatActivity
         RegisterFragment.OnRegisterFragmentInteractionListener,
         VerifyFragment.OnVerifyFragmentInteractionListener {
 
+    /** Information from notification **/
+    private String mChatIDfromNotification;
     private boolean mLoadFromChatNotification = false;
     private static final String TAG = SignInActivity.class.getSimpleName();
-    private String mChatIDfromNotification;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         if (getIntent().getExtras() != null) {
+            //If there is message notification, grab all of the information.
             if (getIntent().getExtras().containsKey("type")) {
                 Log.d(TAG, "type of message: " + getIntent().getExtras().getString("type"));
                 Log.d(TAG, "chatID from notification: " + getIntent().getExtras().getString("chatID"));
 
+                //Grab all of message information.
                 mLoadFromChatNotification = getIntent().getExtras().getString("type").equals("contact");
                 mChatIDfromNotification = getIntent().getExtras().getString("chatID");
             } else {
@@ -137,9 +141,12 @@ public class SignInActivity extends AppCompatActivity
 
     private void openMain(Credentials credentials) {
         Intent intent = new Intent(this, HomeActivity.class);
+        //Send credential to next activity
         intent.putExtra(getString(R.string.key_credential), credentials);
+
+        //Send whether if we're opening from notification.
         intent.putExtra(getString(R.string.keys_intent_notification_msg), mLoadFromChatNotification);
-        if (mChatIDfromNotification != null) {
+        if (mChatIDfromNotification != null) { //If from notification, send chatID to home activity.
             intent.putExtra(getString(R.string.keys_intent_notification_chatID), Integer.parseInt(mChatIDfromNotification));
         }
         startActivity(intent);

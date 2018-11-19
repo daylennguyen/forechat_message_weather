@@ -1,12 +1,16 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONArray;
@@ -55,23 +65,101 @@ public class HomeActivity extends AppCompatActivity
         ConnectionListFragment.OnListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         WaitFragment.OnFragmentInteractionListener {
-
+    /**Current user information **/
     private Credentials mCredential;
+    /**ChatId to be updated to load which chatID.**/
     private int mChatID = 0;
+
+    /**Fields to be set when new chat is created**/
     private String theOtherReceiverEmail;
     private String theOtherReceiverUsername;
     private String defaultChatName;
 
+    /*Location Services*/
+    public static final String LONGITUDE_KEY = "LONGITUDE";
+    public static final String LATITUDE_KEY = "LATITUDE";
+    /**
+     * The desired interval for location updates. Inexact. Updates may be more or less frequent.
+     */
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    /**
+     * The fastest rate for active location updates. Exact. Updates will never be more frequent
+     * than this value.
+     */
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    private static final int MY_PERMISSIONS_LOCATIONS = 8414;
+    private LocationRequest mLocationRequest;
+    private Location mCurrentLocation;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    /**
+     * Requests location updates from the FusedLocationApi.
+     */
+    protected void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback,
+                    null /* Looper */);
+        }
+    }
+
+    /**
+     * Removes location updates from the FusedLocationApi.
+     */
+    protected void stopLocationUpdates() {
+        // It is a good practice to remove location requests when the activity is in a paused or
+        // stopped state. Doing so helps battery performance and is especially
+        // recommended in applications that request frequent location updates.
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    /**
+     * Create and configure a Location Request used when retrieving location updates
+     */
+    protected void createLocationRequest() {
+        mLocationRequest = LocationRequest.create();
+        // Sets the desired interval for active location updates. This interval is
+        // inexact. You may not receive updates at all if no location sources are available, or
+        // you may receive them slower than requested. You may also receive updates faster than
+        // requested if other applications are requesting location at a faster interval.
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        setTitle("Main Page");
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
-        Fragment fragment;
+
+        //If notification received, then load all chats.
         if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
             mChatID = getIntent().getExtras().getInt(getString(R.string.keys_intent_notification_chatID));
-            loadOldChats();
-        } else {
+            loadAllMessages();
+        } else { // load default fragment.
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.frame_home_container, new HomeFragment())
                     .commit();
@@ -97,13 +185,106 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
-        TextView nav_user = (TextView)hView.findViewById(R.id.tv_drawerheader_username);
-        nav_user.setText(mCredential.getUsername());
+        TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
+        nav_user.setText(mCredential.getUsername()); //Set the header username.
         navigationView.setNavigationItemSelectedListener(this);
+        /*Location*/
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION
+                            , Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_LOCATIONS);
+        } else {
+            //The user has already allowed the use of Locations. Get the current location.
+            requestLocation();
+        }
+        /**/
+
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    Log.d("LOCATION", "LATITUDE: " + String.valueOf(location.getLatitude()));
+                    Log.d("LOCATION", "LONG: " + String.valueOf(location.getLongitude()));
+                }
+            }
+        };
+        createLocationRequest();
 
     }
+
+    private void setLocation(final Location location) {
+        mCurrentLocation = location;
+    }
+
+    /*vvvvvvvvvvvv~~~~~LOCATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+    private void requestLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("REQUEST LOCATION", "User did NOT allow permission to request location!");
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                setLocation(location);
+                                Log.d("LOCATION", location.toString());
+                            }
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_LOCATIONS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // locations-related task you need to do.
+                    requestLocation();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.d("PERMISSION DENIED", "Nothing to see or do here.");
+
+                    //Shut down the app. In production release, you would let the user
+                    //know why the app is shutting down...maybe ask for permission again?
+                    finishAndRemoveTask();
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    /*^^^^^^^^^^^^^LOCATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -148,21 +329,31 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         Bundle args = new Bundle();
         Fragment fragment = new HomeFragment();
+
         /*depending on the ID of the nav_item, route them to the appropriate fragment*/
 
         boolean loadingFromDifferentMethods = false;
         switch (item.getItemId()) {
             case R.id.nav_home:
+                setTitle("Main Page");
                 fragment = new HomeFragment();
                 break;
             case R.id.nav_connections:
+                setTitle("Connections");
                 loadConnections();
                 break;
             case R.id.nav_weather:
+
+                setTitle("Weather");
+                args.putDouble(LATITUDE_KEY, mCurrentLocation.getLatitude());
+                args.putDouble(LONGITUDE_KEY, mCurrentLocation.getLongitude());
                 fragment = new WeatherDateFragment();
+                fragment.setArguments(args);
                 break;
             case R.id.nav_chat:
+                setTitle("Chat");
                 loadAllChats();
+                onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
             case R.id.nav_settings:
@@ -315,7 +506,7 @@ public class HomeActivity extends AppCompatActivity
             createNewChat();
         } else {
             mChatID = chatID;
-            loadOldChats();
+            loadAllMessages();
 
         }
         Log.w("WTF", String.valueOf(chatID));
@@ -323,7 +514,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /*Retrieves the previous chats the user was apart of*/
-    private void loadOldChats() {
+
+    /**
+     * Retrieves the previous messages that chatID has.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void loadAllMessages() {
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -341,15 +538,22 @@ public class HomeActivity extends AppCompatActivity
 
         Log.w("URL for getting all chat:", uri.toString());
         new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
-                .onPostExecute(this::handleOldChatPost)
+                .onPostExecute(this::handleAllMessagesPost)
                 .onCancelled(error -> Log.e("ERROR EMMETT", error))
                 .build().execute();
 
     }
 
-    private void handleOldChatPost(String result) {
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void handleAllMessagesPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
+
             JSONArray temp = resultsJSON.getJSONArray("messages");
             JSONObject grabTitle = resultsJSON.getJSONObject("chatName");
             String chatTitle = grabTitle.getString("name");
@@ -358,7 +562,7 @@ public class HomeActivity extends AppCompatActivity
 
             bundle.putString(getString(R.string.key_json_array), temp.toString());
             bundle.putString(getString(R.string.key_chat_Title), chatTitle);
-            loadNewChat(bundle);
+            loadChatFragment(bundle);
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -369,9 +573,15 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method creates new chat sessions.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void createNewChat() {
         JSONObject chatName = new JSONObject();
         try {
+            //Create default chat name for current user and user to be chatting.
             defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsername;
             chatName.put("name", defaultChatName);
         } catch (JSONException e) {
@@ -391,6 +601,14 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment while
+     * adding users to the new chat room.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void handleNewChatPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
@@ -404,7 +622,7 @@ public class HomeActivity extends AppCompatActivity
 
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_chat_Title), defaultChatName);
-            loadNewChat(bundle);
+            loadChatFragment(bundle);
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -415,6 +633,13 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Add the users to a certain chatroom through chatID.
+     * @param chatID chatroom identifier.
+     * @param email user's email to be added.
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void addChatters(int chatID, String email) {
         JSONObject chatterInfo = new JSONObject();
         Log.w("Adding", email);
@@ -439,6 +664,12 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Receive and show if succeeded through logcat.
+     * @param result JSON file
+     * @Author Emmett Kang
+     * @Version 15 November 2018
+     */
     private void handleAddChattersPost(String result) {
         try {
             Log.w("JSON result adding peeps", result);
@@ -449,13 +680,20 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 Log.w("Adding", "DARN IT, IT DIDN'T WORK");
             }
-
         } catch (JSONException e) {
 
         }
     }
 
-    private void loadNewChat(Bundle bundle) {
+
+    /**
+     * Receive bundle from other methods, send necessary information, and
+     * load the chat fragment.
+     * @param bundle Information chat fragment to open.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
+    private void loadChatFragment(Bundle bundle) {
         Log.w("WHAT IS THIS", String.valueOf(mChatID));
         ChatFragment chatFragment = new ChatFragment();
         bundle.putSerializable(getString(R.string.key_connection_chatID), mChatID);
@@ -473,13 +711,17 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChatsListFragmentInteraction(Chat item) {
         mChatID = item.getChatID();
-        loadOldChats();
+        loadAllMessages();
 
     }
 
 
+    /**
+     * Load all chats that user associates with.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
     private void loadAllChats() {
-
         JSONObject chatterInfo = new JSONObject();
 
         try {
@@ -505,15 +747,22 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Receive and process the result from the endpoint and send to chat fragment.
+     * @param result JSON file from endpoint.
+     * @Author Emmett Kang
+     * @Version 16 November 2018
+     */
     private void handleAllChatsPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
             JSONArray listOfAllChats = resultsJSON.getJSONArray("chats");
-
+            //Chatroom information to be displayed.
             ArrayList<Chat> allExistingChats = new ArrayList<>();
 
             Bundle args = new Bundle();
 
+            //Iterate through the JSONarray and create chat objects to display.
             for (int i = 0; i < listOfAllChats.length(); i++) {
                 JSONObject chatRoom = listOfAllChats.getJSONObject(i);
                 String chatName = chatRoom.getString("name");
@@ -522,9 +771,10 @@ public class HomeActivity extends AppCompatActivity
                 allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
             }
             args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
-
+            //Create chats list fragment and display.
             Fragment fragment = new ChatsFragment();
             fragment.setArguments(args);
+            onWaitFragmentInteractionHide();
             loadFragment(fragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String

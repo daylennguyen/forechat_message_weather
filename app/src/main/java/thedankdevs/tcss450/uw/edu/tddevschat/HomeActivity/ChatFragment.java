@@ -28,16 +28,21 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that deals with Receiving and Sending a chat between users.
+ * @Author Emmett Kang
+ * @Version 15 November 2018
  */
 public class ChatFragment extends Fragment {
 
     private FirebaseMessageReciever mFirebaseMessageReciever;
 
     private static final String TAG = "CHAT_FRAG";
-  //  private static final String CHAT_ID = "1";
+
+    /** Views that will show message recieved and sending**/
     private TextView mMessageOutputTextView;
     private EditText mMessageInputEditText;
+
+    /**User information.**/
     private String mEmail;
     private String mUsername;
     private String mSendUrl;
@@ -116,6 +121,10 @@ public class ChatFragment extends Fragment {
 
     }
 
+    /**
+     * When send button is clicked, invoke endpoint to send messages.
+     * @param theButton sendbutton.
+     */
     private void handleSendClick(final View theButton) {
         String msg = mMessageInputEditText.getText().toString();
         Log.w("YASS ", String.valueOf(mChatID));
