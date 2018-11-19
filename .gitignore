@@ -1,3 +1,6 @@
+# idea folder
+.idea/
+
 # Built application files
 *.apk
 *.ap_
