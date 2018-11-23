@@ -17,14 +17,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.Checkable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
@@ -53,6 +59,7 @@ public class HomeActivity extends AppCompatActivity
         WeatherDateFragment.OnListFragmentInteractionListener,
         ChatsFragment.OnChatsListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
+        CreateNewChatFragment.OnCreateNewChatButtonListener,
         WaitFragment.OnFragmentInteractionListener {
 
 
@@ -189,7 +196,8 @@ public class HomeActivity extends AppCompatActivity
 
             case R.id.nav_connections:
                 setTitle("Connections");
-                mConnectionsNode.loadConnections();
+                Fragment frag = new ConnectionListFragment();
+                mConnectionsNode.loadConnections(frag);
                 break;
             case R.id.nav_weather:
                 setTitle("Weather");
@@ -249,7 +257,6 @@ public class HomeActivity extends AppCompatActivity
 
     /*Signs the user out of the current account*/
     private void logout() {
-
         new DeleteTokenAsyncTask(this).execute();
     }
 
@@ -291,10 +298,35 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onCreateNewChatButtonInteraction() {
+    public void onCreateNewChatButtonPressed() {
+        Fragment fragment = new CreateNewChatFragment();
+        mConnectionsNode.loadConnections(fragment);
 
     }
 
+    @Override
+    public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
+        StringBuilder checkedBoxesSB = checkedBoxes(cbList);
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(this,  checkedBoxesSB.toString() + "  selected", duration);
+        toast.show();
+        mChatNode.CreateNewChatInteraction(cbList, connectionList);
+
+    }
+
+    private StringBuilder checkedBoxes(List<CheckBox> list) {
+        StringBuilder sb = new StringBuilder();
+
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isChecked() && i == 0) {
+                sb.append(list.get(i).getText().toString());
+            } else if(list.get(i).isChecked()) {
+                sb.append((", " + list.get(i).getText().toString()));
+            }
+        }
+        return sb;
+    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 

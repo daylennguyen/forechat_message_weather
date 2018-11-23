@@ -1,4 +1,4 @@
-package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
+package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
 
 import android.app.Activity;

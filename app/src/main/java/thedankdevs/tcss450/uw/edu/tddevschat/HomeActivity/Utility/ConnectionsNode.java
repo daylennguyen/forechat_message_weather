@@ -34,6 +34,7 @@ public class ConnectionsNode {
      */
     private thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials mCredential;
 
+    private Fragment loadingFragment;
     /**
      * The constructor for the connection node
      *
@@ -50,7 +51,8 @@ public class ConnectionsNode {
      * Creates a post request, asynchronously, to retrieve the
      * connection data from the application server
      */
-    public void loadConnections() {
+    public void loadConnections(Fragment frag) {
+        loadingFragment = frag;
         JSONObject memberInfo = new JSONObject();
         try {
             memberInfo.put("memberID", mCredential.getMemberID());
@@ -80,8 +82,7 @@ public class ConnectionsNode {
         try {
             JSONObject resultsJSON = new JSONObject(result);
             JSONArray jsonConnections = resultsJSON.getJSONArray("connections");
-            ArrayList<Connection> myConnections = new ArrayList<>();
-            Bundle args = new Bundle();
+            ArrayList<Connection>myConnections = new ArrayList<>();
             for (int i = 0; i < jsonConnections.length(); i++) {
                 JSONObject connection = jsonConnections.getJSONObject(i);
                 String first = connection.getString("firstname");
@@ -100,11 +101,12 @@ public class ConnectionsNode {
                         .addChatID(chatid)
                         .build());
             }
+            Bundle args = new Bundle();
             args.putSerializable(ConnectionListFragment.ARG_CONNECTIONS_LIST, myConnections);
-
-            Fragment connectionListFragment = new ConnectionListFragment();
-            connectionListFragment.setArguments(args);
-            mMaster.loadFragment(connectionListFragment);
+            //Fragment connectionListFragment = new ConnectionListFragment();
+            //connectionListFragment.setArguments(args);
+            loadingFragment.setArguments(args);
+            mMaster.loadFragment(loadingFragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -113,4 +115,7 @@ public class ConnectionsNode {
                     + e.getMessage());
         }
     }
+
+
+
 }

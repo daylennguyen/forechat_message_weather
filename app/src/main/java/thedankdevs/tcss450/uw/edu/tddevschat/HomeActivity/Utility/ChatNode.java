@@ -4,14 +4,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.CheckBox;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.ChatFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
@@ -37,7 +41,8 @@ public class ChatNode {
     /**
      * Fields to be set when new chat is created
      **/
-    private String theOtherReceiverEmail;
+ //   private String theOtherReceiverEmail;
+    private ArrayList<String> theOtherReceiverUsernames = new ArrayList<>();
     private String theOtherReceiverUsername;
     private String defaultChatName;
 
@@ -69,8 +74,8 @@ public class ChatNode {
     /**
      * Retrieves the previous messages that chatID has.
      *
-     * @Author Emmett Kang
-     * @Version 16 November 2018
+     * @author Emmett Kang
+     * @version 16 November 2018
      */
     private void loadAllMessages() {
         JSONObject chatterInfo = new JSONObject();
@@ -122,9 +127,9 @@ public class ChatNode {
      * @param chatID
      */
     public void onOpenChatInteraction(int chatID, String email, String username) {
-        theOtherReceiverUsername = username;
+
         if (chatID == -1) {
-            theOtherReceiverEmail = email;
+            theOtherReceiverUsernames.add(username);
             createNewChat();
         } else {
             mChatID = chatID;
@@ -175,7 +180,11 @@ public class ChatNode {
         JSONObject chatName = new JSONObject();
         try {
             //Create default chat name for current user and user to be chatting.
-            defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsername;
+            if (theOtherReceiverUsernames.size() == 1) {
+                defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsernames.get(0);
+            } else {
+                defaultChatName = "Group Chat";
+            }
             chatName.put("name", defaultChatName);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
@@ -210,9 +219,11 @@ public class ChatNode {
             JSONObject tempContent = temp.getJSONObject(0);
             mChatID = tempContent.getInt("chatid");
             Log.w("CHATID", String.valueOf(mChatID));
-            addChatters(mChatID, theOtherReceiverEmail);
-            addChatters(mChatID, mCredential.getEmail());
-
+           theOtherReceiverUsernames.add(mCredential.getUsername());
+           /* for (int i = 0; i < theOtherReceiverUsernames.size(); i++) {
+                addChatters(mChatID, theOtherReceiverUsernames.get(i));
+            }*/
+           addChatters(mChatID, theOtherReceiverUsernames);
 
             Bundle bundle = new Bundle();
             bundle.putString(mMaster.getString(R.string.key_chat_Title), defaultChatName);
@@ -231,17 +242,19 @@ public class ChatNode {
      * Add the users to a certain chatroom through chatID.
      *
      * @param chatID chatroom identifier.
-     * @param email  user's email to be added.
+     * @param usernames  user's email to be added.
      * @Author Emmett Kang
      * @Version 15 November 2018
      */
-    private void addChatters(int chatID, String email) {
-        JSONObject chatterInfo = new JSONObject();
-        Log.w("Adding", email);
+    private void addChatters(int chatID, ArrayList<String> usernames) {
+        JSONObject chatterInfoObject = new JSONObject();
+        JSONArray chatterInfo = new JSONArray(usernames);
+       // Log.w("Adding", usernames);
         Log.w("Adding", String.valueOf(chatID));
-        try {
-            chatterInfo.put("chatID", chatID);
-            chatterInfo.put("email", email);
+        Log.w("jsonarray", chatterInfo.toString());
+         try {
+             chatterInfoObject.put("chatID", chatID);
+             chatterInfoObject.put("chatters", chatterInfo);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
@@ -253,7 +266,7 @@ public class ChatNode {
                 .build();
         Log.w("URL for create new chat:", uri.toString());
 
-        new SendPostAsyncTask.Builder(uri.toString(), chatterInfo)
+        new SendPostAsyncTask.Builder(uri.toString(), chatterInfoObject)
                 .onPostExecute(this::handleAddChattersPost)
                 .onCancelled(error -> Log.e("ERROR EMMETT", error))
                 .build().execute();
@@ -276,6 +289,7 @@ public class ChatNode {
             } else {
                 Log.w("Adding", "DARN IT, IT DIDN'T WORK");
             }
+
         } catch (JSONException e) {
 
         }
@@ -369,6 +383,35 @@ public class ChatNode {
             Log.e("JSON_PARSE_ERROR", result
                     + System.lineSeparator()
                     + e.getMessage());
+        }
+    }
+
+    public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
+
+        for (CheckBox checkBox : cbList) {
+            if (checkBox.isChecked()) {
+                theOtherReceiverUsernames.add(checkBox.getText().toString());
+                Log.wtf("CHECKED", "checkBox.getText().toString()");
+            }
+        }
+
+        if (theOtherReceiverUsernames.size() == 1) {
+            Log.wtf("SIZE", "Shouldn't come here");
+            for (Connection c : connectionList) {
+                if(c.getUsername() == theOtherReceiverUsernames.get(0)) {
+                    int tempChatID = c.getChatID();
+                    if (tempChatID == -1) {
+                        createNewChat();
+                    } else {
+                        mChatID = tempChatID;
+                        loadAllMessages();
+                    }
+                    break;
+                }
+            }
+        } else {
+            Log.wtf("SIZE", "Should come here");
+            createNewChat();
         }
     }
 

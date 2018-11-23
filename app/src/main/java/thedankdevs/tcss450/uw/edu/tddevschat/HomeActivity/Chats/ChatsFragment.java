@@ -108,7 +108,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_newChat_chats:
-                mListener.onCreateNewChatButtonInteraction();
+                mListener.onCreateNewChatButtonPressed();
         }
     }
 
@@ -125,6 +125,6 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public interface OnChatsListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onChatsListFragmentInteraction(Chat item);
-        void onCreateNewChatButtonInteraction();
+        void onCreateNewChatButtonPressed();
     }
 }

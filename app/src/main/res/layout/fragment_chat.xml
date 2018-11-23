@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    tools:context=".HomeActivity.ChatFragment">
+    tools:context=".HomeActivity.Chats.ChatFragment">
 
 
     <ScrollView
@@ -47,7 +47,7 @@
                 style="@android:style/Widget.Material.ImageButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_marginBottom="8dp"
                 android:backgroundTint="@android:color/white"
                 android:contentDescription="@string/send_button"
@@ -62,7 +62,7 @@
             <EditText
                 android:id="@+id/et_chat_message"
                 style="@android:style/Widget.AutoCompleteTextView"
-                android:layout_width="326dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"

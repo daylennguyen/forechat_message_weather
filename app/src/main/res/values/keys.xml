@@ -16,6 +16,7 @@
     <string name="key_connection_first">connection first</string>
     <string name="key_connection_last">connection last</string>
     <string name="key_connection_chatID">connection chatID</string>
+    <string name="key_connection_connection">connection</string>
 
     <string name="keys_intent_notification_msg">notification?</string>
     <string name="keys_intent_notification_chatID">notificationChatID</string>
