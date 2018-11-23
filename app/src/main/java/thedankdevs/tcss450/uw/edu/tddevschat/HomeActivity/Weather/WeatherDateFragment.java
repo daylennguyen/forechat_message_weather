@@ -21,10 +21,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
+
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
 
 /**
  * A fragment representing a list of Items.
@@ -69,7 +71,7 @@ public class WeatherDateFragment extends Fragment {
 
         if (getArguments() != null) {
             Bundle LocationData = getArguments();
-            Coordinates_getCurrentWeatherData(LocationData.getDouble(HomeActivity.LATITUDE_KEY), LocationData.getDouble(HomeActivity.LONGITUDE_KEY));
+            Coordinates_getCurrentWeatherData(LocationData.getDouble(LATITUDE_KEY), LocationData.getDouble(LONGITUDE_KEY));
             /*mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);*/
         }
     }

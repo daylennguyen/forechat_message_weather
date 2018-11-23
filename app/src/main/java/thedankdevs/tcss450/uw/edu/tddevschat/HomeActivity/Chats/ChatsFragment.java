@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -21,7 +23,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  * Activities containing this fragment MUST implement the {@link }
  * interface.
  */
-public class ChatsFragment extends Fragment {
+public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     private ArrayList<Chat> mChats;
     public static final String ARG_CHATS_LIST = "chats list";
@@ -52,17 +54,19 @@ public class ChatsFragment extends Fragment {
         if (getArguments() != null) {
             mChats = (ArrayList) getArguments().getSerializable(ARG_CHATS_LIST);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
-
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (view instanceof LinearLayout) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -70,6 +74,8 @@ public class ChatsFragment extends Fragment {
             }
             recyclerView.setAdapter(new MyChatsRecyclerViewAdapter(mChats, mListener));
         }
+        Button b = view.findViewById(R.id.btn_newChat_chats);
+        b.setOnClickListener(this);
         return view;
     }
 
@@ -98,6 +104,14 @@ public class ChatsFragment extends Fragment {
         getActivity().setTitle("Chat");
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_newChat_chats:
+                mListener.onCreateNewChatButtonPressed();
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -111,5 +125,6 @@ public class ChatsFragment extends Fragment {
     public interface OnChatsListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onChatsListFragmentInteraction(Chat item);
+        void onCreateNewChatButtonPressed();
     }
 }

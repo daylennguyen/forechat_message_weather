@@ -1,6 +1,7 @@
-package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
+package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +10,15 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -37,6 +42,7 @@ public class ChatFragment extends Fragment {
     private FirebaseMessageReciever mFirebaseMessageReciever;
 
     private static final String TAG = "CHAT_FRAG";
+    static View rootLayout;
 
     /** Views that will show message recieved and sending**/
     private TextView mMessageOutputTextView;
@@ -57,7 +63,6 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //mEmail = getArguments().getString(getString(R.string.key_connection_email));
 
         mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
         mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
@@ -65,11 +70,11 @@ public class ChatFragment extends Fragment {
         mUsername = mCredentials.getUsername();
         String title = getArguments().getString(getString(R.string.key_chat_Title));
         getActivity().setTitle(title);
-
-        View rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
-
-        mMessageOutputTextView = rootLayout.findViewById(R.id.tv_chat_display);
+        rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
         mMessageInputEditText = rootLayout.findViewById(R.id.et_chat_message);
+
+        ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
+        scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
 
         JSONArray pastChat;
         String pastChatString = getArguments().getString(getString(R.string.key_json_array));
@@ -78,20 +83,20 @@ public class ChatFragment extends Fragment {
                  pastChat = new JSONArray(pastChatString);
 
                 for (int i = pastChat.length()-1; i >= 0; i--) {
+                    LinearLayout holder = new LinearLayout(getContext());
+                    holder.setOrientation(LinearLayout.HORIZONTAL);
                     JSONObject message = pastChat.getJSONObject(i);
                     String sender = message.getString("username");
                     String msg = message.getString("message");
-                    mMessageOutputTextView.append(sender + ": " + msg);
-                    mMessageOutputTextView.append(System.lineSeparator());
-                    mMessageOutputTextView.append(System.lineSeparator());
+
+                    Log.w("sender",   sender);
+                    Log.w("sender", mCredentials.getUsername());
+                    createBubbleUI(sender, msg);
                 }
             } catch (JSONException e) {
                 Log.w("cant make it", "DARN IT");
             }
         }
-
-
-
         rootLayout.findViewById(R.id.btn_chat_send).setOnClickListener(this::handleSendClick);
         return rootLayout;
     }
@@ -137,6 +142,7 @@ public class ChatFragment extends Fragment {
             messageJson.put("username", mUsername);
             messageJson.put("message", msg);
             messageJson.put("chatID", mChatID);
+            messageJson.put("memberID", mCredentials.getMemberID());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -180,6 +186,48 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    public void createBubbleUI (String sender, String msg) {
+        LinearLayout ll = rootLayout.findViewById(R.id.LinLay);
+        LinearLayout holder = new LinearLayout(getContext());
+        holder.setOrientation(LinearLayout.HORIZONTAL);
+        if(sender.equals(mCredentials.getUsername())) {
+            TextView messageBubble = new TextView(getContext());
+            messageBubble.setText(msg);
+            messageBubble.setTextSize(16);
+            messageBubble.setTextColor(getResources().getColor(R.color.colorLightestGrey));
+            messageBubble.setBackgroundResource(R.drawable.my_message);
+            messageBubble.setPadding(32,10,32,16);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(400, 16, 16, 8);
+
+            holder.addView(messageBubble, layoutParams);
+
+            holder.setGravity(Gravity.RIGHT);
+            ll.addView(holder);
+        } else {
+            holder.setOrientation(LinearLayout.VERTICAL);
+            TextView messageBubble = new TextView(getContext());
+            TextView send = new TextView(getContext());
+            send.setText(sender);
+            messageBubble.setText(msg);
+            messageBubble.setBackgroundResource(R.drawable.their_message);
+            messageBubble.setPadding(32,10,32,16);
+            messageBubble.setTextColor(getResources().getColor(R.color.colorLightestGrey));
+            messageBubble.setTextSize(16);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(16, 16, 400, 8);
+
+            holder.addView(send, layoutParams);
+            holder.addView(messageBubble, layoutParams);
+            ll.addView(holder);
+
+        }
+
+    }
+
     /**
      * A BroadcastReceiver setup to listen for messages sent from
      MyFirebaseMessagingService
@@ -203,11 +251,12 @@ public class ChatFragment extends Fragment {
                         int cid = Integer.parseInt(chatID);
                         if (cid == mChatID) {
                             Log.i("FCM Chat Frag", sender + " " + msg);
-                            mMessageOutputTextView.append(sender + ": " + msg);
-                            mMessageOutputTextView.append(System.lineSeparator());
-                            mMessageOutputTextView.append(System.lineSeparator());
+                            createBubbleUI(sender, msg);
                         }
                     }
+
+                    ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
+                    scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
                 } catch (JSONException e) {
                     Log.e("JSON PARSE", e.toString());
                 }
