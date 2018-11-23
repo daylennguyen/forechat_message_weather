@@ -34,11 +34,10 @@
 
     <string name="connection_chatinitialized">Open Chat</string>
     <string name="connection_chatuninitialized">New Chat</string>
+    <string name="connection_requestconnection">Request Connection</string>
 
     <string name="chats_list_newChat">Create New Chat</string>
-
     <string name="create_new_chat_select">Select your connection(s) for the new chat</string>
-    <!--<string name=""></string>-->
 
 
     <!--ERROR NOTIFICATIONS-->
