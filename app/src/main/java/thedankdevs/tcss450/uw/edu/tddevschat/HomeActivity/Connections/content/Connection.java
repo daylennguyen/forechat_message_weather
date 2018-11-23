@@ -18,6 +18,7 @@ public class Connection implements Serializable {
     private final String mFirstName;
     private final String mLastName;
     private  int mChatID;
+    private boolean mIsMine;
 
 
     /**
@@ -32,6 +33,7 @@ public class Connection implements Serializable {
         private String mFirstName = "";
         private String mLastName = "";
         private int mChatID = -1;
+        private boolean mIsMine = false;
 
 
         /**
@@ -75,6 +77,16 @@ public class Connection implements Serializable {
             return this;
         }
 
+        /**
+         * Changes the value of mIsMine
+         * to signify that this member is a verified Connection of this user;
+         * @return the Builder of this Connection
+         */
+        public Builder isMine() {
+            mIsMine = true;
+            return this;
+        }
+
         /*
          * Add an optional something to the connection.
          * @param val an optional something for the connection
@@ -97,6 +109,7 @@ public class Connection implements Serializable {
         this.mFirstName = builder.mFirstName;
         this.mLastName = builder.mLastName;
         this.mChatID = builder.mChatID;
+        this.mIsMine = builder.mIsMine;
     }
 
     public String getEmail() {
@@ -117,6 +130,10 @@ public class Connection implements Serializable {
 
     public int getChatID() {
         return mChatID;
+    }
+
+    public boolean getIsMine() {
+        return mIsMine;
     }
 
     public void setChatID(int chatID ) {

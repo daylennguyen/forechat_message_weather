@@ -34,7 +34,7 @@
 
     <string name="connection_chatinitialized">Open Chat</string>
     <string name="connection_chatuninitialized">New Chat</string>
-    <!--<string name=""></string>-->
+    <string name="connection_requestconnection">Request Connection</string>
 
 
     <!--ERROR NOTIFICATIONS-->

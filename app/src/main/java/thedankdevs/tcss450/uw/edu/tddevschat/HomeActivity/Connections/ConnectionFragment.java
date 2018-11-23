@@ -26,6 +26,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     private String mFirstName;
     private String mLastName;
     private int mChatID;
+    private boolean mIsMine;
 
     private OnConnectionFragmentInteractionListener mListener;
 
@@ -40,6 +41,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
             mFirstName = getArguments().getString(getString(R.string.key_connection_first));
             mLastName = getArguments().getString(getString(R.string.key_connection_last));
             mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
+            mIsMine = getArguments().getBoolean(getString(R.string.key_connection_isMine));
         }
     }
 
@@ -57,8 +59,10 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         Button chatButton = v.findViewById(R.id.btn_connection_openchat);
         if (mChatID > 0) {
             chatButton.setText(R.string.connection_chatinitialized);
-        } else {
+        } else if (mChatID < 0) {
             chatButton.setText(R.string.connection_chatuninitialized);
+        } else if (mIsMine) {
+            chatButton.setText(R.string.connection_requestconnection);
         }
         chatButton.setOnClickListener(this);
         return v;
@@ -100,7 +104,11 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_connection_openchat:
-                    mListener.onOpenChatInteraction(mChatID, mEmail, mUsername);
+                    if (mIsMine) {
+                        //TODO send connection request
+                    } else {
+                        mListener.onOpenChatInteraction(mChatID, mEmail, mUsername);
+                    }
                     break;
             }
         }
