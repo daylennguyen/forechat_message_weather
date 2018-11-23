@@ -193,8 +193,11 @@ public class HomeActivity extends AppCompatActivity
                 break;
             case R.id.nav_weather:
                 setTitle("Weather");
-                args.putDouble(LATITUDE_KEY, mLocationNode.getmCurrentLocation().getLatitude());
-                args.putDouble(LONGITUDE_KEY, mLocationNode.getmCurrentLocation().getLongitude());
+                if ((mLocationNode.getmCurrentLocation() != null)
+                        && (mLocationNode.getmCurrentLocation() != null)) {
+                    args.putDouble(LATITUDE_KEY, mLocationNode.getmCurrentLocation().getLatitude());
+                    args.putDouble(LONGITUDE_KEY, mLocationNode.getmCurrentLocation().getLongitude());
+                }
                 fragment = new WeatherDateFragment();
                 fragment.setArguments(args);
                 break;
@@ -285,6 +288,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChatsListFragmentInteraction(Chat item) {
         mChatNode.onChatsListFragmentInteraction(item);
+    }
+
+    @Override
+    public void onCreateNewChatButtonInteraction() {
+
     }
 
 

@@ -1,53 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout6"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    android:orientation="vertical"
     tools:context=".HomeActivity.ChatFragment">
 
+
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:id="@+id/Scroller"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/LinLay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_chat_display"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:padding="10dp" />
-        </LinearLayout>
+            android:orientation="vertical" />
     </ScrollView>
 
     <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
         android:backgroundTint="@color/colorMedPurple"
         android:outlineProvider="background"
-        android:paddingTop="15dp">
+        android:paddingTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/btn_chat_send"
+                style="@android:style/Widget.Material.ImageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="@android:color/white"
+                android:contentDescription="@string/send_button"
+                android:elevation="10dp"
+                android:src="@drawable/ic_menu_send"
+                android:tint="@color/colorDarkPurple"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <EditText
                 android:id="@+id/et_chat_message"
                 style="@android:style/Widget.AutoCompleteTextView"
-                android:layout_width="287dp"
+                android:layout_width="326dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:autofillHints="@string/enter_a_message"
                 android:backgroundTint="@color/colorMedGrey"
                 android:ems="10"
@@ -60,24 +78,12 @@
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_chat_send"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:targetApi="o" />
+        </android.support.constraint.ConstraintLayout>
 
-            <ImageButton
-                android:id="@+id/btn_chat_send"
-                style="@android:style/Widget.Material.ImageButton"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/white"
-                android:contentDescription="@string/send_button"
-                android:elevation="10dp"
-                android:src="@drawable/ic_menu_send"
-                android:tint="@color/colorDarkPurple"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_chat_display" />
-        </LinearLayout>
 
     </android.support.v7.widget.CardView>
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
