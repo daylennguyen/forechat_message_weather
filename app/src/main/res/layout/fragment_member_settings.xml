@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--Header-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_margin="0dp"
+        android:padding="10dp"
+        android:text="Change Personal Information"
+        android:fontFamily="@font/roboto"
+        android:typeface="normal"
+        android:textSize="24sp"
+        android:textColor="@color/colorLightestGrey"
+        android:background="@color/colorDarkPurple"/>
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alignmentMode="alignMargins"
+        android:background="#ffffffff"
+        android:columnCount="6"
+        android:columnOrderPreserved="false"
+        android:rowOrderPreserved="false"
+        android:orientation="horizontal">
+
+
+
+        <!--Firstname-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="First Name"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_firstname"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="left|fill_horizontal"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_member_settings_firstname"
+            android:src="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1" />
+
+        <!--Lastname-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="Last Name"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_lastname"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="left|fill_horizontal"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_member_settings_lastname"
+            android:src="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1" />
+
+        <!--Username-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="Username"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_username"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="left|fill_horizontal"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_member_settings_username"
+            android:src="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1" />
+
+        <!--email-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="Email"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_email"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="left|fill_horizontal"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_member_settings_email"
+            android:src="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1" />
+
+        <!--Password-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="Password"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_password"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="left|fill_horizontal"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_member_settings_password"
+            android:src="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1" />
+
+        <!--Confirm Password-->
+        <TextView
+            android:layout_columnSpan="6"
+            android:layout_gravity="fill_horizontal"
+            android:text="Confirm Password"/>
+
+        <EditText
+            android:id="@+id/et_member_settings_confirm_password"
+            android:layout_width="0dp"
+            android:layout_columnSpan="5"
+            android:layout_gravity="fill_horizontal"/>
+
+        <Space
+            android:layout_columnSpan="1"/>
+
+
+
+        <!--Apply Button-->
+        <Button
+            android:id="@+id/btn_member_settings_apply"
+            android:layout_columnSpan="3"
+            android:text="Apply"
+            android:layout_gravity="right"
+            android:background="@color/colorPrimary"
+            android:layout_margin="5dp"/>
+
+        <!--Cancel Button-->
+        <Button
+            android:id="@+id/btn_member_settings_cancel"
+            android:layout_columnSpan="3"
+            android:text="Cancel"
+            android:background="@color/colorAccent"
+            android:layout_margin="5dp"/>
+
+
+    </GridLayout>
+
+
+</LinearLayout>
+
+
+
+
+
+
+
