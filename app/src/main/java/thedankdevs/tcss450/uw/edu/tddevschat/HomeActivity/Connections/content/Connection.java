@@ -22,7 +22,7 @@ public class Connection implements Serializable {
 
 
     /**
-     * Helper class for building ConnectionListFragment.
+     * Helper class for building Connection.
      *
      * @author Michelle Brown
      */

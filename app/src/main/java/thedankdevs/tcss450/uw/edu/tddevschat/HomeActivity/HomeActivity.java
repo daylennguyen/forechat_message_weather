@@ -34,6 +34,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFra
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.RequestFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
@@ -60,7 +61,8 @@ public class HomeActivity extends AppCompatActivity
         ChatsFragment.OnChatsListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         CreateNewChatFragment.OnCreateNewChatButtonListener,
-        WaitFragment.OnFragmentInteractionListener {
+        WaitFragment.OnFragmentInteractionListener,
+        RequestFragment.OnListFragmentInteractionListener {
 
 
     /**
@@ -221,6 +223,11 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
 
+            case R.id.nav_connectionRequests:
+                setTitle("Pending Requests");
+                mConnectionsNode.loadRequests();
+                break;
+
             default:
 
         }
@@ -284,7 +291,12 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Connection item) {
-        mChatNode.onListFragmentInteraction(item);
+        mConnectionsNode.onListFragmentInteraction(item);
+    }
+
+    @Override
+    public void onRequestListFragmentInteraction(String theirUsername) {
+        mConnectionsNode.onRequestListFragmentInteraction(theirUsername);
     }
 
     @Override
@@ -327,6 +339,7 @@ public class HomeActivity extends AppCompatActivity
         }
         return sb;
     }
+
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 

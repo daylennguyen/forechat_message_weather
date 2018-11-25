@@ -11,13 +11,13 @@
     <string name="keys_prefs_password">see_the_city_see_the_zoo</string>
 
     <!--ConnectionListFragment-->
-    <string name="key_connection_email">connection email</string>
-    <string name="key_connection_username">connection username</string>
-    <string name="key_connection_first">connection first</string>
-    <string name="key_connection_last">connection last</string>
+    <!--<string name="key_connection_email">connection email</string>-->
+    <!--<string name="key_connection_username">connection username</string>-->
+    <!--<string name="key_connection_first">connection first</string>-->
+    <!--<string name="key_connection_last">connection last</string>-->
     <string name="key_connection_chatID">connection chatID</string>
     <string name="key_connection_connection">connection</string>
-    <string name="key_connection_isMine">connection isMine</string>
+    <!--<string name="key_connection_isMine">connection isMine</string>-->
 
     <string name="keys_intent_notification_msg">notification?</string>
     <string name="keys_intent_notification_chatID">notificationChatID</string>
