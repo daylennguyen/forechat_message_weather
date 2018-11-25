@@ -102,26 +102,6 @@ public class ChatNode {
     }
 
     /**
-     * Opens a Connection fragment for the corresponding connection
-     * that was clicked on in {@link ConnectionListFragment}
-     *
-     * @param item the connection selected
-     */
-    public void onListFragmentInteraction(Connection item) {
-        ConnectionFragment connectionFragment = new ConnectionFragment();
-        Bundle args = new Bundle();
-
-        //Could this be just one item being sent?
-        args.putSerializable(mMaster.getString(R.string.key_connection_email), item.getEmail());
-        args.putSerializable(mMaster.getString(R.string.key_connection_username), item.getUsername());
-        args.putSerializable(mMaster.getString(R.string.key_connection_first), item.getFirstName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_last), item.getLastName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_chatID), item.getChatID());
-        connectionFragment.setArguments(args);
-        mMaster.loadFragment(connectionFragment);
-    }
-
-    /**
      * Does something when something was clicked in {@link ConnectionFragment}
      *
      * @param chatID
