@@ -61,6 +61,8 @@ public class ChatNode {
     /**/
     private HomeActivity mMaster;
 
+
+
     public ChatNode(HomeActivity Master, Credentials mCredential) {
         this.mCredential = mCredential;
         this.mMaster = Master;
@@ -88,6 +90,7 @@ public class ChatNode {
      * @version 16 November 2018
      */
     private void loadAllMessages() {
+
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -319,6 +322,7 @@ public class ChatNode {
      * @Version 16 November 2018
      */
     public void loadAllChats() {
+
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -405,7 +409,6 @@ public class ChatNode {
                     members.append(", ");
                 }
             }
-
             allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
             Bundle args = new Bundle();
             //Iterate through the JSONarray and create chat objects to display.
@@ -417,6 +420,17 @@ public class ChatNode {
                 allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
             }
 
+            ArrayList<Integer> notichat = mMaster.getNotifiedChats();
+            if (notichat.size() > 0) {
+               for (int i = 0; i < notichat.size(); i++) {
+                   for (int j = 0; j < allExistingChats.size(); j++) {
+                       if (notichat.get(i) == allExistingChats.get(j).getChatID()) {
+                           allExistingChats.get(j).notifiedChat();
+                       }
+                   }
+               }
+            }
+
 
             args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
             //Create chats list fragment and display.
@@ -425,6 +439,7 @@ public class ChatNode {
             mMaster.onWaitFragmentInteractionHide();
             mMaster.loadFragment(fragment);
 
+            mMaster.resetNotifiedChats();
             allExistingChats = new ArrayList<>();
         } catch (JSONException e) {
             e.printStackTrace();

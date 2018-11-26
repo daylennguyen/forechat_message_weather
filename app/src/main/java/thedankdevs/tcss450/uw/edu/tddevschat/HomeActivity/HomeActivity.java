@@ -91,6 +91,7 @@ public class HomeActivity extends AppCompatActivity
 
     ActionBarDrawerToggle toggle;
 
+    private ArrayList<Integer> notifiedChats = new ArrayList<>();
 
     private FirebaseMessageReciever mFirebaseMessageReciever;
 
@@ -377,6 +378,13 @@ public class HomeActivity extends AppCompatActivity
         return sb;
     }
 
+    public ArrayList<Integer> getNotifiedChats(){
+        return notifiedChats;
+    }
+
+    public void resetNotifiedChats() {
+        notifiedChats = new ArrayList<>();
+    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -418,6 +426,7 @@ public class HomeActivity extends AppCompatActivity
             mMaster.finishAndRemoveTask();
         }
     }
+
     /**
      * A BroadcastReceiver setup to listen for messages sent from
      MyFirebaseMessagingService
@@ -436,6 +445,8 @@ public class HomeActivity extends AppCompatActivity
                     if (jObj.has("message") && jObj.has("sender")) {
                         String sender = jObj.getString("sender");
                         if (sender != mCredential.getUsername()) {
+                            String chatID = jObj.getString("chatID");
+                            notifiedChats.add(Integer.valueOf(chatID));
                             toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorLightBluePurple));
                             toggle.syncState();
                             NavigationView navigationView = findViewById(R.id.nav_view);

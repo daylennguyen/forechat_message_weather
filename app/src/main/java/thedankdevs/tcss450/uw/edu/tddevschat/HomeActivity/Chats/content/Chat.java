@@ -88,8 +88,8 @@ public class Chat implements Serializable {
         return mMemberEmails;
     }
 
-    public void setmChatName (String newChatName) {
-        this.mChatName = newChatName;
+    public void notifiedChat() {
+        this.mChatName = "*" + this.getChatName();
     }
     public void addMember(String newMemberEmail) {
         mMemberEmails.add(newMemberEmail);
