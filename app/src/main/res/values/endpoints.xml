@@ -26,9 +26,11 @@
     <!--________________Messaging________________-->
     <string name="ep_messaging">messaging</string>
     <string name="ep_messaging_send">send</string>
-    <string name="ep_messaging_new">new</string>
+    <string name="ep_messaging_new_group">newGroup</string>
+    <string name="ep_messaging_new_individual">newIndividual</string>
     <string name="ep_messaging_add">add</string>
     <string name="ep_getAllChats">getAllChats</string>
+    <string name="ep_getOthers">getOthersInGroup</string>
     <string name="ep_with_token">with_token</string>
     <string name="ep_getAllMessages">getAllMessages</string>
 

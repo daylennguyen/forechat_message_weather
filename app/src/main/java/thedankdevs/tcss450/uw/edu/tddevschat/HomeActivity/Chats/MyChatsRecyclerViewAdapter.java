@@ -1,6 +1,8 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
+import android.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,12 +54,22 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
                 }
             }
         });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    mListener.onChatsListFragmentLongInteraction(holder.mItem);
+                }
+                return true;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;

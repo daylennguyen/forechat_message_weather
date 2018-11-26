@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class Chat implements Serializable {
 
-    private final String mChatName;
+    private String mChatName;
     private final int mChatID;
     private ArrayList<String> mMemberEmails;
 
@@ -32,7 +32,7 @@ public class Chat implements Serializable {
      */
     public static class Builder {
 
-        private final String mChatName;
+        private  String mChatName;
         private final int mChatID;
         private ArrayList<String> mMemberEmails;
 
@@ -88,6 +88,9 @@ public class Chat implements Serializable {
         return mMemberEmails;
     }
 
+    public void setmChatName (String newChatName) {
+        this.mChatName = newChatName;
+    }
     public void addMember(String newMemberEmail) {
         mMemberEmails.add(newMemberEmail);
     }

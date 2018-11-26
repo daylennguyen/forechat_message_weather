@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
@@ -102,6 +103,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Chat");
+
     }
 
     @Override
@@ -126,5 +128,6 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
         // TODO: Update argument type and name
         void onChatsListFragmentInteraction(Chat item);
         void onCreateNewChatButtonPressed();
+        void onChatsListFragmentLongInteraction(Chat item);
     }
 }

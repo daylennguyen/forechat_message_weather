@@ -45,7 +45,7 @@ public class ChatFragment extends Fragment {
     static View rootLayout;
 
     /** Views that will show message recieved and sending**/
-    private TextView mMessageOutputTextView;
+
     private EditText mMessageInputEditText;
 
     /**User information.**/
@@ -169,6 +169,7 @@ public class ChatFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -238,7 +239,6 @@ public class ChatFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Log.i("FCM Chat Frag", "start onRecieve");
             if(intent.hasExtra("DATA")) {
-
                 String data = intent.getStringExtra("DATA");
                 Log.w("FCM DATA", data);
                 JSONObject jObj = null;
@@ -254,7 +254,6 @@ public class ChatFragment extends Fragment {
                             createBubbleUI(sender, msg);
                         }
                     }
-
                     ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
                     scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
                 } catch (JSONException e) {
