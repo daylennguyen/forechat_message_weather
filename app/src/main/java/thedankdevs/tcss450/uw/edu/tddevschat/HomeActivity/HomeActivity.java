@@ -1,10 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -40,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
@@ -54,6 +50,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
@@ -78,17 +75,20 @@ public class HomeActivity extends AppCompatActivity
         RequestFragment.OnListFragmentInteractionListener {
 
 
+    /*Node for retrieving the weather data and displaying the information*/
+//    private WeatherNode mWeatherNode;
+    /*Node for retrieving and setting the user settings*/
+    public SettingsNode mSettingsNode;
     /**
      * Current user information
-     **/
+     */
     private Credentials mCredential;
-    /** */
+    /**Node for retrieving/fetching the location information of the user*/
     private LocationNode mLocationNode;
-    /** */
+    /**Node for retrieving connection information*/
     private ConnectionsNode mConnectionsNode;
-
+    /**Node for retrieving information on user chats*/
     private ChatNode mChatNode;
-
     ActionBarDrawerToggle toggle;
 
     private ArrayList<Integer> notifiedChats = new ArrayList<>();
@@ -113,38 +113,16 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_home);
         setTitle("Main Page");
-
         findViewById(R.id.nav_view);
+
         /**/
-
-        Log.d("DAYLEN", "initializing Cred");
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
-        Log.d("DAYLEN", "Cred initialized");
-
-        /*Connections*/
-        Log.d("DAYLEN", "initializing connect");
-
-        mConnectionsNode = new ConnectionsNode(this, mCredential);
-        Log.d("DAYLEN", "connect initialized");
-
-        /*Location*/
-        Log.d("DAYLEN", "initializing location");
-        mLocationNode = new LocationNode(this);
-        Log.d("DAYLEN", "location initialized");
-
-        /*Chat*/
-        Log.d("DAYLEN", "initializing chat");
-        mChatNode = new ChatNode(this, mCredential);
-        Log.d("DAYLEN", "chat initialized");
-
+        initializeNodes();
         /*insert option items into the tool bar*/
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -154,25 +132,31 @@ public class HomeActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
-
         drawer.addDrawerListener(toggle);
-
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
-
         View hView = navigationView.getHeaderView(0);
-
         navigationView.setNavigationItemSelectedListener(this);
-
         TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
-
         nav_user.setText(mCredential.getUsername()); //Set the header username.
-
         mLocationNode.startLocationUpdates();
+    }
 
+    /*Helper class to create node objects*/
+    private void initializeNodes() {
+        /*Retrieve user settings*/
+        mSettingsNode = new SettingsNode(this);
+        /*  Connections  */
+        mConnectionsNode = new ConnectionsNode(this, mCredential);
+        /*   Location    */
+        mLocationNode = new LocationNode(this);
+        /*     Chat      */
+        mChatNode = new ChatNode(this, mCredential);
+        /*   Weather     */
+//        mWeatherNode = new WeatherNode(this, mLocationNode);
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -203,6 +187,7 @@ public class HomeActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            loadFragment(new SettingsFragment());
             return true;
         } else if (id == R.id.action_logout) {
             logout();
