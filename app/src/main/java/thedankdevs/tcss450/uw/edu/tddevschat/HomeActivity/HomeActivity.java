@@ -1,7 +1,11 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,22 +17,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
@@ -39,12 +48,15 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
+import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
@@ -62,86 +74,92 @@ public class HomeActivity extends AppCompatActivity
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         CreateNewChatFragment.OnCreateNewChatButtonListener,
         WaitFragment.OnFragmentInteractionListener,
-        RequestFragment.OnListFragmentInteractionListener {
+        RequestFragment.OnListFragmentInteractionListener,
+        RemoveChatMembers.OnRemoveMemberListener {
 
 
+    /*Node for retrieving the weather data and displaying the information*/
+//    private WeatherNode mWeatherNode;
+    /*Node for retrieving and setting the user settings*/
+    public SettingsNode mSettingsNode;
     /**
      * Current user information
-     **/
+     */
     private Credentials mCredential;
-    /** */
+    /**Node for retrieving/fetching the location information of the user*/
     private LocationNode mLocationNode;
-    /** */
+    /**Node for retrieving connection information*/
     private ConnectionsNode mConnectionsNode;
-
+    /**Node for retrieving information on user chats*/
     private ChatNode mChatNode;
+    ActionBarDrawerToggle toggle;
+
+    private ArrayList<Integer> notifiedChats = new ArrayList<>();
+
+    private FirebaseMessageReciever mFirebaseMessageReciever;
 
     @Override
     protected void onResume() {
         super.onResume();
-        mLocationNode.startLocationUpdates();
+        if (mFirebaseMessageReciever == null) {
+            mFirebaseMessageReciever = new FirebaseMessageReciever();
+        }
+        IntentFilter iFilter = new IntentFilter(MyFirebaseMessagingService.RECEIVED_NEW_MESSAGE);
+        registerReceiver(mFirebaseMessageReciever, iFilter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mLocationNode.stopLocationUpdates();
+        if (mFirebaseMessageReciever != null){
+            unregisterReceiver(mFirebaseMessageReciever);
+        }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         setTitle("Main Page");
+        findViewById(R.id.nav_view);
+
         /**/
-
-        Log.d("DAYLEN", "initializing Cred");
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
-        Log.d("DAYLEN", "Cred initialized");
-
-        /*Connections*/
-        Log.d("DAYLEN", "initializing connect");
-
-        mConnectionsNode = new ConnectionsNode(this, mCredential);
-        Log.d("DAYLEN", "connect initialized");
-
-        /*Location*/
-        Log.d("DAYLEN", "initializing location");
-        mLocationNode = new LocationNode(this);
-        Log.d("DAYLEN", "location initialized");
-
-        /*Chat*/
-        Log.d("DAYLEN", "initializing chat");
-        mChatNode = new ChatNode(this, mCredential);
-        Log.d("DAYLEN", "chat initialized");
-
+        initializeNodes();
         /*insert option items into the tool bar*/
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         drawer.addDrawerListener(toggle);
-
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
-
         View hView = navigationView.getHeaderView(0);
-
         navigationView.setNavigationItemSelectedListener(this);
-
         TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
-
         nav_user.setText(mCredential.getUsername()); //Set the header username.
+        mLocationNode.startLocationUpdates();
+    }
+
+    /*Helper class to create node objects*/
+    private void initializeNodes() {
+        /*Retrieve user settings*/
+        mSettingsNode = new SettingsNode(this);
+        /*  Connections  */
+        mConnectionsNode = new ConnectionsNode(this, mCredential);
+        /*   Location    */
+        mLocationNode = new LocationNode(this);
+        /*     Chat      */
+        mChatNode = new ChatNode(this, mCredential);
+        /*   Weather     */
+//        mWeatherNode = new WeatherNode(this, mLocationNode);
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -149,8 +167,16 @@ public class HomeActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
+            if (currentFragment instanceof ChatFragment) {
+                mChatNode.loadAllChats();
+                Log.wtf("wtf", "NOT ENTERING");
+            } else {
+                super.onBackPressed();
+            }
         }
+
+
     }
 
     @Override
@@ -172,6 +198,7 @@ public class HomeActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            loadFragment(new SettingsFragment());
             return true;
         } else if (id == R.id.action_logout) {
             logout();
@@ -215,6 +242,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_chat:
                 setTitle("Chat");
                 mChatNode.loadAllChats();
+              notifyUI(Color.BLACK, Color.WHITE);
                 onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
@@ -253,6 +281,7 @@ public class HomeActivity extends AppCompatActivity
                 .commit();
     }
 
+
     @Override
     public void onWaitFragmentInteractionHide() {
         /*remove the wait fragment that is displayed; meaning that something is done loading*/
@@ -274,6 +303,15 @@ public class HomeActivity extends AppCompatActivity
                 .beginTransaction()
                 .replace(R.id.frame_home_container, frag)
                 .addToBackStack(null);
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    /*Helper method to load an instance of the given fragment into the current activity*/
+    public void loadFragmentWithoutBackStack(Fragment frag) {
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_home_container, frag);
         // Commit the transaction
         transaction.commit();
     }
@@ -317,6 +355,11 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
+    public void onChatsListFragmentLongInteraction(Chat item) {
+        mChatNode.onChatsListFragmentLongInteraction(item);
+    }
+
+    @Override
     public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
         StringBuilder checkedBoxesSB = checkedBoxes(cbList);
         int duration = Toast.LENGTH_SHORT;
@@ -329,17 +372,42 @@ public class HomeActivity extends AppCompatActivity
     private StringBuilder checkedBoxes(List<CheckBox> list) {
         StringBuilder sb = new StringBuilder();
 
-
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).isChecked() && i == 0) {
+            if (list.get(i).isChecked()) {
                 sb.append(list.get(i).getText().toString());
-            } else if(list.get(i).isChecked()) {
-                sb.append((", " + list.get(i).getText().toString()));
             }
         }
         return sb;
     }
 
+    public ArrayList<Integer> getNotifiedChats(){
+        return (ArrayList<Integer>) notifiedChats.clone();
+    }
+
+
+    public void updateNotifiedChats(int openedChatID ) {
+        notifiedChats.remove(notifiedChats.indexOf(openedChatID));
+
+    }
+
+
+    public void notifyUI(int colorOfText, int colorOfBurger) {
+        toggle.getDrawerArrowDrawable().setColor(colorOfBurger);
+        toggle.syncState();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu m = navigationView.getMenu();
+        MenuItem menuItem = m.findItem(R.id.nav_chat);
+        SpannableString s = new SpannableString(menuItem.getTitle());
+
+        s.setSpan(new ForegroundColorSpan(colorOfText),
+                0, s.length(), 0);
+        menuItem.setTitle(s);
+    }
+
+    @Override
+    public void RemoveMemberInteraction(ArrayList<String> users, int theChatID) {
+        mChatNode.RemoveMembersFromChat(users, theChatID);
+    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -382,5 +450,47 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-
+    /**
+     * A BroadcastReceiver setup to listen for messages sent from
+     MyFirebaseMessagingService
+     * that Android allows to run all the time.
+     */
+    private class FirebaseMessageReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("FCM Chat Frag", "start onRecieve");
+            if (intent.hasExtra("DATA")) {
+                String data = intent.getStringExtra("DATA");
+                Log.w("FCM DATA", data);
+                JSONObject jObj = null;
+                try {
+                    jObj = new JSONObject(data);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
+                    if (jObj.has("message") && jObj.has("sender")) {
+                        String sender = jObj.getString("sender");
+                        Log.wtf("sender", sender);
+                        Log.wtf("username", mCredential.getUsername());
+                        int chatID = Integer.valueOf(jObj.getString("chatID"));
+                        if (currentFragment instanceof ChatFragment) {
+                            if (!sender.equals(mCredential.getUsername())) {
+                                int currentChatID = ((ChatFragment) currentFragment).getmChatID();
+                                Log.wtf("currChatID: ", String.valueOf(currentChatID));
+                                if (currentChatID != chatID) {
+                                    notifiedChats.add(chatID);
+                                    notifyUI(getResources().getColor(R.color.colorLightBluePurple),
+                                            getResources().getColor(R.color.colorLightBluePurple));
+                                }
+                            }
+                        } else {
+                            notifiedChats.add(chatID);
+                            notifyUI(getResources().getColor(R.color.colorLightBluePurple),
+                                    getResources().getColor(R.color.colorLightBluePurple));
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

@@ -112,6 +112,7 @@ public class ConnectionsNode {
             //Fragment connectionListFragment = new ConnectionListFragment();
             //connectionListFragment.setArguments(args);
             loadingFragment.setArguments(args);
+            mMaster.onWaitFragmentInteractionHide();
             mMaster.loadFragment(loadingFragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String

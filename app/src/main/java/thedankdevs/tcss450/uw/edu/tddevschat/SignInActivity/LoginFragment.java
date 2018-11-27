@@ -161,7 +161,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .appendPath(getString(R.string.ep_getID))
                 .build();
         Log.w("URL for getting memberID of user:", uri.toString());
-        mListener.onWaitFragmentInteractionShow();
+
         new SendPostAsyncTask.Builder(uri.toString(), memberInfo)
                 .onPreExecute(this::handleIDOnPre)
                 .onPostExecute(this::handleIDOnPostExecute)
@@ -190,7 +190,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             Log.e("Could not retrieve memberID", e.getMessage());
             //TODO: how do i make sure that we can still get the memberID, or just quit?
         }
-        mListener.onWaitFragmentInteractionHide();
+
     }
 
 
@@ -334,7 +334,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getFirebaseToken(/*final String email, final String password*/) {
-        mListener.onWaitFragmentInteractionShow();
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic("all");
         //the call to getInstanceId happens asynchronously. task is an onCompleteListener
@@ -367,7 +366,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * Handle the setup of the UI before the HTTP call to the webservice.
      */
     private void handleLoginOnPre() {
-        mListener.onWaitFragmentInteractionShow();
     }
 
     /**
@@ -380,12 +378,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             Log.d("JSON result login",result);
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean("success");
-            mListener.onWaitFragmentInteractionHide();
+
             if (success) {
 
                 saveCredentials(mCredentials);
                 //Login was successful. Inform the Activity so it can do its thing.
                 mListener.onLoginSuccess(mCredentials);
+                mListener.onWaitFragmentInteractionHide();
             } else {
                 String verified = resultsJSON.getString("message");
                 if (verified.equals("NV")) { //If User's account was not verified, send another one.

@@ -25,8 +25,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -45,7 +47,7 @@ public class ChatFragment extends Fragment {
     static View rootLayout;
 
     /** Views that will show message recieved and sending**/
-    private TextView mMessageOutputTextView;
+
     private EditText mMessageInputEditText;
 
     /**User information.**/
@@ -152,23 +154,22 @@ public class ChatFragment extends Fragment {
                 .build().execute();
     }
 
+
+
     private void endOfSendMsgTask(final String result) {
         try {
-            Log.w("IS IT HERE", result);
             //This is the result from the web service
             JSONObject res = new JSONObject(result);
-
             if (res.has("success") && res.getBoolean("success")) {
                 //The web service got our message. Time to clear out the input EditText
                 mMessageInputEditText.setText("");
 
-                //its up to you to decide if you want to send the message to the output here
-//or wait for the message to come back from the web service.
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -177,6 +178,7 @@ public class ChatFragment extends Fragment {
         }
         IntentFilter iFilter = new IntentFilter(MyFirebaseMessagingService.RECEIVED_NEW_MESSAGE);
         getActivity().registerReceiver(mFirebaseMessageReciever, iFilter);
+
     }
     @Override
     public void onPause() {
@@ -228,6 +230,10 @@ public class ChatFragment extends Fragment {
 
     }
 
+    public int getmChatID() {
+        return mChatID;
+    }
+
     /**
      * A BroadcastReceiver setup to listen for messages sent from
      MyFirebaseMessagingService
@@ -238,7 +244,6 @@ public class ChatFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Log.i("FCM Chat Frag", "start onRecieve");
             if(intent.hasExtra("DATA")) {
-
                 String data = intent.getStringExtra("DATA");
                 Log.w("FCM DATA", data);
                 JSONObject jObj = null;
@@ -254,7 +259,6 @@ public class ChatFragment extends Fragment {
                             createBubbleUI(sender, msg);
                         }
                     }
-
                     ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
                     scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
                 } catch (JSONException e) {
