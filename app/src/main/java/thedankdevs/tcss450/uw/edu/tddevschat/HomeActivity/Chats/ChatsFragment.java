@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
@@ -32,6 +34,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     private int mColumnCount = 1;
 
     private OnChatsListFragmentInteractionListener mListener;
+    MyChatsRecyclerViewAdapter adapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -39,6 +42,8 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
      */
     public ChatsFragment() {
     }
+
+
 
     public static ChatsFragment newInstance(int columnCount) { //TODO: fix
         ChatsFragment fragment = new ChatsFragment();
@@ -62,6 +67,8 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        adapter = new MyChatsRecyclerViewAdapter(mChats, mListener);
         View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
         // Set the adapter
         if (view instanceof LinearLayout) {
@@ -73,7 +80,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyChatsRecyclerViewAdapter(mChats, mListener));
+            recyclerView.setAdapter(adapter);
         }
         Button b = view.findViewById(R.id.btn_newChat_chats);
         b.setOnClickListener(this);
@@ -103,6 +110,10 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Chat");
+
+
+        adapter.notifyDataSetChanged();
+
 
     }
 

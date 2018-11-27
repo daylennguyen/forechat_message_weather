@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -51,9 +52,7 @@ public class ChatNode {
     private ArrayList<Chat> allExistingChats = new ArrayList<>();
     private JSONArray allIndividualChats;
     private JSONArray allGroupChats;
-    private StringBuilder members = new StringBuilder();
-    private int groupchatID;
-    private String groupchatName;
+
     /**
      * Current user information
      **/
@@ -219,8 +218,10 @@ public class ChatNode {
            theOtherReceiverUsernames.add(mCredential.getUsername());
            addChatters(mChatID, theOtherReceiverUsernames);
 
+            Log.w("Adding", "YAY WE DID IT");
             Bundle bundle = new Bundle();
             bundle.putString(mMaster.getString(R.string.key_chat_Title), defaultChatName);
+            theOtherReceiverUsernames = new ArrayList<>();
             loadChatFragment(bundle);
 
         } catch (JSONException e) {
@@ -242,8 +243,9 @@ public class ChatNode {
      */
     private void addChatters(int chatID, ArrayList<String> usernames) {
         JSONObject chatterInfoObject = new JSONObject();
+
         JSONArray chatterInfo = new JSONArray(usernames);
-        // Log.w("Adding", usernames);
+
         Log.w("Adding", String.valueOf(chatID));
         Log.w("jsonarray", chatterInfo.toString());
          try {
@@ -258,7 +260,7 @@ public class ChatNode {
                 .appendPath(mMaster.getString((R.string.ep_messaging)))
                 .appendPath(mMaster.getString(R.string.ep_messaging_add))
                 .build();
-        Log.w("URL for create new chat:", uri.toString());
+        Log.w("URL for adding:", uri.toString());
 
         new SendPostAsyncTask.Builder(uri.toString(), chatterInfoObject)
                 .onPostExecute(this::handleAddChattersPost)
@@ -274,19 +276,22 @@ public class ChatNode {
      * @Version 15 November 2018
      */
     private void handleAddChattersPost(String result) {
+
+        JSONObject resultsJSON;
         try {
-            Log.w("JSON result adding peeps", result);
-            JSONObject resultsJSON = new JSONObject(result);
+            resultsJSON = new JSONObject(result);
             boolean didIt = resultsJSON.getBoolean("success");
+            Log.w("BLAH", String.valueOf(didIt));
             if (didIt) {
-                Log.w("Adding", "YAY WE DID IT");
+
             } else {
                 Log.w("Adding", "DARN IT, IT DIDN'T WORK");
             }
 
         } catch (JSONException e) {
-
+            e.printStackTrace();
         }
+
     }
 
 
@@ -357,13 +362,9 @@ public class ChatNode {
              allIndividualChats = resultsJSON.getJSONArray("individualChats");
             allGroupChats = resultsJSON.getJSONArray("groupChats");
 
-            //Iterate through the JSONarray and create chat objects to display.
-            for (int i = 0; i < allGroupChats.length(); i++) {
-                JSONObject chatRoom = allGroupChats.getJSONObject(i);
-                groupchatName = chatRoom.getString("name");
-                groupchatID = chatRoom.getInt("chatid");
-                getGroupchatMembers(groupchatID);
-            }
+            getGroupchatMembers();
+
+
 
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -374,14 +375,8 @@ public class ChatNode {
         }
     }
 
-    public void getGroupchatMembers (int groupChatID) {
-        JSONObject groupChatInfo = new JSONObject();
-        try {
-            groupChatInfo.put("chatID", groupChatID);
-            groupChatInfo.put("memberID", mCredential.getMemberID());
-        } catch (JSONException e) {
-            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
-        }
+    public void getGroupchatMembers () {
+        JSONObject empty = new JSONObject();
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .appendPath(mMaster.getString(R.string.base_url))
@@ -389,29 +384,35 @@ public class ChatNode {
                 .appendPath(mMaster.getString(R.string.ep_getOthers))
                 .build();
         Log.w("URL for getting all chat:", uri.toString());
-        new SendPostAsyncTask.Builder(uri.toString(), groupChatInfo)
-                .onPostExecute(this::handleGroupChatPost)
+        new SendPostAsyncTask.Builder(uri.toString(), empty)
+                .onPostExecute(this::handleGroupChatMemPost)
                 .onCancelled(error -> Log.e("ERROR EMMETT", error))
                 .build().execute();
     }
 
-    private void handleGroupChatPost(String result) {
+    private void handleGroupChatMemPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
-            JSONArray membersArray = resultsJSON.getJSONArray("others");
-            members = new StringBuilder();
+            JSONArray membersArray = resultsJSON.getJSONArray("groupmem");
 
-            for (int i = 0; i < membersArray.length(); i++) {
-                JSONObject firstMember = membersArray.getJSONObject(i);
-                String firstMemUsername = firstMember.getString("username");
-                members.append(firstMemUsername);
-                if (i < membersArray.length()-1) {
-                    members.append(", ");
-                }
-            }
-            allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
-            Bundle args = new Bundle();
             //Iterate through the JSONarray and create chat objects to display.
+            for (int i = 0; i < allGroupChats.length(); i++) {
+                StringBuilder members = new StringBuilder();
+                JSONObject chatRoom = allGroupChats.getJSONObject(i);
+                String groupchatName = chatRoom.getString("name");
+                int groupchatID = chatRoom.getInt("chatid");
+                for (int j = 0; j < membersArray.length(); j++) {
+                    JSONObject member = membersArray.getJSONObject(j);
+                    int tempChatID = Integer.parseInt(member.getString("chatid"));
+                    Log.w("shit", String.valueOf(tempChatID));
+                    if (tempChatID == groupchatID) {
+                        String tempUsername = member.getString("username");
+                        members.append(" "+ tempUsername+ " ");
+                    }
+                }
+                allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
+            }
+
             for (int i = 0; i < allIndividualChats.length(); i++) {
                 JSONObject chatRoom = allIndividualChats.getJSONObject(i);
                 String chatName = chatRoom.getString("name");
@@ -422,23 +423,21 @@ public class ChatNode {
 
             ArrayList<Integer> notichat = mMaster.getNotifiedChats();
             if (notichat.size() > 0) {
-               for (int i = 0; i < notichat.size(); i++) {
-                   for (int j = 0; j < allExistingChats.size(); j++) {
-                       if (notichat.get(i) == allExistingChats.get(j).getChatID()) {
-                           allExistingChats.get(j).notifiedChat();
-                       }
-                   }
-               }
+                for (int i = 0; i < notichat.size(); i++) {
+                    for (int j = 0; j < allExistingChats.size(); j++) {
+                        if (notichat.get(i) == allExistingChats.get(j).getChatID()) {
+                            allExistingChats.get(j).notifiedChat();
+                        }
+                    }
+                }
             }
-
-
+            Bundle args = new Bundle();
             args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
             //Create chats list fragment and display.
             Fragment fragment = new ChatsFragment();
             fragment.setArguments(args);
             mMaster.onWaitFragmentInteractionHide();
             mMaster.loadFragment(fragment);
-
             mMaster.resetNotifiedChats();
             allExistingChats = new ArrayList<>();
         } catch (JSONException e) {
@@ -446,7 +445,76 @@ public class ChatNode {
         }
 
     }
+    /*
+        public void getGroupchatMembers (int groupChatID) {
+            JSONObject groupChatInfo = new JSONObject();
+            try {
+                groupChatInfo.put("chatID", groupChatID);
+                groupChatInfo.put("memberID", mCredential.getMemberID());
+            } catch (JSONException e) {
+                Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+            }
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(mMaster.getString(R.string.base_url))
+                    .appendPath(mMaster.getString((R.string.ep_messaging)))
+                    .appendPath(mMaster.getString(R.string.ep_getOthers))
+                    .build();
+            Log.w("URL for getting all chat:", uri.toString());
+            new SendPostAsyncTask.Builder(uri.toString(), groupChatInfo)
+                    .onPostExecute(this::handleGroupChatPost)
+                    .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                    .build().execute();
+        }
 
+        private void handleGroupChatPost(String result) {
+            try {
+                JSONObject resultsJSON = new JSONObject(result);
+                JSONArray membersArray = resultsJSON.getJSONArray("others");
+                members = new StringBuilder();
+
+                for (int i = 0; i < membersArray.length(); i++) {
+                    JSONObject firstMember = membersArray.getJSONObject(i);
+                    String firstMemUsername = firstMember.getString("username");
+                    members.append(firstMemUsername);
+
+                    if (i < membersArray.length()-1) {
+                        members.append(", ");
+                    }
+                }
+
+
+                Log.wtf("members", members.toString());
+                allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
+                Bundle args = new Bundle();
+                //Iterate through the JSONarray and create chat objects to display.
+                for (int i = 0; i < allIndividualChats.length(); i++) {
+                    JSONObject chatRoom = allIndividualChats.getJSONObject(i);
+                    String chatName = chatRoom.getString("name");
+                    String receiver = chatRoom.getString("username");
+                    int chatid = chatRoom.getInt("chatid");
+                    allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
+                    Log.wtf("existingchats", chatName + receiver + chatid);
+                }
+
+
+
+                args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
+
+                args.putSerializable("ChatNodeKey", this);
+                //Create chats list fragment and display.
+                Fragment fragment = new ChatsFragment();
+                fragment.setArguments(args);
+                mMaster.onWaitFragmentInteractionHide();
+                mMaster.loadFragment(fragment);
+                mMaster.resetNotifiedChats();
+                allExistingChats = new ArrayList<>();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    */
     public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
 
         for (CheckBox checkBox : cbList) {
@@ -466,7 +534,6 @@ public class ChatNode {
                     } else {
                         mChatID = tempChatID;
                         loadAllMessages();
-
                     }
                     break;
                 }

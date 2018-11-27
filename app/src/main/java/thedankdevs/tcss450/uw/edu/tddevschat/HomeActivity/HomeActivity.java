@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
@@ -164,8 +165,16 @@ public class HomeActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
+            if (currentFragment instanceof ChatFragment) {
+                mChatNode.loadAllChats();
+                Log.wtf("wtf", "NOT ENTERING");
+            } else {
+                super.onBackPressed();
+            }
         }
+
+
     }
 
     @Override
@@ -371,6 +380,19 @@ public class HomeActivity extends AppCompatActivity
         notifiedChats = new ArrayList<>();
     }
 
+    public void notifyUI(int notifiedChatID) {
+        notifiedChats.add(notifiedChatID);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorLightBluePurple));
+        toggle.syncState();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu m = navigationView.getMenu();
+        MenuItem menuItem = m.findItem(R.id.nav_chat);
+        SpannableString s = new SpannableString(menuItem.getTitle());
+        s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorBluePurple)),
+                0, s.length(), 0);
+        menuItem.setTitle(s);
+    }
+
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private HomeActivity mMaster;
@@ -427,21 +449,23 @@ public class HomeActivity extends AppCompatActivity
                 JSONObject jObj = null;
                 try {
                     jObj = new JSONObject(data);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
                     if (jObj.has("message") && jObj.has("sender")) {
                         String sender = jObj.getString("sender");
-                        if (sender != mCredential.getUsername()) {
-                            String chatID = jObj.getString("chatID");
-                            notifiedChats.add(Integer.valueOf(chatID));
-                            toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorLightBluePurple));
-                            toggle.syncState();
-                            NavigationView navigationView = findViewById(R.id.nav_view);
-                            Menu m = navigationView.getMenu();
-                            MenuItem menuItem = m.findItem(R.id.nav_chat);
-                            SpannableString s = new SpannableString(menuItem.getTitle());
-                            s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                            menuItem.setTitle(s);
+                        Log.wtf("sender", sender);
+                        Log.wtf("username", mCredential.getUsername());
+                        int chatID = Integer.valueOf(jObj.getString("chatID"));
+                        if (currentFragment instanceof ChatFragment) {
+                            if (!sender.equals(mCredential.getUsername())) {
+                                int currentChatID = ((ChatFragment) currentFragment).getmChatID();
+                                Log.wtf("currChatID: ", String.valueOf(currentChatID));
+                                if (currentChatID != chatID) {
+                                    notifyUI(chatID);
+                                }
+                            }
+                        } else {
+                            notifyUI(chatID);
                         }
-
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -449,6 +473,4 @@ public class HomeActivity extends AppCompatActivity
             }
         }
     }
-
-
 }

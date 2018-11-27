@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -153,18 +154,16 @@ public class ChatFragment extends Fragment {
                 .build().execute();
     }
 
+
+
     private void endOfSendMsgTask(final String result) {
         try {
-            Log.w("IS IT HERE", result);
             //This is the result from the web service
             JSONObject res = new JSONObject(result);
-
             if (res.has("success") && res.getBoolean("success")) {
                 //The web service got our message. Time to clear out the input EditText
                 mMessageInputEditText.setText("");
 
-                //its up to you to decide if you want to send the message to the output here
-//or wait for the message to come back from the web service.
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -179,6 +178,7 @@ public class ChatFragment extends Fragment {
         }
         IntentFilter iFilter = new IntentFilter(MyFirebaseMessagingService.RECEIVED_NEW_MESSAGE);
         getActivity().registerReceiver(mFirebaseMessageReciever, iFilter);
+
     }
     @Override
     public void onPause() {
@@ -228,6 +228,10 @@ public class ChatFragment extends Fragment {
 
         }
 
+    }
+
+    public int getmChatID() {
+        return mChatID;
     }
 
     /**
