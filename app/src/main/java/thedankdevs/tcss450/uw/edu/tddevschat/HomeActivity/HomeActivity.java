@@ -242,11 +242,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_chat:
                 setTitle("Chat");
                 mChatNode.loadAllChats();
-                toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorLightestGrey));
-                toggle.syncState();
-                SpannableString s = new SpannableString(item.getTitle());
-                s.setSpan(new ForegroundColorSpan(Color.BLACK), 0, s.length(), 0);
-                item.setTitle(s);
+              notifyUI(Color.BLACK, Color.WHITE);
                 onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
@@ -284,6 +280,7 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack(null)
                 .commit();
     }
+
 
     @Override
     public void onWaitFragmentInteractionHide() {
@@ -394,15 +391,15 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
-    public void notifyUI(int notifiedChatID) {
-        notifiedChats.add(notifiedChatID);
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorLightBluePurple));
+    public void notifyUI(int colorOfText, int colorOfBurger) {
+        toggle.getDrawerArrowDrawable().setColor(colorOfBurger);
         toggle.syncState();
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu m = navigationView.getMenu();
         MenuItem menuItem = m.findItem(R.id.nav_chat);
         SpannableString s = new SpannableString(menuItem.getTitle());
-        s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorBluePurple)),
+
+        s.setSpan(new ForegroundColorSpan(colorOfText),
                 0, s.length(), 0);
         menuItem.setTitle(s);
     }
@@ -479,14 +476,15 @@ public class HomeActivity extends AppCompatActivity
                                 int currentChatID = ((ChatFragment) currentFragment).getmChatID();
                                 Log.wtf("currChatID: ", String.valueOf(currentChatID));
                                 if (currentChatID != chatID) {
-                                    notifyUI(chatID);
+                                    notifiedChats.add(chatID);
+                                    notifyUI(getResources().getColor(R.color.colorLightBluePurple),
+                                            getResources().getColor(R.color.colorLightBluePurple));
                                 }
                             }
-                        }else if (currentFragment instanceof ChatsFragment) {
-                            mChatNode.loadAllChats();
-                            notifiedChats.add(chatID);
                         } else {
-                            notifyUI(chatID);
+                            notifiedChats.add(chatID);
+                            notifyUI(getResources().getColor(R.color.colorLightBluePurple),
+                                    getResources().getColor(R.color.colorLightBluePurple));
                         }
                     }
                 } catch (JSONException e) {

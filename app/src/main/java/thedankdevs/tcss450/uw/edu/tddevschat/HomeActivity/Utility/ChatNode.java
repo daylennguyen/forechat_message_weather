@@ -1,6 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -314,6 +315,7 @@ public class ChatNode {
         for (int cid : notifiedChats) {
             if (cid == mChatID) {
                 mMaster.updateNotifiedChats(mChatID);
+                mMaster.notifyUI(Color.BLACK, Color.WHITE);
             }
         }
         loadAllMessages();
