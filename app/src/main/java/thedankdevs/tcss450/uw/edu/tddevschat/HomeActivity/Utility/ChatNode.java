@@ -406,10 +406,13 @@ public class ChatNode {
                 for (int j = 0; j < membersArray.length(); j++) {
                     JSONObject member = membersArray.getJSONObject(j);
                     int tempChatID = Integer.parseInt(member.getString("chatid"));
-                    Log.w("shit", String.valueOf(tempChatID));
+
                     if (tempChatID == groupchatID) {
                         String tempUsername = member.getString("username");
-                        members.append(" "+ tempUsername+ " ");
+                        Log.w("LOL", tempUsername);
+                        if (!tempUsername.equals(mCredential.getUsername())) {
+                            members.append(" " + tempUsername + " ");
+                        }
                     }
                 }
                 allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());

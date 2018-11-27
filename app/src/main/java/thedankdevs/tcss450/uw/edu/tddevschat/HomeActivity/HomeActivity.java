@@ -242,7 +242,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_chat:
                 setTitle("Chat");
                 mChatNode.loadAllChats();
-              notifyUI(Color.BLACK, Color.WHITE);
+                notifyUI(Color.BLACK, Color.WHITE);
                 onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
