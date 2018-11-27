@@ -48,6 +48,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
@@ -73,7 +74,8 @@ public class HomeActivity extends AppCompatActivity
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         CreateNewChatFragment.OnCreateNewChatButtonListener,
         WaitFragment.OnFragmentInteractionListener,
-        RequestFragment.OnListFragmentInteractionListener {
+        RequestFragment.OnListFragmentInteractionListener,
+        RemoveChatMembers.OnRemoveMemberListener {
 
 
     /*Node for retrieving the weather data and displaying the information*/
@@ -308,6 +310,15 @@ public class HomeActivity extends AppCompatActivity
         transaction.commit();
     }
 
+    /*Helper method to load an instance of the given fragment into the current activity*/
+    public void loadFragmentWithoutBackStack(Fragment frag) {
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_home_container, frag);
+        // Commit the transaction
+        transaction.commit();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationNode.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -373,12 +384,15 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public ArrayList<Integer> getNotifiedChats(){
-        return notifiedChats;
+        return (ArrayList<Integer>) notifiedChats.clone();
     }
 
-    public void resetNotifiedChats() {
-        notifiedChats = new ArrayList<>();
+
+    public void updateNotifiedChats(int openedChatID ) {
+        notifiedChats.remove(notifiedChats.indexOf(openedChatID));
+
     }
+
 
     public void notifyUI(int notifiedChatID) {
         notifiedChats.add(notifiedChatID);
@@ -391,6 +405,11 @@ public class HomeActivity extends AppCompatActivity
         s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorBluePurple)),
                 0, s.length(), 0);
         menuItem.setTitle(s);
+    }
+
+    @Override
+    public void RemoveMemberInteraction(ArrayList<String> users, int theChatID) {
+        mChatNode.RemoveMembersFromChat(users, theChatID);
     }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -463,6 +482,9 @@ public class HomeActivity extends AppCompatActivity
                                     notifyUI(chatID);
                                 }
                             }
+                        }else if (currentFragment instanceof ChatsFragment) {
+                            mChatNode.loadAllChats();
+                            notifiedChats.add(chatID);
                         } else {
                             notifyUI(chatID);
                         }

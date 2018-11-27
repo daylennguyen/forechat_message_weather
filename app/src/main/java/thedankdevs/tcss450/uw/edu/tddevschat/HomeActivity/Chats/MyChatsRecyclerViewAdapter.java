@@ -1,14 +1,10 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
-import android.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -42,7 +38,7 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mChatName.setText(mValues.get(position).getChatName());
-        holder.mReceiver.setText(mValues.get(position).getMemberEmails().toString());
+        holder.mReceiver.setText(mValues.get(position).getChatMembers().toString());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
