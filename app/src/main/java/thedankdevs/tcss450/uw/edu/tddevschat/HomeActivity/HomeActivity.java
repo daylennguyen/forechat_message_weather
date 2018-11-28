@@ -49,14 +49,13 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
-import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -81,26 +80,20 @@ public class HomeActivity extends AppCompatActivity
         RemoveChatMembers.OnRemoveMemberListener,
         MemberSettingsFragment.OnFragmentInteractionListener {
 
-
-    /*Node for retrieving the weather data and displaying the information*/
-//    private WeatherNode mWeatherNode;
-    /*Node for retrieving and setting the user settings*/
+    /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public SettingsNode mSettingsNode;
-    /**
-     * Current user information
-     */
+    /*******************FIELD VARIABLES*******************/
+    /*User saved credentials*/
     private Credentials mCredential;
-    /**Node for retrieving/fetching the location information of the user*/
     private LocationNode mLocationNode;
-    /**Node for retrieving connection information*/
     private ConnectionsNode mConnectionsNode;
-    /**Node for retrieving information on user chats*/
     private ChatNode mChatNode;
-    ActionBarDrawerToggle toggle;
-
+    /*Chat Field variables*/
+    private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer> notifiedChats = new ArrayList<>();
 
-    private FirebaseMessageReciever mFirebaseMessageReciever;
+    /*Used to toggle the opened/closed state of the nav drawer*/
+    private ActionBarDrawerToggle toggle;
 
     private MemberSettingsNode mMemberSettingsNode;
 
@@ -112,35 +105,40 @@ public class HomeActivity extends AppCompatActivity
         }
         IntentFilter iFilter = new IntentFilter(MyFirebaseMessagingService.RECEIVED_NEW_MESSAGE);
         registerReceiver(mFirebaseMessageReciever, iFilter);
+        mLocationNode.stopLocationUpdates();
     }
-
     @Override
     protected void onPause() {
         super.onPause();
-        if (mFirebaseMessageReciever != null){
+        if (mFirebaseMessageReciever != null) {
             unregisterReceiver(mFirebaseMessageReciever);
         }
+        mLocationNode.stopLocationUpdates();
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*initialize the view with the xml content*/
         setContentView(R.layout.activity_home);
         setTitle("Main Page");
         findViewById(R.id.nav_view);
 
-        /**/
+        /*Check for saved-sign-in info*/
         mCredential = (Credentials) getIntent().getSerializableExtra(getString(R.string.key_credential));
         initializeNodes();
-        /*insert option items into the tool bar*/
+
+        /*insert option items into the tool bar and initialize the drawer*/
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        initializeActionDrawerToggle(drawer, toolbar);
 
+        mLocationNode.startLocationUpdates();
+    }
 
-        toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
+    /*Enables toggling of the nav drawer and displays with username within said drawer aswell*/
+    private void initializeActionDrawerToggle(DrawerLayout drawer, Toolbar toolbar) {
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -148,13 +146,12 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
         nav_user.setText(mCredential.getUsername()); //Set the header username.
-        mLocationNode.startLocationUpdates();
     }
 
     /*Helper class to create node objects*/
     private void initializeNodes() {
         /*Retrieve user settings*/
-        mSettingsNode = new SettingsNode(this);
+        mSettingsNode = new SettingsNode();
         /*  Connections  */
         mConnectionsNode = new ConnectionsNode(this, mCredential);
         /*   Location    */
@@ -236,8 +233,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
             case R.id.nav_weather:
                 setTitle("Weather");
-                if ((mLocationNode.getmCurrentLocation() != null)
-                        && (mLocationNode.getmCurrentLocation() != null)) {
+                if ((mLocationNode.getmCurrentLocation() != null)) {
                     args.putDouble(LATITUDE_KEY, mLocationNode.getmCurrentLocation().getLatitude());
                     args.putDouble(LONGITUDE_KEY, mLocationNode.getmCurrentLocation().getLongitude());
                 }
@@ -403,7 +399,7 @@ public class HomeActivity extends AppCompatActivity
 
 
     public void updateNotifiedChats(int openedChatID ) {
-        notifiedChats.remove(notifiedChats.indexOf(openedChatID));
+        notifiedChats.remove(openedChatID);
 
     }
 

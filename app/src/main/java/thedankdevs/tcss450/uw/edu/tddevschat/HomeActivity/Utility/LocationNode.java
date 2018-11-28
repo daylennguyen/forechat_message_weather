@@ -21,54 +21,21 @@ import java.io.Serializable;
  */
 public class LocationNode implements Serializable {
 
-    /**
-     * The key to
-     */
+    public static final String ZIP_KEY = "ZIP";
+    public static final String CITY_KEY = "CITY";
+    public static final String STATE_KEY = "STATE";
     public static final String LONGITUDE_KEY = "LONGITUDE";
-
-    /*Location Services*/
-    /**
-     *
-     */
     public static final String LATITUDE_KEY = "LATITUDE";
-    /**
-     *
-     */
-    public static final String LOCATION_KEY = "LOCATE";
-    /**
-     *
-     */
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
 
     /*Location Services*/
-    /**
-     *
-     */
-    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    /**
-     *
-     */
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private static final int MY_PERMISSIONS_LOCATIONS = 8414;
     private AppCompatActivity myNodeMaster;
-    /**
-     *
-     */
     private LocationRequest mLocationRequest;
-    /**
-     *
-     */
     private Location mCurrentLocation;
-    /**
-     *
-     */
     private FusedLocationProviderClient mFusedLocationClient;
-    /**
-     *
-     */
     private LocationCallback mLocationCallback;
-
-
     /**
      * @param MasterActivity
      */
@@ -123,9 +90,6 @@ public class LocationNode implements Serializable {
      * Removes location updates from the FusedLocationApi.
      */
     public void stopLocationUpdates() {
-        // It is a good practice to remove location requests when the activity is in a paused or
-        // stopped state. Doing so helps battery performance and is especially
-        // recommended in applications that request frequent location updates.
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
@@ -134,29 +98,16 @@ public class LocationNode implements Serializable {
      */
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
-        // Sets the desired interval for active location updates. This interval is
-        // inexact. You may not receive updates at all if no location sources are available, or
-        // you may receive them slower than requested. You may also receive updates faster than
-        // requested if other applications are requesting location at a faster interval.
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        // Sets the fastest rate for active location updates. This interval is exact, and your
-        // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
     }
 
-
-    /**
-     * @param location
-     */
+    /** @param location*/
     private void setLocation(final Location location) {
         mCurrentLocation = location;
     }
 
-    /**
-     *
-     */
     /*Method to request the location permissions from the user*/
     private void requestLocation() {
         if (ActivityCompat.checkSelfPermission(getMyNodeMaster(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -184,17 +135,13 @@ public class LocationNode implements Serializable {
      */
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-
             case MY_PERMISSIONS_LOCATIONS: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // locations-related task you need to do.
+                    // permission was granted
                     requestLocation();
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Log.d("PERMISSION DENIED", "Nothing to see or do here.");
 
                     //Shut down the app. In production release, you would let the user
@@ -202,8 +149,6 @@ public class LocationNode implements Serializable {
                     myNodeMaster.finishAndRemoveTask();
                 }
             }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 

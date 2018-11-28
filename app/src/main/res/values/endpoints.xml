@@ -41,12 +41,14 @@
     <string name="ep_weather">weather</string>
     <string name="ep_weather_icon">https://www.weatherbit.io/static/img/icons/</string>
     <string name="ep_weather_icon_file_ext">.png/</string>
+    <string name="ep_weather_citystate">citystate</string>
+    <string name="ep_weather_postalcode">postalcode</string>
 
     <!--_______________Search_________________-->
     <string name="ep_search">search</string>
     <string name="ep_contacts">contacts</string>
     <string name="ep_weather_bycoordinate">coord</string>
-    
+
     <!--_______________Settings_______________-->
     <string name="ep_settings">settings</string>
     <string name="ep_update_info">update_info</string>

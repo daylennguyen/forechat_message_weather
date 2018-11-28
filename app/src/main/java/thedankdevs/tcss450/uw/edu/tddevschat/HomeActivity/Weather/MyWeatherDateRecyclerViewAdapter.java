@@ -41,9 +41,9 @@ public class MyWeatherDateRecyclerViewAdapter extends RecyclerView.Adapter<MyWea
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mDateTxtView.setText(mValues.get(position).mDateTxtView);
-        holder.mLoTxtView.setText(String.format("Lo: %s", Double.toString(mValues.get(position).mLoTxtView)));
-        holder.mHiTxtView.setText(String.format("Hi: %s", Double.toString(mValues.get(position).mHiTxtView)));
-        holder.mAvgTxtView.setText(String.format("Avg:%s", Double.toString(mValues.get(position).mAvgTxtView)));
+        holder.mLoTxtView.setText(String.format("Lo: %s°%s", Double.toString(mValues.get(position).mLoTxtView), mValues.get(position).mMetric));
+        holder.mHiTxtView.setText(String.format("Hi: %s°%s", Double.toString(mValues.get(position).mHiTxtView), mValues.get(position).mMetric));
+        holder.mAvgTxtView.setText(String.format("Avg:%s°%s", Double.toString(mValues.get(position).mAvgTxtView), mValues.get(position).mMetric));
         holder.mConditionTxtView.setText(mValues.get(position).mConditionTxtView);
         holder.mView.setOnClickListener(v -> {
             if (null != mListener) {

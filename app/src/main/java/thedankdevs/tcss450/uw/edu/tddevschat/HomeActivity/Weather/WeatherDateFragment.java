@@ -1,6 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,13 +21,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.CITY_KEY;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.STATE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.ZIP_KEY;
 
 /**
  * A fragment representing a list of Items.
@@ -35,27 +43,27 @@ import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.Locatio
  * interface.
  */
 public class WeatherDateFragment extends Fragment {
-    /*Debug tag*/
-    static final String TAG = "WEATHER";
-    /*tag for # columns within the list*/
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    /*value for # columns within the list*/
-    private int mColumnCount = 1;
 
-    /*Response from server will push content to list*/
+    static final String TAG = "WEATHER";
+
+    /*  UNITS OF MEASUREMENT  */
+    private static final String METRIC = "M";       // - [DEFAULT] Metric (Celcius, m/s, mm)
+    private static final String SCIENTIFIC = "S";   // - Scientific (Kelvin, m/s, mm)
+    private static final String MURICA = "I";       // - Fahrenheit (F, mph, in)
+
+    /*  Response from server will push content to list  */
     private List<WeatherDate> currentWeatherData;
 
-    /*
-        Weather Variables; data output is dependant on valid variables
-        NOTE: State is the state abbreviation.
-    */
-    private String mState, mCity;
-    private double mLon, mLat;
-    /*TODO: implement listener for date selection*/
-    private OnListFragmentInteractionListener mListener;
+/* Weather Variables; data output is dependant on valid variables
+   NOTE: State is the state abbreviation.*/
 
-    /*The recycler view contained within this fragment*/
+    private String mState, mCity, mZip;
+    private double mLon, mLat;
+    private OnListFragmentInteractionListener mListener;
     private RecyclerView myRV;
+    private int current_LocationDeterminant;
+    private String current_WeatherMetric;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -67,13 +75,45 @@ public class WeatherDateFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getAndUpdateLocationDeterminantPref();
+        getAndUpdateMetricPreferences();
         // Send request for weather data
-
         if (getArguments() != null) {
-            Bundle LocationData = getArguments();
-            Coordinates_getCurrentWeatherData(LocationData.getDouble(LATITUDE_KEY), LocationData.getDouble(LONGITUDE_KEY));
-            /*mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);*/
+            Bundle bundle = getArguments();
+            getLocationDataBasedOnPreference(bundle);
+            Coordinates_getCurrentWeatherData();
         }
+    }
+
+    /*** Retrieves the user's location data based on preference settings*/
+    private void getLocationDataBasedOnPreference(Bundle bundle) {
+        switch (current_LocationDeterminant) {
+            case SettingsNode.CITY_STATE:
+                mCity = bundle.getString(CITY_KEY, "TACOMA");
+                mState = bundle.getString(STATE_KEY, "WA");
+                break;
+            case SettingsNode.GPS_DATA:
+                mLat = bundle.getDouble(LATITUDE_KEY, 0);
+                mLon = bundle.getDouble(LONGITUDE_KEY, 0);
+                break;
+            case SettingsNode.SELECT_FROM_MAP:
+                mLat = bundle.getDouble(LATITUDE_KEY, 0);
+                mLon = bundle.getDouble(LONGITUDE_KEY, 0);
+                break;
+            case SettingsNode.POSTAL_CODE:
+                mZip = bundle.getString(ZIP_KEY, "98422");
+                break;
+        }
+    }
+
+    public void getAndUpdateMetricPreferences() {
+        SharedPreferences settings = Objects.requireNonNull(getContext()).getApplicationContext().getSharedPreferences(METRIC_PREF, Context.MODE_PRIVATE);
+        current_WeatherMetric = settings.getString(METRIC_PREF, "C");
+    }
+
+    public void getAndUpdateLocationDeterminantPref() {
+        SharedPreferences settings = Objects.requireNonNull(getContext()).getSharedPreferences(DETERMINANT_PREF, Context.MODE_PRIVATE);
+        current_LocationDeterminant = settings.getInt(DETERMINANT_PREF, SettingsNode.GPS_DATA);
     }
 
     /*Once the weather request has been fulfilled, we can remove the load/wait fragment*/
@@ -91,6 +131,11 @@ public class WeatherDateFragment extends Fragment {
             // latitude and longitude
             mState = res.getString("state_code");
             mCity = res.getString("city_name");
+
+            Log.i("DAYLEN_WEATH_DATE_FRAG", mCity + mState);
+            Log.i("DAYLEN_WEATH_DATE_FRAG", "LOCATIONDETERMINANT = ".concat(String.valueOf(current_LocationDeterminant)));
+            Log.i("DAYLEN_WEATH_DATE_FRAG", "WEATHER METRIC = ".concat(String.valueOf(current_WeatherMetric)));
+
             // response will contain a json array containing 16 day forecast
             // each index, 1 day
             JSONArray data = res.getJSONArray("data");
@@ -102,11 +147,13 @@ public class WeatherDateFragment extends Fragment {
             for (int i = 0; i < 10; i++) {
                 // data will be in the form of a json object
                 JSONObject currentDay = (JSONObject) data.get(i);
+
                 // extract json values from response
                 String date = currentDay.getString("datetime");
                 double avg = currentDay.getDouble("temp");
                 double min = currentDay.getDouble("min_temp");
                 double max = currentDay.getDouble("max_temp");
+
                 JSONObject weather = currentDay.getJSONObject("weather");
                 String desc = weather.getString("description");
 
@@ -117,9 +164,9 @@ public class WeatherDateFragment extends Fragment {
                 String iconURI = String.format("%s%s%s", icolocation, iconAlias, icoextension);
 
                 // encapsulate the values for retrieval by the recycler view
-                WeatherDate Day = new WeatherDate(i, iconURI, i + " Day(s) away: " + date, min, max, avg, desc);
+                WeatherDate Day = new WeatherDate(i, current_WeatherMetric, iconURI, i + " Day(s) away: " + date, min, max, avg, desc);
                 if (i == 0) {
-                    Day = new WeatherDate(i, iconURI, "Today: " + date, min, max, avg, desc);
+                    Day = new WeatherDate(i, current_WeatherMetric, iconURI, "Today: " + date, min, max, avg, desc);
                 }
 
                 /*Add the current weather to the field [list]*/
@@ -132,7 +179,7 @@ public class WeatherDateFragment extends Fragment {
         } finally {
 
             //display the location correlating to the data we are displaying
-            ((TextView) getView().findViewById(R.id.city_head_textview)).setText(mCity);
+            ((TextView) Objects.requireNonNull(getView()).findViewById(R.id.city_head_textview)).setText(mCity);
             ((TextView) getView().findViewById(R.id.state_head_textview)).setText(mState);
             /*After retrieving the data, make it visible and remove the wait-fragment*/
             myRV.setAdapter(new MyWeatherDateRecyclerViewAdapter(currentWeatherData, mListener));
@@ -141,38 +188,98 @@ public class WeatherDateFragment extends Fragment {
 
     }
 
-    /*
-        helper method to send a post request to the server, containing the state abbreviation
-        and city (in JSON format)
-
-
-    */
-    private void Coordinates_getCurrentWeatherData(final double Latitude, final double Longitude) {
-        mLon = Longitude;
-        mLat = Latitude;
-        String mSendUrl = new Uri.Builder()
+    /*Generates a URI string. Changes the endpoint depending on location determinant*/
+    private String constructRequestLocation() {
+        Uri.Builder uri_builder = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.base_url))
-                .appendPath(getString(R.string.ep_weather))
-                .appendPath(getString(R.string.ep_weather_bycoordinate))
-                .build()
-                .toString();
-        JSONObject request = new JSONObject();
+                .appendPath(getString(R.string.ep_weather));
+        switch (current_LocationDeterminant) {
+            case SettingsNode.CITY_STATE:
+                uri_builder.appendPath(getString(R.string.ep_weather_citystate));
+                break;
+            case SettingsNode.GPS_DATA:
+                uri_builder.appendPath(getString(R.string.ep_weather_bycoordinate));
+                break;
+            case SettingsNode.SELECT_FROM_MAP:
+                uri_builder.appendPath(getString(R.string.ep_weather_bycoordinate));
+                break;
+            case SettingsNode.POSTAL_CODE:
+                uri_builder.appendPath(getString(R.string.ep_weather_postalcode));
+                break;
+        }
+        return uri_builder.build().toString();
+    }
+
+    private void getMetricReqString(JSONObject j) {
         try {
-            request.put("lon", mLon);
-            request.put("lat", mLat);
+            switch (current_WeatherMetric) {
+                case "F":
+                    j.put("units", "I");
+                    break;
+                case "K":
+                    j.put("units", "S");
+                    break;
+                case "C":
+                    break;
+            }
         } catch (JSONException e) {
-            Log.d(TAG, e.toString());
             e.printStackTrace();
         }
+    }
+
+    /*returns a json object, dependent on the location determinant*/
+    private JSONObject constructRequestJSON() {
+        JSONObject request = new JSONObject();
+        try {
+            switch (current_LocationDeterminant) {
+                case SettingsNode.CITY_STATE:
+                    request.put(getString(R.string.weather_lcase_city), mCity);
+                    request.put(getString(R.string.weather_lcase_state), mState);
+                    break;
+                case SettingsNode.GPS_DATA:
+                    request.put(getString(R.string.weather_lon_json), mLon);
+                    request.put(getString(R.string.weather_lat_json), mLat);
+                    break;
+                case SettingsNode.SELECT_FROM_MAP:
+                    request.put(getString(R.string.weather_lon_json), mLon);
+                    request.put(getString(R.string.weather_lat_json), mLat);
+                    break;
+                case SettingsNode.POSTAL_CODE:
+                    request.put(getString(R.string.weather_json_postal), mZip);
+                    break;
+            }
+            /*DEFAULT UNIT IS CELSIUS*/
+            if (!current_WeatherMetric.equals(SettingsNode.CELSIUS)) {
+                switch (current_WeatherMetric) {
+                    case SettingsNode.FAHRENHEIT:
+                        request.put("units", MURICA);
+                        break;
+                    case SettingsNode.KELVIN:
+                        request.put("units", SCIENTIFIC);
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("WEATHER", String.valueOf(e));
+        }
+        getMetricReqString(request);
+        return request;
+    }
+
+    private void Coordinates_getCurrentWeatherData() {
+        String mSendUrl = constructRequestLocation();
+        JSONObject request = constructRequestJSON();
         Log.d(TAG, mSendUrl);
+        if (request != null) {
+            Log.d(TAG, request.toString());
+        }
         new SendPostAsyncTask.Builder(mSendUrl, request)
                 .onPreExecute(this::PreWeatherRequest)
                 .onPostExecute(this::PostWeatherRequest)
                 .onCancelled(error -> Log.e(TAG, error))
                 .build()
                 .execute();
-
     }
 
 //    /*overload, if no args are provided then default to uwt location*/
@@ -189,6 +296,7 @@ public class WeatherDateFragment extends Fragment {
         // Set the adapter and layout manager
         if (myRV != null) {
             Context context = myRV.getContext();
+            int mColumnCount = 1;
             if (mColumnCount <= 1) {
                 myRV.setLayoutManager(new LinearLayoutManager(context));
             } else {

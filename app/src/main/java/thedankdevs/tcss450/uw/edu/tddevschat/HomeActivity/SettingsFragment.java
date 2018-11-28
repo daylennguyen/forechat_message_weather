@@ -1,4 +1,4 @@
-package thedankdevs.tcss450.uw.edu.tddevschat;
+package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
 
 import android.content.SharedPreferences;
@@ -15,8 +15,8 @@ import android.widget.Spinner;
 
 import java.util.Objects;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
-import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 
 /**
@@ -62,13 +62,13 @@ public class SettingsFragment extends Fragment {
         super.onDestroy();
         // Get from the SharedPreferences
         SharedPreferences settings = Objects.requireNonNull(this.getContext()).getSharedPreferences(METRIC_PREF, 0);
-        int METRICPREF = settings.getInt(METRIC_PREF, 0);
+        String METRICPREF = settings.getString(METRIC_PREF, "C");
         Log.e("DAYLEN", String.valueOf(METRICPREF));
         /*update the shared preference fields within settings node*/
-        if (home != null && home.mSettingsNode != null) {
-            home.mSettingsNode.getAndUpdateLocationDeterminantPref();
-            home.mSettingsNode.getAndUpdateMetricPreferences();
-        }
+//        if (home != null && home.mSettingsNode != null) {
+//            home.mSettingsNode.getAndUpdateLocationDeterminantPref();
+//            home.mSettingsNode.getAndUpdateMetricPreferences();
+//        }
     }
 
     public String getSavedMetricPreference() {
