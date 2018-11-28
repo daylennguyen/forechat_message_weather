@@ -40,6 +40,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages
         // are handled
@@ -57,6 +58,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // [END_EXCLUDE]
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+        super.onMessageReceived(remoteMessage);
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {

@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 
@@ -40,7 +38,7 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mChatName.setText(mValues.get(position).getChatName());
-        holder.mReceiver.setText(mValues.get(position).getMemberEmails().toString());
+        holder.mReceiver.setText(mValues.get(position).getChatMembers().toString());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,12 +50,22 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
                 }
             }
         });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    mListener.onChatsListFragmentLongInteraction(holder.mItem);
+                }
+                return true;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;

@@ -58,6 +58,8 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
 
     private OnListFragmentInteractionListener mListener;
 
+    boolean mExistsLocally;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -156,8 +158,8 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     @Override
     public boolean onQueryTextChange(String text) {
         text = text.toLowerCase();
-        boolean existsLocally = mLocalAdapter.filter(text);
-        if (!existsLocally) {
+        mExistsLocally = mLocalAdapter.filter(text);
+        if (!mExistsLocally) {
 
             /*
                 since global adapter was previously initialized and that list
@@ -182,7 +184,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
                 reset the adapter to local
              */
 
-        } else if (existsLocally && !mRecyclerView.getAdapter().equals(mLocalAdapter)) {
+        } else if (mExistsLocally && !mRecyclerView.getAdapter().equals(mLocalAdapter)) {
 
             mRecyclerView.setAdapter(mLocalAdapter);
         }
@@ -243,11 +245,19 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
                     String username = member.getString("username");
                     String email = member.getString("email");
 
-                    Connection c = new Connection.Builder(email, username)
-                            .addFirstName(firstName)
-                            .addLastName(lastName)
-                            .build();
-
+                    Connection c;
+                    if (mExistsLocally) {
+                        c = new Connection.Builder(email, username)
+                                .addFirstName(firstName)
+                                .addLastName(lastName)
+                                .isMine()
+                                .build();
+                    } else {
+                        c = new Connection.Builder(email, username)
+                                .addFirstName(firstName)
+                                .addLastName(lastName)
+                                .build();
+                    }
                     globalConnections.add(c);
 
                 }

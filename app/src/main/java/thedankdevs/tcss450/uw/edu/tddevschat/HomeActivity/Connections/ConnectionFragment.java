@@ -1,15 +1,24 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
+import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,12 +30,16 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  */
 public class ConnectionFragment extends Fragment implements View.OnClickListener {
 
-    private String mEmail;
-    private String mUsername;
-    private String mFirstName;
-    private String mLastName;
-    private int mChatID;
-    private boolean mIsMine;
+    private String mTheirEmail;
+    private String mTheirUsername;
+    private String mTheirFirstName;
+    private String mTheirLastName;
+    private int mOurChatID;
+    private boolean mIsMine = false;
+
+    private Credentials mCredentials;
+
+    Button mChatButton;
 
     private OnConnectionFragmentInteractionListener mListener;
 
@@ -36,12 +49,20 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mEmail = getArguments().getString(getString(R.string.key_connection_email));
-            mUsername = getArguments().getString(getString(R.string.key_connection_username));
-            mFirstName = getArguments().getString(getString(R.string.key_connection_first));
-            mLastName = getArguments().getString(getString(R.string.key_connection_last));
-            mChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
-            mIsMine = getArguments().getBoolean(getString(R.string.key_connection_isMine));
+            Connection theConnection = (Connection) getArguments().getSerializable(getString(R.string.key_connection_connection));
+            mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
+            /*mTheirEmail = getArguments().getString(getString(R.string.key_connection_email));
+            mTheirUsername = getArguments().getString(getString(R.string.key_connection_username));
+            mTheirFirstName = getArguments().getString(getString(R.string.key_connection_first));
+            mTheirLastName = getArguments().getString(getString(R.string.key_connection_last));
+            mOurChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
+            mIsMine = getArguments().getBoolean(getString(R.string.key_connection_isMine));*/
+            mTheirEmail = theConnection.getEmail();
+            mTheirUsername = theConnection.getUsername();
+            mTheirFirstName = theConnection.getFirstName();
+            mTheirLastName = theConnection.getLastName();
+            mOurChatID = theConnection.getChatID();
+            mIsMine = theConnection.getIsMine();
         }
     }
 
@@ -56,15 +77,15 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_connection, container, false);
-        Button chatButton = v.findViewById(R.id.btn_connection_openchat);
-        if (mChatID > 0) {
-            chatButton.setText(R.string.connection_chatinitialized);
-        } else if (mChatID < 0) {
-            chatButton.setText(R.string.connection_chatuninitialized);
-        } else if (mIsMine) {
-            chatButton.setText(R.string.connection_requestconnection);
+        mChatButton = v.findViewById(R.id.btn_connection_openchat);
+        if (mOurChatID > 0) {
+            mChatButton.setText(R.string.connection_chatinitialized);
+        } else if (!mIsMine) {
+            mChatButton.setText(R.string.connection_requestconnection);
+        } else if (mOurChatID < 0) {
+            mChatButton.setText(R.string.connection_chatuninitialized);
         }
-        chatButton.setOnClickListener(this);
+        mChatButton.setOnClickListener(this);
         return v;
     }
 
@@ -73,11 +94,19 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         super.onStart();
         if (getArguments() != null) { //the arguments will have been retrieved already
             TextView tv = getActivity().findViewById(R.id.tv_connection_username);
-            tv.setText(mUsername);
-            tv = getActivity().findViewById(R.id.tv_connection_firstname);
-            tv.setText(mFirstName);
-            tv = getActivity().findViewById(R.id.tv_connection_lastname);
-            tv.setText(mLastName);
+            tv.setText(mTheirUsername);
+            Log.d("MICHELLE", "is the connection mine? " + mIsMine);
+            if (mIsMine) {
+                tv = getActivity().findViewById(R.id.tv_connection_firstname);
+                tv.setText(mTheirFirstName);
+                tv = getActivity().findViewById(R.id.tv_connection_lastname);
+                tv.setText(mTheirLastName);
+            } else {
+                tv = getActivity().findViewById(R.id.tv_connection_firstname);
+                tv.setText("");
+                tv = getActivity().findViewById(R.id.tv_connection_lastname);
+                tv.setText("");
+            }
         }
     }
 
@@ -104,15 +133,60 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_connection_openchat:
-                    if (mIsMine) {
-                        //TODO send connection request
+                    if (!mIsMine) {
+                        requestConnection();
                     } else {
-                        mListener.onOpenChatInteraction(mChatID, mEmail, mUsername);
+                        mListener.onOpenChatInteraction(mOurChatID, mTheirEmail, mTheirUsername);
                     }
                     break;
             }
         }
     }
+
+    private void requestConnection() {
+        //loadingFragment = frag;
+        JSONObject requestJson = new JSONObject();
+        try {
+            requestJson.put("myMemberID", mCredentials.getMemberID());
+            requestJson.put("theirEmail", mTheirEmail);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.base_url))
+                .appendPath(getString((R.string.ep_connections)))
+                .appendPath(getString(R.string.ep_requestConnection))
+                .build();
+        Log.w("URL for requesting a connection:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), requestJson)
+                .onPostExecute(this::handleRequestOnPostExecute)
+                .onCancelled(error -> Log.e("ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+
+    private void handleRequestOnPostExecute(String result) {
+        try {
+            Log.w("REQUEST CONNECTION POST RESULT", result);
+            //This is the result from the web service
+            JSONObject res = new JSONObject(result);
+
+            String toastMsg;
+            if (res.has("success") && res.getBoolean("success")) {
+                toastMsg = getString(R.string.connection_requestsent);
+            } else {
+                toastMsg = getString(R.string.connection_requestfailed);
+            }
+            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                    toastMsg, Toast.LENGTH_SHORT);
+            toast.show();
+            mChatButton.setEnabled(false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

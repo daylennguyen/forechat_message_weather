@@ -1,9 +1,11 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,7 +13,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.RequestFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.content.Request;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
@@ -99,6 +104,7 @@ public class ConnectionsNode {
                         .addFirstName(first)
                         .addLastName(last)
                         .addChatID(chatid)
+                        .isMine()
                         .build());
             }
             Bundle args = new Bundle();
@@ -106,6 +112,7 @@ public class ConnectionsNode {
             //Fragment connectionListFragment = new ConnectionListFragment();
             //connectionListFragment.setArguments(args);
             loadingFragment.setArguments(args);
+            mMaster.onWaitFragmentInteractionHide();
             mMaster.loadFragment(loadingFragment);
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
@@ -116,6 +123,123 @@ public class ConnectionsNode {
         }
     }
 
+    /**
+     * Opens a Connection fragment for the corresponding connection
+     * that was clicked on in {@link ConnectionListFragment}
+     *
+     * @param item the connection selected
+     */
+    public void onListFragmentInteraction(Connection item) {
+        ConnectionFragment connectionFragment = new ConnectionFragment();
+        Bundle args = new Bundle();
 
+        //Could this be just one item being sent?
+        args.putSerializable(mMaster.getString(R.string.key_connection_connection), item);
+        args.putSerializable(mMaster.getString(R.string.key_credential), mCredential);
+        /*args.putSerializable(mMaster.getString(R.string.key_connection_email), item.getEmail());
+        args.putSerializable(mMaster.getString(R.string.key_connection_username), item.getUsername());
+        args.putSerializable(mMaster.getString(R.string.key_connection_first), item.getFirstName());
+        args.putSerializable(mMaster.getString(R.string.key_connection_last), item.getLastName());
+        args.putSerializable(mMaster.getString(R.string.key_connection_chatID), item.getChatID()); */
+        connectionFragment.setArguments(args);
+        mMaster.loadFragment(connectionFragment);
+    }
+
+
+
+
+    //__________________________CONNECTION REQUESTS__________________________
+
+
+    public void loadRequests() {
+        JSONObject memberInfo = new JSONObject();
+        try {
+            memberInfo.put("memberID", mCredential.getMemberID());
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_connections)))
+                .appendPath(mMaster.getString(R.string.ep_getRequests))
+                .build();
+        Log.w("loadRequests() - URL for getting all connection requests:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), memberInfo)
+                .onPreExecute(mMaster::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleRequestsOnPostExecute)
+                .onCancelled(error -> Log.e("loadRequests() - ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+    private void handleRequestsOnPostExecute(String result) {
+        try {
+            ArrayList<Request>myConnRequests = new ArrayList<>();
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray jsonReceivedRequests = resultsJSON.getJSONArray("received");
+            for (int i = 0; i < jsonReceivedRequests.length(); i++) {
+                JSONObject connection = jsonReceivedRequests.getJSONObject(i);
+                String username = connection.getString("username");
+                myConnRequests.add(new Request.Builder(username, true)
+                        .build());
+            }
+//            JSONArray jsonSentRequests = resultsJSON.getJSONArray("sent");
+//            for (int i = 0; i < jsonSentRequests.length(); i++) {
+//                JSONObject connection = jsonSentRequests.getJSONObject(i);
+//                String username = connection.getString("username");
+//                myConnRequests.add(new Request.Builder(username, false)
+//                        .build());
+//            }
+            Bundle args = new Bundle();
+            args.putSerializable(RequestFragment.ARG_REQUESTS_LIST, myConnRequests);
+            Fragment connRequestsFragment = new RequestFragment();
+            connRequestsFragment.setArguments(args);
+            mMaster.loadFragment(connRequestsFragment);
+        } catch (JSONException e) {
+            //It appears that the web service didnt return a JSON formatted String
+            // or it didn’t have what we expected in it.
+            Log.e("handleRequestsOnPostExecute - JSON_PARSE_ERROR", result
+                    + System.lineSeparator()
+                    + e.getMessage());
+        }
+    }
+
+    public void onRequestListFragmentInteraction(String theirUsername) {
+        JSONObject acceptJson = new JSONObject();
+        try {
+            acceptJson.put("myMemberID", mCredential.getMemberID());
+            Log.w("my member id", " " + mCredential.getMemberID());
+            acceptJson.put("theirUsername", theirUsername);
+            Log.w("their email", " " + theirUsername);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_connections)))
+                .appendPath(mMaster.getString(R.string.ep_verifyConnection))
+                .build();
+        Log.w("URL for accepting a connection request:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), acceptJson)
+                .onPostExecute(this::handleAcceptRequestOnPostExecute)
+                .onCancelled(error -> Log.e("onRequestListFragmentInteraction - ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+    private void handleAcceptRequestOnPostExecute(String result) {
+        try {
+            Log.w("ACCEPT CONNECTION POST RESULT", result);
+            //This is the result from the web service
+            JSONObject res = new JSONObject(result);
+            //TODO: let the user know properly in RequestFragment
+            Button acceptButton = mMaster.findViewById(R.id.btn_connectionRequest_accept);
+            //acceptButton.setText("Accepted!");
+            //acceptButton.setBackgroundColor(mMaster.getResources().getColor(R.color.colorBluePurple));
+            //acceptButton.setTextColor(Color.WHITE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -1,25 +1,23 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.CheckBox;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeFragment;
@@ -41,10 +39,14 @@ public class ChatNode {
     /**
      * Fields to be set when new chat is created
      **/
- //   private String theOtherReceiverEmail;
+
     private ArrayList<String> theOtherReceiverUsernames = new ArrayList<>();
-    private String theOtherReceiverUsername;
     private String defaultChatName;
+
+    //Chatroom information to be displayed.
+    private ArrayList<Chat> allExistingChats = new ArrayList<>();
+    private JSONArray allIndividualChats;
+    private JSONArray allGroupChats;
 
     /**
      * Current user information
@@ -52,6 +54,8 @@ public class ChatNode {
     private Credentials mCredential;
     /**/
     private HomeActivity mMaster;
+
+
 
     public ChatNode(HomeActivity Master, Credentials mCredential) {
         this.mCredential = mCredential;
@@ -64,6 +68,8 @@ public class ChatNode {
         if (mMaster.getIntent().getBooleanExtra(mMaster.getString(R.string.keys_intent_notification_msg), false)) {
             mChatID = mMaster.getIntent().getExtras().getInt(mMaster.getString(R.string.keys_intent_notification_chatID));
             loadAllMessages();
+            //mMaster.onBackPressed();
+
         } else { // load default fragment.
             mMaster.getSupportFragmentManager().beginTransaction()
                     .add(R.id.frame_home_container, new HomeFragment())
@@ -78,6 +84,7 @@ public class ChatNode {
      * @version 16 November 2018
      */
     private void loadAllMessages() {
+
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -99,26 +106,6 @@ public class ChatNode {
                 .onCancelled(error -> Log.e("ERROR EMMETT", error))
                 .build().execute();
 
-    }
-
-    /**
-     * Opens a Connection fragment for the corresponding connection
-     * that was clicked on in {@link ConnectionListFragment}
-     *
-     * @param item the connection selected
-     */
-    public void onListFragmentInteraction(Connection item) {
-        ConnectionFragment connectionFragment = new ConnectionFragment();
-        Bundle args = new Bundle();
-
-        //Could this be just one item being sent?
-        args.putSerializable(mMaster.getString(R.string.key_connection_email), item.getEmail());
-        args.putSerializable(mMaster.getString(R.string.key_connection_username), item.getUsername());
-        args.putSerializable(mMaster.getString(R.string.key_connection_first), item.getFirstName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_last), item.getLastName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_chatID), item.getChatID());
-        connectionFragment.setArguments(args);
-        mMaster.loadFragment(connectionFragment);
     }
 
     /**
@@ -178,12 +165,15 @@ public class ChatNode {
      */
     private void createNewChat() {
         JSONObject chatName = new JSONObject();
+        String urlname = "";
         try {
             //Create default chat name for current user and user to be chatting.
             if (theOtherReceiverUsernames.size() == 1) {
                 defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsernames.get(0);
+                urlname = mMaster.getString(R.string.ep_messaging_new_individual);
             } else {
                 defaultChatName = "Group Chat";
+                urlname = mMaster.getString(R.string.ep_messaging_new_group);
             }
             chatName.put("name", defaultChatName);
         } catch (JSONException e) {
@@ -193,7 +183,7 @@ public class ChatNode {
                 .scheme("https")
                 .appendPath(mMaster.getString(R.string.base_url))
                 .appendPath(mMaster.getString((R.string.ep_messaging)))
-                .appendPath(mMaster.getString(R.string.ep_messaging_new))
+                .appendPath(urlname)
                 .build();
 
         Log.w("URL for create new chat:", uri.toString());
@@ -215,18 +205,18 @@ public class ChatNode {
     private void handleNewChatPost(String result) {
         try {
             JSONObject resultsJSON = new JSONObject(result);
+            Log.wtf("CHATID?", String.valueOf(resultsJSON));
             JSONArray temp = resultsJSON.getJSONArray("newChatID");
             JSONObject tempContent = temp.getJSONObject(0);
             mChatID = tempContent.getInt("chatid");
             Log.w("CHATID", String.valueOf(mChatID));
            theOtherReceiverUsernames.add(mCredential.getUsername());
-           /* for (int i = 0; i < theOtherReceiverUsernames.size(); i++) {
-                addChatters(mChatID, theOtherReceiverUsernames.get(i));
-            }*/
            addChatters(mChatID, theOtherReceiverUsernames);
 
+            Log.w("Adding", "YAY WE DID IT");
             Bundle bundle = new Bundle();
             bundle.putString(mMaster.getString(R.string.key_chat_Title), defaultChatName);
+            theOtherReceiverUsernames = new ArrayList<>();
             loadChatFragment(bundle);
 
         } catch (JSONException e) {
@@ -248,8 +238,9 @@ public class ChatNode {
      */
     private void addChatters(int chatID, ArrayList<String> usernames) {
         JSONObject chatterInfoObject = new JSONObject();
+
         JSONArray chatterInfo = new JSONArray(usernames);
-       // Log.w("Adding", usernames);
+
         Log.w("Adding", String.valueOf(chatID));
         Log.w("jsonarray", chatterInfo.toString());
          try {
@@ -264,7 +255,7 @@ public class ChatNode {
                 .appendPath(mMaster.getString((R.string.ep_messaging)))
                 .appendPath(mMaster.getString(R.string.ep_messaging_add))
                 .build();
-        Log.w("URL for create new chat:", uri.toString());
+        Log.w("URL for adding:", uri.toString());
 
         new SendPostAsyncTask.Builder(uri.toString(), chatterInfoObject)
                 .onPostExecute(this::handleAddChattersPost)
@@ -280,19 +271,22 @@ public class ChatNode {
      * @Version 15 November 2018
      */
     private void handleAddChattersPost(String result) {
+
+        JSONObject resultsJSON;
         try {
-            Log.w("JSON result adding peeps", result);
-            JSONObject resultsJSON = new JSONObject(result);
+            resultsJSON = new JSONObject(result);
             boolean didIt = resultsJSON.getBoolean("success");
+            Log.w("BLAH", String.valueOf(didIt));
             if (didIt) {
-                Log.w("Adding", "YAY WE DID IT");
+
             } else {
                 Log.w("Adding", "DARN IT, IT DIDN'T WORK");
             }
 
         } catch (JSONException e) {
-
+            e.printStackTrace();
         }
+
     }
 
 
@@ -317,6 +311,13 @@ public class ChatNode {
 
     public void onChatsListFragmentInteraction(Chat item) {
         mChatID = item.getChatID();
+        ArrayList<Integer> notifiedChats = mMaster.getNotifiedChats();
+        for (int cid : notifiedChats) {
+            if (cid == mChatID) {
+                mMaster.updateNotifiedChats(mChatID);
+                mMaster.notifyUI(Color.BLACK, Color.WHITE);
+            }
+        }
         loadAllMessages();
     }
 
@@ -328,6 +329,7 @@ public class ChatNode {
      * @Version 16 November 2018
      */
     public void loadAllChats() {
+
         JSONObject chatterInfo = new JSONObject();
         try {
             chatterInfo.put("email", mCredential.getEmail());
@@ -356,27 +358,16 @@ public class ChatNode {
      */
     private void handleAllChatsPost(String result) {
         try {
-            JSONObject resultsJSON = new JSONObject(result);
-            JSONArray listOfAllChats = resultsJSON.getJSONArray("chats");
-            //Chatroom information to be displayed.
-            ArrayList<Chat> allExistingChats = new ArrayList<>();
 
-            Bundle args = new Bundle();
-
-            //Iterate through the JSONarray and create chat objects to display.
-            for (int i = 0; i < listOfAllChats.length(); i++) {
-                JSONObject chatRoom = listOfAllChats.getJSONObject(i);
-                String chatName = chatRoom.getString("name");
-                String receiver = chatRoom.getString("username");
-                int chatid = chatRoom.getInt("chatid");
-                allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
-            }
-            args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
-            //Create chats list fragment and display.
-            Fragment fragment = new ChatsFragment();
-            fragment.setArguments(args);
             mMaster.onWaitFragmentInteractionHide();
-            mMaster.loadFragment(fragment);
+            JSONObject resultsJSON = new JSONObject(result);
+            allIndividualChats = resultsJSON.getJSONArray("individualChats");
+            allGroupChats = resultsJSON.getJSONArray("groupChats");
+
+            getGroupchatMembers();
+
+
+
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -386,12 +377,154 @@ public class ChatNode {
         }
     }
 
+    private void getGroupchatMembers() {
+        JSONObject empty = new JSONObject();
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_messaging)))
+                .appendPath(mMaster.getString(R.string.ep_getOthers))
+                .build();
+        Log.w("URL for getting all chat:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), empty)
+                .onPostExecute(this::handleGroupChatMemPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleGroupChatMemPost(String result) {
+        try {
+            JSONObject resultsJSON = new JSONObject(result);
+            JSONArray membersArray = resultsJSON.getJSONArray("groupmem");
+
+            //Iterate through the JSONarray and create chat objects to display.
+            for (int i = 0; i < allGroupChats.length(); i++) {
+                StringBuilder members = new StringBuilder();
+                JSONObject chatRoom = allGroupChats.getJSONObject(i);
+                String groupchatName = chatRoom.getString("name");
+                int groupchatID = chatRoom.getInt("chatid");
+                for (int j = 0; j < membersArray.length(); j++) {
+                    JSONObject member = membersArray.getJSONObject(j);
+                    int tempChatID = Integer.parseInt(member.getString("chatid"));
+
+                    if (tempChatID == groupchatID) {
+                        String tempUsername = member.getString("username");
+                        Log.w("LOL", tempUsername);
+                        if (!tempUsername.equals(mCredential.getUsername())) {
+                            members.append(" " + tempUsername + " ");
+                        }
+                    }
+                }
+                allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
+            }
+
+            for (int i = 0; i < allIndividualChats.length(); i++) {
+                JSONObject chatRoom = allIndividualChats.getJSONObject(i);
+                String chatName = chatRoom.getString("name");
+                String receiver = chatRoom.getString("username");
+                int chatid = chatRoom.getInt("chatid");
+                allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
+            }
+
+            ArrayList<Integer> notichat = mMaster.getNotifiedChats();
+            if (notichat.size() > 0) {
+                for (int i = 0; i < notichat.size(); i++) {
+                    for (int j = 0; j < allExistingChats.size(); j++) {
+                        if (notichat.get(i) == allExistingChats.get(j).getChatID()) {
+                            allExistingChats.get(j).notifiedChat();
+                        }
+                    }
+                }
+            }
+            Bundle args = new Bundle();
+            args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
+            //Create chats list fragment and display.
+            Fragment fragment = new ChatsFragment();
+            fragment.setArguments(args);
+            mMaster.onWaitFragmentInteractionHide();
+            mMaster.loadFragmentWithoutBackStack(fragment);
+            allExistingChats = new ArrayList<>();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+    /*
+        public void getGroupchatMembers (int groupChatID) {
+            JSONObject groupChatInfo = new JSONObject();
+            try {
+                groupChatInfo.put("chatID", groupChatID);
+                groupChatInfo.put("memberID", mCredential.getMemberID());
+            } catch (JSONException e) {
+                Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+            }
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(mMaster.getString(R.string.base_url))
+                    .appendPath(mMaster.getString((R.string.ep_messaging)))
+                    .appendPath(mMaster.getString(R.string.ep_getOthers))
+                    .build();
+            Log.w("URL for getting all chat:", uri.toString());
+            new SendPostAsyncTask.Builder(uri.toString(), groupChatInfo)
+                    .onPostExecute(this::handleGroupChatPost)
+                    .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                    .build().execute();
+        }
+
+        private void handleGroupChatPost(String result) {
+            try {
+                JSONObject resultsJSON = new JSONObject(result);
+                JSONArray membersArray = resultsJSON.getJSONArray("others");
+                members = new StringBuilder();
+
+                for (int i = 0; i < membersArray.length(); i++) {
+                    JSONObject firstMember = membersArray.getJSONObject(i);
+                    String firstMemUsername = firstMember.getString("username");
+                    members.append(firstMemUsername);
+
+                    if (i < membersArray.length()-1) {
+                        members.append(", ");
+                    }
+                }
+
+
+                Log.wtf("members", members.toString());
+                allExistingChats.add(new Chat.Builder(groupchatName, members.toString(), groupchatID).build());
+                Bundle args = new Bundle();
+                //Iterate through the JSONarray and create chat objects to display.
+                for (int i = 0; i < allIndividualChats.length(); i++) {
+                    JSONObject chatRoom = allIndividualChats.getJSONObject(i);
+                    String chatName = chatRoom.getString("name");
+                    String receiver = chatRoom.getString("username");
+                    int chatid = chatRoom.getInt("chatid");
+                    allExistingChats.add(new Chat.Builder(chatName, receiver, chatid).build());
+                    Log.wtf("existingchats", chatName + receiver + chatid);
+                }
+
+
+
+                args.putSerializable(ChatsFragment.ARG_CHATS_LIST, allExistingChats);
+
+                args.putSerializable("ChatNodeKey", this);
+                //Create chats list fragment and display.
+                Fragment fragment = new ChatsFragment();
+                fragment.setArguments(args);
+                mMaster.onWaitFragmentInteractionHide();
+                mMaster.loadFragment(fragment);
+                mMaster.resetNotifiedChats();
+                allExistingChats = new ArrayList<>();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    */
     public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
 
         for (CheckBox checkBox : cbList) {
             if (checkBox.isChecked()) {
                 theOtherReceiverUsernames.add(checkBox.getText().toString());
-                Log.wtf("CHECKED", "checkBox.getText().toString()");
+                Log.wtf("CHECKED", checkBox.getText().toString());
             }
         }
 
@@ -415,6 +548,116 @@ public class ChatNode {
         }
     }
 
+    public void onChatsListFragmentLongInteraction(Chat item) {
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(getmMaster());
+
+        String chatMems = item.getChatMembers();
+        String[] tokenizedChatMems = chatMems.split(" ");
+        if (tokenizedChatMems.length > 1) {
+            builder.setMessage(item.getChatName() + " Options")
+                    .setPositiveButton("Remove chat member", (dialog, id) -> {
+                        displayRemoveChatMember(item.getChatID());
+                    })
+                    .setNeutralButton("Cancel", (dialog, id) -> {
+
+                    })
+                    .setNegativeButton("End Chat", (dialog, id) -> {
+                        endChatSession(item.getChatID());
+                    });
+        } else {
+            builder.setMessage(item.getChatName() + " Options")
+                    .setPositiveButton("End Chat", (dialog, id) -> {
+                        endChatSession(item.getChatID());
+                    })
+                    .setNegativeButton("Cancel", (dialog, id) -> {
+                    });
+        }
+
+// 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void endChatSession(int theChatID) {
+        JSONObject chatInfo = new JSONObject();
+        try {
+            chatInfo.put("chatID", theChatID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_messaging)))
+                .appendPath(mMaster.getString(R.string.ep_messaging_end_chat))
+                .build();
+        Log.w("URL for ending chat:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), chatInfo)
+                .onPostExecute(this::handleEndChatPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleEndChatPost(String result) {
+        loadAllChats();
+    }
+
+
+    private void displayRemoveChatMember(int groupChatID) {
+        JSONObject groupChatInfo = new JSONObject();
+        try {
+            groupChatInfo.put("chatID", groupChatID);
+            groupChatInfo.put("memberID", mCredential.getMemberID());
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+
+        mChatID = groupChatID;
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_messaging)))
+                .appendPath(mMaster.getString(R.string.ep_getOthersinGC))
+                .build();
+        Log.w("URL for getting all chat:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), groupChatInfo)
+                .onPostExecute(this::handleGroupChatPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleGroupChatPost(String result) {
+        try {
+
+            JSONObject resultsJSON = new JSONObject(result);
+
+            JSONArray membersArray = resultsJSON.getJSONArray("others");
+
+
+            Bundle args = new Bundle();
+
+            ArrayList<CheckBox> usersInChatCheckBox = new ArrayList<>();
+            for (int i = 0; i < membersArray.length(); i++) {
+                CheckBox checkBox = new CheckBox(mMaster);
+                checkBox.setTextSize(20);
+                JSONObject temp = membersArray.getJSONObject(i);
+                String member = temp.getString("username");
+                checkBox.setText(member);
+                checkBox.setFontFeatureSettings(String.valueOf(R.font.roboto));
+                usersInChatCheckBox.add(checkBox);
+            }
+            args.putSerializable(mMaster.getString(R.string.key_array_list), usersInChatCheckBox);
+            args.putSerializable("chatID", mChatID);
+            RemoveChatMembers fragment = new RemoveChatMembers();
+            fragment.setArguments(args);
+            mMaster.loadFragment(fragment);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public HomeActivity getmMaster() {
         return mMaster;
     }
@@ -422,4 +665,35 @@ public class ChatNode {
     public void setmMaster(HomeActivity mMaster) {
         this.mMaster = mMaster;
     }
+
+    public void RemoveMembersFromChat(ArrayList<String> members, int theChatID) {
+        JSONObject membersRemovingObject = new JSONObject();
+        JSONArray membersToBeRemoved = new JSONArray(members);
+        try {
+            Log.wtf("names", String.valueOf(theChatID));
+            membersRemovingObject.put("chatters", membersToBeRemoved);
+            membersRemovingObject.put("chatID", theChatID);
+
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_messaging)))
+                .appendPath(mMaster.getString(R.string.ep_messaging_remove_members))
+                .build();
+        Log.w("URL for adding:", uri.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), membersRemovingObject)
+                .onPostExecute(this::handleRemoveChattersPost)
+                .onCancelled(error -> Log.e("ERROR EMMETT", error))
+                .build().execute();
+    }
+
+    private void handleRemoveChattersPost(String result) {
+        loadAllChats();
+    }
+
+
 }
