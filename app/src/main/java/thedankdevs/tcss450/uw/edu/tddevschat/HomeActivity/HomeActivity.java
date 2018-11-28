@@ -27,6 +27,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
@@ -38,8 +39,10 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
@@ -60,7 +63,8 @@ public class HomeActivity extends AppCompatActivity
         ChatsFragment.OnChatsListFragmentInteractionListener,
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         CreateNewChatFragment.OnCreateNewChatButtonListener,
-        WaitFragment.OnFragmentInteractionListener {
+        WaitFragment.OnFragmentInteractionListener,
+        MemberSettingsFragment.OnFragmentInteractionListener {
 
 
     /**
@@ -73,6 +77,8 @@ public class HomeActivity extends AppCompatActivity
     private ConnectionsNode mConnectionsNode;
 
     private ChatNode mChatNode;
+
+    private MemberSettingsNode mMemberSettingsNode;
 
     @Override
     protected void onResume() {
@@ -114,6 +120,8 @@ public class HomeActivity extends AppCompatActivity
         Log.d("DAYLEN", "initializing chat");
         mChatNode = new ChatNode(this, mCredential);
         Log.d("DAYLEN", "chat initialized");
+
+        mMemberSettingsNode = new MemberSettingsNode(this, mCredential);
 
         /*insert option items into the tool bar*/
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -221,6 +229,12 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
 
+            case R.id.nav_member_settings:
+                fragment = new MemberSettingsFragment();
+                args.putSerializable(getString(R.string.nav_membersettings), mCredential);
+                fragment.setArguments(args);
+                break;
+
             default:
 
         }
@@ -305,6 +319,11 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
+    public void onChangeMemberInfo(Map<String, String> info) {
+        mMemberSettingsNode.onChangeMemberInfo(info);
+    }
+
+    @Override
     public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
         StringBuilder checkedBoxesSB = checkedBoxes(cbList);
         int duration = Toast.LENGTH_SHORT;
@@ -327,6 +346,7 @@ public class HomeActivity extends AppCompatActivity
         }
         return sb;
     }
+
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
