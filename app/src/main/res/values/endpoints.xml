@@ -46,5 +46,10 @@
     <string name="ep_search">search</string>
     <string name="ep_contacts">contacts</string>
     <string name="ep_weather_bycoordinate">coord</string>
+    
+    <!--_______________Settings_______________-->
+    <string name="ep_settings">settings</string>
+    <string name="ep_update_info">update_info</string>
+
 
 </resources>

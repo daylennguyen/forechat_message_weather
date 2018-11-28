@@ -24,6 +24,7 @@
 
 
     <GridLayout
+        android:id="@+id/gl_member_settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alignmentMode="alignMargins"
@@ -45,12 +46,14 @@
             android:id="@+id/et_member_settings_firstname"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="left|fill_horizontal"/>
+            android:layout_gravity="left|fill_horizontal"
+            android:inputType="textPersonName"
+            android:padding="3dp" />
 
-        <ImageButton
-            android:id="@+id/imgbtn_member_settings_firstname"
-            android:src="@drawable/ic_settings_edit_memberinfo"
-            android:layout_columnSpan="1" />
+        <Button
+            android:id="@+id/btn_member_settings_firstname"
+            android:layout_columnSpan="1"
+            android:drawableLeft="@drawable/ic_settings_edit_memberinfo" />
 
         <!--Lastname-->
         <TextView
@@ -62,11 +65,13 @@
             android:id="@+id/et_member_settings_lastname"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="left|fill_horizontal"/>
+            android:layout_gravity="left|fill_horizontal"
+            android:inputType="textPersonName"
+            android:padding="3dp" />
 
-        <ImageButton
-            android:id="@+id/imgbtn_member_settings_lastname"
-            android:src="@drawable/ic_settings_edit_memberinfo"
+        <Button
+            android:id="@+id/btn_member_settings_lastname"
+            android:drawableLeft="@drawable/ic_settings_edit_memberinfo"
             android:layout_columnSpan="1" />
 
         <!--Username-->
@@ -79,11 +84,13 @@
             android:id="@+id/et_member_settings_username"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="left|fill_horizontal"/>
+            android:layout_gravity="left|fill_horizontal"
+            android:inputType="textPersonName"
+            android:padding="3dp" />
 
-        <ImageButton
-            android:id="@+id/imgbtn_member_settings_username"
-            android:src="@drawable/ic_settings_edit_memberinfo"
+        <Button
+            android:id="@+id/btn_member_settings_username"
+            android:drawableLeft="@drawable/ic_settings_edit_memberinfo"
             android:layout_columnSpan="1" />
 
         <!--email-->
@@ -96,12 +103,19 @@
             android:id="@+id/et_member_settings_email"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="left|fill_horizontal"/>
+            android:layout_gravity="left|fill_horizontal"
+            android:inputType="textEmailAddress"
+            android:padding="3dp" />
 
-        <ImageButton
-            android:id="@+id/imgbtn_member_settings_email"
-            android:src="@drawable/ic_settings_edit_memberinfo"
-            android:layout_columnSpan="1" />
+        <!--Testing purposes only while email endpoint is not set up-->
+        <Space
+            android:layout_columnSpan="1"/>
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_member_settings_email"-->
+            <!--android:drawableLeft="@drawable/ic_settings_edit_memberinfo"-->
+            <!--android:layout_columnSpan="1"-->
+            <!--android:tag="email_btn"/>-->
 
         <!--Password-->
         <TextView
@@ -113,24 +127,29 @@
             android:id="@+id/et_member_settings_password"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="left|fill_horizontal"/>
+            android:layout_gravity="left|fill_horizontal"
+            android:inputType="textPassword"
+            android:padding="3dp" />
 
-        <ImageButton
-            android:id="@+id/imgbtn_member_settings_password"
-            android:src="@drawable/ic_settings_edit_memberinfo"
-            android:layout_columnSpan="1" />
+        <Button
+            android:id="@+id/btn_member_settings_password"
+            android:drawableLeft="@drawable/ic_settings_edit_memberinfo"
+            android:layout_columnSpan="1"/>
 
         <!--Confirm Password-->
         <TextView
+            android:id="@+id/tv_member_settings_confirmpass"
             android:layout_columnSpan="6"
             android:layout_gravity="fill_horizontal"
-            android:text="Confirm Password"/>
+            android:text="Confirm Password" />
 
         <EditText
             android:id="@+id/et_member_settings_confirm_password"
             android:layout_width="0dp"
             android:layout_columnSpan="5"
-            android:layout_gravity="fill_horizontal"/>
+            android:layout_gravity="fill_horizontal"
+            android:inputType="textPassword"
+            android:padding="3dp" />
 
         <Space
             android:layout_columnSpan="1"/>
@@ -144,7 +163,7 @@
             android:text="Apply"
             android:layout_gravity="right"
             android:background="@color/colorPrimary"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp" />
 
         <!--Cancel Button-->
         <Button
