@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
@@ -49,8 +50,10 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
@@ -75,7 +78,8 @@ public class HomeActivity extends AppCompatActivity
         CreateNewChatFragment.OnCreateNewChatButtonListener,
         WaitFragment.OnFragmentInteractionListener,
         RequestFragment.OnListFragmentInteractionListener,
-        RemoveChatMembers.OnRemoveMemberListener {
+        RemoveChatMembers.OnRemoveMemberListener,
+        MemberSettingsFragment.OnFragmentInteractionListener {
 
 
     /*Node for retrieving the weather data and displaying the information*/
@@ -97,6 +101,8 @@ public class HomeActivity extends AppCompatActivity
     private ArrayList<Integer> notifiedChats = new ArrayList<>();
 
     private FirebaseMessageReciever mFirebaseMessageReciever;
+
+    private MemberSettingsNode mMemberSettingsNode;
 
     @Override
     protected void onResume() {
@@ -157,7 +163,7 @@ public class HomeActivity extends AppCompatActivity
         mChatNode = new ChatNode(this, mCredential);
         /*   Weather     */
 //        mWeatherNode = new WeatherNode(this, mLocationNode);
-
+        mMemberSettingsNode = new MemberSettingsNode(this, mCredential);
     }
 
 
@@ -249,6 +255,12 @@ public class HomeActivity extends AppCompatActivity
 
             case R.id.nav_settings:
                 fragment = new SettingsFragment();
+                break;
+
+            case R.id.nav_member_settings:
+                fragment = new MemberSettingsFragment();
+                args.putSerializable(getString(R.string.nav_membersettings), mCredential);
+                fragment.setArguments(args);
                 break;
 
             case R.id.nav_connectionRequests:
@@ -357,6 +369,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChatsListFragmentLongInteraction(Chat item) {
         mChatNode.onChatsListFragmentLongInteraction(item);
+    }
+
+    @Override
+    public void onChangeMemberInfo(Map<String, String> info) {
+        mMemberSettingsNode.onChangeMemberInfo(info);
     }
 
     @Override
