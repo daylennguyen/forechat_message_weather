@@ -49,6 +49,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
@@ -313,7 +314,7 @@ public class HomeActivity extends AppCompatActivity
     public void loadFragment(Fragment frag) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frame_home_container, frag)
+                .replace(R.id.frame_home_container, frag, frag.getClass().getSimpleName())
                 .addToBackStack(null);
         // Commit the transaction
         transaction.commit();
@@ -338,6 +339,12 @@ public class HomeActivity extends AppCompatActivity
     public void onWeatherListItemFragmentInteraction(WeatherDate item) {
 
     }
+
+    @Override
+    public void onChangeMemberInfo(Map<String, String> info) {
+        mMemberSettingsNode.onChangeMemberInfo(info);
+    }
+
 
     @Override
     public void onListFragmentInteraction(Connection item) {
@@ -371,10 +378,6 @@ public class HomeActivity extends AppCompatActivity
         mChatNode.onChatsListFragmentLongInteraction(item);
     }
 
-    @Override
-    public void onChangeMemberInfo(Map<String, String> info) {
-        mMemberSettingsNode.onChangeMemberInfo(info);
-    }
 
     @Override
     public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
