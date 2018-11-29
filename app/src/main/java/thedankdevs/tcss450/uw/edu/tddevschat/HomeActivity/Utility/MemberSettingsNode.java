@@ -1,6 +1,9 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
 import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -9,6 +12,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -61,11 +65,22 @@ public class MemberSettingsNode {
         try {
             JSONObject jsonObject = new JSONObject(result);
             boolean success = jsonObject.getBoolean("success");
+            FragmentManager fm = mMaster.getSupportFragmentManager();
+            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentByTag("MemberSettingsFragment");
+            FragmentTransaction transaction = fm.beginTransaction();
+
             if (success) {
                 Log.d(TAG, "Member Settings Update successful");
+                frag.successfulUpdateDialog();
+
             } else {
                 Log.d(TAG, "Member Settings Update failed");
+                frag.unSuccessfulUpdateDialog();
             }
+            // a way to refresh the fragment
+            transaction.detach(frag)
+                    .attach(frag)
+                    .commit();
 
         } catch (JSONException e) {
             Log.e(TAG, "JSON on post execute failed");
