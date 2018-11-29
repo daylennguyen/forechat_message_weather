@@ -85,7 +85,7 @@
     <string name="settings_txt">Settings</string>
     <string name="send_button">Send button</string>
     <string name="enter_a_message">Enter a Message</string>
-    <string name="select_location_from_map">Select Location from Map</string>
+    <string name="select_location_from_map">Apply Map Selection</string>
     <string name="apply_changes">Apply Changes</string>
 
     <!--Weather and related settings-->
@@ -116,5 +116,6 @@
     <string name="weather_lcase_city">city</string>
     <string name="weather_lcase_state">state</string>
     <string name="weather_json_postal">postalcode</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>

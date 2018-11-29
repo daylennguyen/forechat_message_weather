@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioGroup;
 
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
@@ -19,15 +20,23 @@ public class SettingsNode {
     public static final String KELVIN = "K";
     public static final String CELSIUS = "C";
     public static final String FAHRENHEIT = "F";
+
     /*Location Determinant*/
     public static final int GPS_DATA = 0;
     public static final int SELECT_FROM_MAP = 1;
     public static final int POSTAL_CODE = 2;
     public static final int CITY_STATE = 3;
+    public static final String LOCATIONPREF = "GPSSK";
+    public static final int GPS_ISON = 1;
+    public static final int GPS_ISOFF = 0;
+
+
+    private HomeActivity master;
 
     /************************************************/
 
-    public SettingsNode() {
+    public SettingsNode(HomeActivity master) {
+        this.master = master;
     }
 
     /**

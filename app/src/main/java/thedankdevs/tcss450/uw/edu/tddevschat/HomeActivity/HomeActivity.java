@@ -107,6 +107,16 @@ public class HomeActivity extends AppCompatActivity
         registerReceiver(mFirebaseMessageReciever, iFilter);
         mLocationNode.stopLocationUpdates();
     }
+
+    public void stopGPS() {
+        mLocationNode.stopLocationUpdates();
+    }
+
+    public void startGPS() {
+        mLocationNode.startLocationUpdates();
+    }
+
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -151,7 +161,7 @@ public class HomeActivity extends AppCompatActivity
     /*Helper class to create node objects*/
     private void initializeNodes() {
         /*Retrieve user settings*/
-        mSettingsNode = new SettingsNode();
+        mSettingsNode = new SettingsNode(this);
         /*  Connections  */
         mConnectionsNode = new ConnectionsNode(this, mCredential);
         /*   Location    */

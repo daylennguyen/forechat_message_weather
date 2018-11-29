@@ -61,14 +61,21 @@ public class SettingsFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         // Get from the SharedPreferences
-        SharedPreferences settings = Objects.requireNonNull(this.getContext()).getSharedPreferences(METRIC_PREF, 0);
-        String METRICPREF = settings.getString(METRIC_PREF, "C");
-        Log.e("DAYLEN", String.valueOf(METRICPREF));
+        SharedPreferences metSet = Objects.requireNonNull(this.getContext()).getSharedPreferences(METRIC_PREF, 0);
+        SharedPreferences locSet = Objects.requireNonNull(this.getContext()).getSharedPreferences(DETERMINANT_PREF, 0);
+        String METRICPREF = metSet.getString(METRIC_PREF, "C");
+        int gpsState = locSet.getInt(DETERMINANT_PREF, 1);
+        HomeActivity h = (HomeActivity) getActivity();
+        if (gpsState == SettingsNode.GPS_ISON) {
+            Objects.requireNonNull(h).startGPS();
+        } else {
+            Objects.requireNonNull(h).stopGPS();
+        }
+        Log.e("DAYLEN", "gpeSTATE=" + String.valueOf(gpsState));
+//        Log.e("DAYLEN", String.valueOf());
+
         /*update the shared preference fields within settings node*/
-//        if (home != null && home.mSettingsNode != null) {
-//            home.mSettingsNode.getAndUpdateLocationDeterminantPref();
-//            home.mSettingsNode.getAndUpdateMetricPreferences();
-//        }
+
     }
 
     public String getSavedMetricPreference() {
