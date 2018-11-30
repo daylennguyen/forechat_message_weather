@@ -100,20 +100,21 @@
 
 				<Spinner
 					android:id = "@+id/locate_spinner"
-					style = "@android:style/Widget.Material.Spinner"
+					style = "@android:style/Widget.Holo.Spinner"
 					android:layout_width = "wrap_content"
-					android:layout_height = "50dp"
-					android:background = "@color/colorLightestGrey"
-					android:dropDownSelector = "@drawable/c02d"
+					android:layout_height = "43dp"
+					android:backgroundTint = "@color/colorMedPurple"
 					android:entries = "@array/location_set"
-					android:popupBackground = "@color/colorLightPurple"
-					android:spinnerMode = "dialog" />
+					android:pointerIcon = "arrow"
+					android:popupBackground = "@android:color/white"
+					tools:style = "@style/Platform.Widget.AppCompat.Spinner" />
 
 				<LinearLayout
 					android:id = "@+id/setting_section_citystate"
 					android:layout_width = "wrap_content"
 					android:layout_height = "match_parent"
-					android:orientation = "vertical">
+					android:orientation = "vertical"
+					android:visibility = "gone">
 
 					<TextView
 						android:layout_width = "wrap_content"
@@ -215,7 +216,11 @@
 			<android.support.v7.widget.CardView
 				android:id = "@+id/map_container"
 				android:layout_width = "match_parent"
-				android:layout_height = "349dp"
+				android:layout_height = "0dp"
+				android:layout_margin = "10dp"
+				android:layout_marginBottom = "8dp"
+				app:cardBackgroundColor = "@color/colorLightPurple"
+				app:layout_constraintBottom_toBottomOf = "parent"
 				app:layout_constraintEnd_toEndOf = "parent"
 				app:layout_constraintHorizontal_bias = "0.5"
 				app:layout_constraintStart_toStartOf = "parent"

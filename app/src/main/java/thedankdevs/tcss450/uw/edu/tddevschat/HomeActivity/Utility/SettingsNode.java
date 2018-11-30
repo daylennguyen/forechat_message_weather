@@ -80,6 +80,8 @@ public class SettingsNode {
             View                     zippy        = view.findViewById( R.id.setting_section_zip );
             View                     cs           = view.findViewById( R.id.setting_section_citystate );
             FrameLayout              map          = view.findViewById( R.id.mapandbutt_holder );
+            view.findViewById( R.id.map_container ).setVisibility( View.GONE );
+
             locateButton.setVisibility( View.GONE );
             cs.setVisibility( View.GONE );
             map.setVisibility( View.GONE );

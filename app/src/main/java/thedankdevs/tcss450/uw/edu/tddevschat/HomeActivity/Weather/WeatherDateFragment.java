@@ -80,8 +80,8 @@ public class WeatherDateFragment extends Fragment {
                 mLon = bundle.getDouble( LONGITUDE_KEY, 0 );
                 break;
             case SettingsNode.SELECT_FROM_MAP:
-                mLat = sp.getLong( MAP_LAT_KEY, 0 );
-                mLon = sp.getLong( MAP_LON_KEY, 0 );
+                mLat = sp.getFloat( MAP_LAT_KEY, 0 );
+                mLon = sp.getFloat( MAP_LON_KEY, 0 );
                 break;
             case SettingsNode.POSTAL_CODE:
                 mZip = sp.getString( ZIP_KEY, "98422" );

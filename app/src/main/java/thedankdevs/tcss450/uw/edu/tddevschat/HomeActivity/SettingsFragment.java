@@ -11,10 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -26,7 +23,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
@@ -78,7 +74,10 @@ public class SettingsFragment extends Fragment {
         mZipView = view.findViewById( R.id.zipcode_txtvjew );
         mMap = view.findViewById( R.id.fragment_map );
         mMap.onCreate( savedInstanceState );
-        MapIsReadyCallback callback = new MapIsReadyCallback( home.getCurrentLat(), home.getCurrentLon() );
+
+        Button             mapLocationButton = view.findViewById( R.id.select_location_button );
+        MapIsReadyCallback callback          = new MapIsReadyCallback( home );
+        mapLocationButton.setOnClickListener( callback );
         mMap.getMapAsync( callback );
 
         view.findViewById( R.id.citystate_apply_button ).setOnClickListener( this::cityStateActionListener );
@@ -244,30 +243,27 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    private class MapIsReadyCallback implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
-        double mlat, mlon;
-        GoogleMap                googleMap;
-        ArrayList<MarkerOptions> prevMarkers;
-        MarkerOptions            currentMarker;
-        CircleOptions            mCircle;
+    private class MapIsReadyCallback implements OnMapReadyCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
+        GoogleMap     googleMap;
+        MarkerOptions currentMarker;
+        CircleOptions mCircle;
+        HomeActivity  mMaster;
+        LatLng        cLocate;
 
-        MapIsReadyCallback( double lat, double lon ) {
-            mlat = lat;
-            mlon = lon;
+        MapIsReadyCallback( HomeActivity master ) {
+            mMaster = master;
         }
 
         @Override
         public void onMapReady( GoogleMap googleMap ) {
             this.googleMap = googleMap;
-            prevMarkers = new ArrayList<>();
-            LatLng CurrentLocation = new LatLng( mlat, mlon );
+            LatLng CurrentLocation = new LatLng( mMaster.getCurrentLat(), mMaster.getCurrentLon() );
             mCircle = new CircleOptions()
                     .center( CurrentLocation )
                     .radius( 10000 )
                     .strokeColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.colorLightPurple ) )
                     .fillColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.transparentcolorLightPurple ) );
             currentMarker = new MarkerOptions().position( CurrentLocation ).title( "Current Location" );
-            prevMarkers.add( currentMarker );
             googleMap.addMarker( currentMarker );
             googleMap.moveCamera( CameraUpdateFactory.newLatLngZoom( CurrentLocation, 10.0f ) );
             googleMap.setOnMapClickListener( this );
@@ -279,19 +275,30 @@ public class SettingsFragment extends Fragment {
             googleMap.clear();
             Log.d( "LAT/LONG", latLng.toString() );
             mCircle.center( latLng );
+
+            cLocate = latLng;
             currentMarker.position( latLng );
             currentMarker.icon( BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_VIOLET ) );
             googleMap.addCircle( mCircle );
             googleMap.addMarker( currentMarker );
             googleMap.moveCamera( CameraUpdateFactory.newLatLngZoom( latLng, 10.0f ) );
 
+
+        }
+
+        @Override
+        public void onClick( View v ) {
             SharedPreferences sp = Objects.requireNonNull( getActivity() )
                     .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
-            SharedPreferences.Editor e = sp.edit();
-            e.putLong( MAP_LAT_KEY, ( long ) latLng.longitude );
-            e.putLong( MAP_LON_KEY, ( long ) latLng.longitude );
-            e.apply();
+            SharedPreferences.Editor e      = sp.edit();
+            float                    curLat = ( float ) cLocate.latitude;
+            float                    curLon = ( float ) cLocate.longitude;
 
+            e.putFloat( MAP_LAT_KEY, curLat );
+            e.putFloat( MAP_LON_KEY, curLon );
+
+            Toast.makeText( mMaster, "Latitude: ".concat( String.valueOf( curLat ) ).concat( " | Longitude: " ).concat( String.valueOf( curLon ) ).concat( " has been applied" ), Toast.LENGTH_SHORT ).show();
+            e.apply();
         }
     }
 }
