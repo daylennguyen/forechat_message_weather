@@ -1,121 +1,111 @@
 <resources>
-    <string name="app_name">forechat</string>
+	<string name = "app_name">forechat</string>
 
-    <!--SIGN IN ACTIVITY-->
-    <string name="loginRegister_email">Email</string>
-    <string name="loginRegister_password">Password</string>
-    <string name="login_login">Login</string>
-    <string name="loginRegister_register">Register</string>
+	<!--SIGN IN ACTIVITY-->
+	<string name = "loginRegister_email">Email</string>
+	<string name = "loginRegister_password">Password</string>
+	<string name = "login_login">Login</string>
+	<string name = "loginRegister_register">Register</string>
+	<string name = "register_firstName">First Name</string>
+	<string name = "register_lastName">Last Name</string>
+	<string name = "register_userName">Username</string>
+	<string name = "register_passwordConfirm">Confirm Password</string>
+	<string name = "register_verify_text">Enter the verification code from your email:</string>
+	<string name = "register_verify">Verify</string>
+	<string name = "register_verify_hint">Verification Code</string>
+	<string name = "register_verify_resend">Resend Email</string>
+	<string name = "register_verify_explain">To complete your registration, please check your email!</string>
+	<string name = "register_verify_title">ALMOST THERE!</string>
 
-    <string name="register_firstName">First Name</string>
-    <string name="register_lastName">Last Name</string>
-    <string name="register_userName">Username</string>
-    <string name="register_passwordConfirm">Confirm Password</string>
+	<!--HOME ACTIVITY-->
+	<string name = "nav_home">Home</string>
+	<string name = "nav_contacts">Connections</string>
+	<string name = "nav_requests">Connection Requests</string>
+	<string name = "nav_weather">Weather</string>
+	<string name = "nav_signout">Sign out</string>
+	<string name = "nav_chat">Chat</string>
+	<string name = "nav_membersettings">Member Settings</string>
+	<string name = "action_logout">Logout</string>
+	<string name = "connection_chatinitialized">Open Chat</string>
+	<string name = "connection_chatuninitialized">New Chat</string>
+	<string name = "connection_requestconnection">Request Connection</string>
+	<string name = "connection_requestsent">request sent</string>
+	<string name = "connection_requestfailed">request failed</string>
+	<string name = "connection_acceptrequest">Accept</string>
+	<string name = "chats_list_newChat">Create New Chat</string>
+	<string name = "create_new_chat_select">Select your connection(s) for the new chat</string>
+	<string name = "remove_chat_members">Select the members of the chat you wish to remove.</string>
+	<string name = "remove_remove">Remove</string>
 
-    <string name="register_verify_text">Enter the verification code from your email:</string>
-    <string name="register_verify">Verify</string>
-    <string name="register_verify_hint">Verification Code</string>
-    <string name="register_verify_resend">Resend Email</string>
-    <string name="register_verify_explain">To complete your registration, please check your email!</string>
-    <string name="register_verify_title">ALMOST THERE!</string>
-
-
-    <!--<string name=""></string>-->
-    <!--<string name=""></string>-->
-
-
-    <!--HOME ACTIVITY-->
-    <string name="nav_home">Home</string>
-    <string name="nav_contacts">Connections</string>
-    <string name="nav_requests">Connection Requests</string>
-    <string name="nav_weather">Weather</string>
-    <string name="nav_signout">Sign out</string>
-    <string name="nav_chat">Chat</string>
-    <string name="nav_membersettings">Member Settings</string>
-    <string name="action_logout">Logout</string>
-    <string name="connection_chatinitialized">Open Chat</string>
-    <string name="connection_chatuninitialized">New Chat</string>
-    <string name="connection_requestconnection">Request Connection</string>
-    <string name="connection_requestsent">request sent</string>
-    <string name="connection_requestfailed">request failed</string>
-    <string name="connection_acceptrequest">Accept</string>
-    <string name="chats_list_newChat">Create New Chat</string>
-    <string name="create_new_chat_select">Select your connection(s) for the new chat</string>
-    <string name="remove_chat_members">Select the members of the chat you wish to remove.</string>
-
-    <string name="remove_remove">Remove</string>
-    <!--ERROR NOTIFICATIONS-->
-    <string name="loginRegister_missingField">empty field</string>
-    <string name="loginRegister_invalidEmail">invalid email</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_home">HomeActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-    <string name="todo">TODO</string>
+	<!--ERROR NOTIFICATIONS-->
+	<string name = "loginRegister_missingField">empty field</string>
+	<string name = "loginRegister_invalidEmail">invalid email</string>
+	<string name = "hello_blank_fragment">Hello blank fragment</string>
+	<string name = "title_activity_home">HomeActivity</string>
+	<string name = "navigation_drawer_open">Open navigation drawer</string>
+	<string name = "navigation_drawer_close">Close navigation drawer</string>
+	<string name = "nav_header_title">Android Studio</string>
+	<string name = "nav_header_subtitle">android.studio@android.com</string>
+	<string name = "nav_header_desc">Navigation header</string>
+	<string name = "action_settings">Settings</string>
+	<string name = "todo">TODO</string>
 
 
-    <!-- Strings related to Settings -->
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message history</string>
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+	<!-- *Strings related to Settings* -->
 
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string name="pref_title_system_sync_settings">System sync settings</string>
 
-    <!-- Example settings for Notifications -->
-    <string name="title_activity_settings_fragment">Settings</string>
-
-    <string name="pref_header_notifications">Notifications</string>
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="settings_txt">Settings</string>
-    <string name="send_button">Send button</string>
-    <string name="enter_a_message">Enter a Message</string>
-    <string name="select_location_from_map">Apply Map Selection</string>
-    <string name="apply_changes">Apply Changes</string>
-
-    <!--Weather and related settings-->
-    <string name="default_state">WA</string>
-    <string name="default_city">TACOMA</string>
-    <string name="zip_code">Zip Code</string>
-    <string name="ex_98422">Ex. 98422</string>
-    <string name="weather_settings">Weather</string>
-    <string name="weather_metric">Metric</string>
-    <string name="_16_day_weather_forecast">10 Day Weather Forecast</string>
-    <string name="state">State</string>
-    <string name="city">City</string>
-    <string name="weather_image">weather image</string>
-    <string name="date_sampl_weath">October 5th 2018</string>
-    <string name="condi_sampl_weath">Sunny</string>
-    <string name="hi_sampl_weath">Hi: 69</string>
-    <string name="lo_sampl_weath">Low: 69</string>
-    <string name="avg_sampl_weath">Avg: 69</string>
-    <string name="location_determinant">Location Determinant</string>
-    <string name="fahrenheit">Fahrenheit</string>
-    <string name="celsius">Celsius</string>
-    <string name="kelvin">Kelvin</string>
-    <string name="ex_seattle">Ex. Seattle</string>
-    <string name="state_abbreviation">State Abbreviation</string>
-    <string name="ex_wa">Ex. WA</string>
-    <string name="weather_lon_json">lon</string>
-    <string name="weather_lat_json">lat</string>
-    <string name="weather_lcase_city">city</string>
-    <string name="weather_lcase_state">state</string>
-    <string name="weather_json_postal">postalcode</string>
-    <string name="title_activity_maps">Map</string>
+	<!-- Example General settings -->
+	<string name = "pref_header_general">General</string>
+	<string name = "pref_title_social_recommendations">Enable social recommendations</string>
+	<string name = "pref_description_social_recommendations">Recommendations for people to contact based on your message history</string>
+	<string name = "pref_title_display_name">Display name</string>
+	<string name = "pref_default_display_name">John Smith</string>
+	<string name = "pref_title_add_friends_to_messages">Add friends to messages</string>
+	<!-- Example settings for Data & Sync -->
+	<string name = "pref_header_data_sync">Data &amp; sync</string>
+	<string name = "pref_title_sync_frequency">Sync frequency</string>
+	<string name = "pref_title_system_sync_settings">System sync settings</string>
+	<!-- Example settings for Notifications -->
+	<string name = "title_activity_settings_fragment">Settings</string>
+	<string name = "pref_header_notifications">Notifications</string>
+	<string name = "pref_title_new_message_notifications">New message notifications</string>
+	<string name = "pref_title_ringtone">Ringtone</string>
+	<string name = "pref_ringtone_silent">Silent</string>
+	<string name = "pref_title_vibrate">Vibrate</string>
+	<string name = "settings_txt">Settings</string>
+	<string name = "send_button">Send button</string>
+	<string name = "enter_a_message">Enter a Message</string>
+	<string name = "select_location_from_map">Apply Map Selection</string>
+	<string name = "apply_changes">Apply Changes</string>
+	<!--Weather and related settings-->
+	<string name = "default_state">WA</string>
+	<string name = "default_city">TACOMA</string>
+	<string name = "zip_code">Zip Code</string>
+	<string name = "ex_98422">Ex. 98422</string>
+	<string name = "weather_settings">Weather</string>
+	<string name = "weather_metric">Metric</string>
+	<string name = "_16_day_weather_forecast">10 Day Weather Forecast</string>
+	<string name = "state">State</string>
+	<string name = "city">City</string>
+	<string name = "weather_image">weather image</string>
+	<string name = "date_sampl_weath">October 5th 2018</string>
+	<string name = "condi_sampl_weath">Sunny</string>
+	<string name = "hi_sampl_weath">Hi: 69</string>
+	<string name = "lo_sampl_weath">Low: 69</string>
+	<string name = "avg_sampl_weath">Avg: 69</string>
+	<string name = "location_determinant">Location Determinant</string>
+	<string name = "fahrenheit">Fahrenheit</string>
+	<string name = "celsius">Celsius</string>
+	<string name = "kelvin">Kelvin</string>
+	<string name = "ex_seattle">Ex. Seattle</string>
+	<string name = "state_abbreviation">State Abbreviation</string>
+	<string name = "ex_wa">Ex. WA</string>
+	<string name = "weather_lon_json">lon</string>
+	<string name = "weather_lat_json">lat</string>
+	<string name = "weather_lcase_city">city</string>
+	<string name = "weather_lcase_state">state</string>
+	<string name = "weather_json_postal">postalcode</string>
+	<string name = "title_activity_maps">Map</string>
+	<string name = "sign_in">Sign in</string>
 
 </resources>

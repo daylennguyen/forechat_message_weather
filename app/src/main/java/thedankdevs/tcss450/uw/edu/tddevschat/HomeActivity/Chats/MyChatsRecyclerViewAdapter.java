@@ -5,13 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment.OnChatsListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import java.util.List;
-
-
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment.OnChatsListFragmentInteractionListener;
-import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Chat} and makes a call to the
@@ -38,7 +36,7 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mChatName.setText(mValues.get(position).getChatName());
-        holder.mReceiver.setText(mValues.get(position).getChatMembers().toString());
+        holder.mReceiver.setText( mValues.get( position ).getChatMembers() );
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="key_email">email</string>
-    <string name="key_password">password</string>
-    <string name="key_credential">credential</string>
-    <string name="key_json_array">JSON</string>
-    <string name="key_chat_Title">ChatTitle</string>
-    <string name="key_array_list">ArrayList</string>
+	<string name = "key_email">email</string>
+	<string name = "key_password">password</string>
+	<string name = "key_credential">credential</string>
+	<string name = "key_json_array">JSON</string>
+	<string name = "key_chat_Title">ChatTitle</string>
+	<string name = "key_array_list">ArrayList</string>
 
-    <string name="keys_shared_prefs">.edu.uw.tcss450.phishapp.PREFS</string>
-    <string name="keys_prefs_email">traffic_light_wont_let_me_through</string>
-    <string name="keys_prefs_password">see_the_city_see_the_zoo</string>
+	<string name = "keys_shared_prefs">.edu.uw.tcss450.phishapp.PREFS</string>
+	<string name = "keys_prefs_email">traffic_light_wont_let_me_through</string>
+	<string name = "keys_prefs_password">see_the_city_see_the_zoo</string>
 
-    <!--ConnectionListFragment-->
-    <!--<string name="key_connection_email">connection email</string>-->
-    <!--<string name="key_connection_username">connection username</string>-->
-    <!--<string name="key_connection_first">connection first</string>-->
-    <!--<string name="key_connection_last">connection last</string>-->
-    <string name="key_connection_chatID">connection chatID</string>
-    <string name="key_connection_connection">connection</string>
-    <!--<string name="key_connection_isMine">connection isMine</string>-->
+	<!--ConnectionListFragment-->
+	<!--<string name="key_connection_email">connection email</string>-->
+	<!--<string name="key_connection_username">connection username</string>-->
+	<!--<string name="key_connection_first">connection first</string>-->
+	<!--<string name="key_connection_last">connection last</string>-->
+	<string name = "key_connection_chatID">connection chatID</string>
+	<string name = "key_connection_connection">connection</string>
+	<!--<string name="key_connection_isMine">connection isMine</string>-->
 
-    <string name="keys_intent_notification_msg">notification?</string>
-    <string name="keys_intent_notification_chatID">notificationChatID</string>
+	<string name = "keys_intent_notification_msg">notification?</string>
+	<string name = "keys_intent_notification_chatID">notificationChatID</string>
 
 </resources>

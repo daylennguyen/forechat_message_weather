@@ -1,16 +1,10 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,15 +14,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.function.Consumer;
-
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -75,7 +63,7 @@ public class ChatFragment extends Fragment {
         rootLayout = inflater.inflate(R.layout.fragment_chat, container, false);
         mMessageInputEditText = rootLayout.findViewById(R.id.et_chat_message);
 
-        ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
+        ScrollView scrollview = rootLayout.findViewById( R.id.Scroller );
         scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
 
         JSONArray pastChat;
@@ -259,7 +247,7 @@ public class ChatFragment extends Fragment {
                             createBubbleUI(sender, msg);
                         }
                     }
-                    ScrollView scrollview = ((ScrollView) rootLayout.findViewById(R.id.Scroller));
+                    ScrollView scrollview = rootLayout.findViewById( R.id.Scroller );
                     scrollview.post(() -> scrollview.fullScroll(ScrollView.FOCUS_DOWN));
                 } catch (JSONException e) {
                     Log.e("JSON PARSE", e.toString());

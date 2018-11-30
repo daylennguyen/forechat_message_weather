@@ -19,13 +19,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 
 
 /**
@@ -75,7 +74,7 @@ public class MemberSettingsFragment extends Fragment {
     public static MemberSettingsFragment newInstance(Credentials credentials) {
         MemberSettingsFragment fragment = new MemberSettingsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_MEMBER_SETTINGS, credentials);;
+        args.putSerializable( ARG_MEMBER_SETTINGS, credentials );
         fragment.setArguments(args);
         return fragment;
     }
