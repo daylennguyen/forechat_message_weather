@@ -1,10 +1,6 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,18 +22,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.iid.FirebaseInstanceId;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.CreateNewChatFragment;
@@ -46,12 +33,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Connection
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.RequestFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ConnectionsNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
@@ -59,6 +41,12 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
@@ -243,7 +231,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
             case R.id.nav_weather:
                 setTitle("Weather");
-                if ((mLocationNode.getmCurrentLocation() != null)) {
+                if (mLocationNode.getmCurrentLocation() != null) {
                     args.putDouble(LATITUDE_KEY, mLocationNode.getmCurrentLocation().getLatitude());
                     args.putDouble(LONGITUDE_KEY, mLocationNode.getmCurrentLocation().getLongitude());
                 }

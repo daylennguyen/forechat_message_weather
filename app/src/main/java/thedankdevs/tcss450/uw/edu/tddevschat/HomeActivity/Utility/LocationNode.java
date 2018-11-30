@@ -6,12 +6,7 @@ import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.*;
 
 import java.io.Serializable;
 
@@ -24,6 +19,9 @@ public class LocationNode implements Serializable {
     public static final String ZIP_KEY = "ZIP";
     public static final String CITY_KEY = "CITY";
     public static final String STATE_KEY = "STATE";
+    public static final String MAP_LON_KEY = "MLON";
+    public static final String MAP_LAT_KEY = "MLAT";
+
     public static final String LONGITUDE_KEY = "LONGITUDE";
     public static final String LATITUDE_KEY = "LATITUDE";
 

@@ -14,27 +14,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.CITY_KEY;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.STATE_KEY;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.ZIP_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
 
 /**
  * A fragment representing a list of Items.
@@ -87,21 +81,24 @@ public class WeatherDateFragment extends Fragment {
 
     /*** Retrieves the user's location data based on preference settings*/
     private void getLocationDataBasedOnPreference(Bundle bundle) {
+        SharedPreferences sp = Objects.requireNonNull(this.getContext()).getSharedPreferences(SettingsNode.LOCATIONPREF, 0);
+//        SharedPreferences.Editor e = sp.edit();
         switch (current_LocationDeterminant) {
             case SettingsNode.CITY_STATE:
-                mCity = bundle.getString(CITY_KEY, "TACOMA");
-                mState = bundle.getString(STATE_KEY, "WA");
+                mCity = sp.getString(CITY_KEY, "TACOMA");
+                mState = sp.getString(STATE_KEY, "WA");
+                Log.w("DAYLEN LOCATION BASED ON PREFERENCE", mCity + mState);
                 break;
             case SettingsNode.GPS_DATA:
                 mLat = bundle.getDouble(LATITUDE_KEY, 0);
                 mLon = bundle.getDouble(LONGITUDE_KEY, 0);
                 break;
             case SettingsNode.SELECT_FROM_MAP:
-                mLat = bundle.getDouble(LATITUDE_KEY, 0);
-                mLon = bundle.getDouble(LONGITUDE_KEY, 0);
+                mLat = sp.getLong(MAP_LAT_KEY, 0);
+                mLon = sp.getLong(MAP_LON_KEY, 0);
                 break;
             case SettingsNode.POSTAL_CODE:
-                mZip = bundle.getString(ZIP_KEY, "98422");
+                mZip = sp.getString(ZIP_KEY, "98422");
                 break;
         }
     }
