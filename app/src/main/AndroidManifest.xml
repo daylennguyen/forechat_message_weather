@@ -54,8 +54,8 @@
 
         <!--Specify the Google API key; of which, is restricted to calling GoogleMap's API within this application-->
         <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBOkTYyJQvsFY_Kk0Zsd_9G-LQEFqR8tOE" />
+            android:name = "com.google.android.geo.API_KEY"
+            android:value = "AIzaSyBMbIL3cX1GwbLkhgiqYvAq7HlYaQh0B8A" />
 
         <!--Apache Exception Fix-->
         <uses-library
