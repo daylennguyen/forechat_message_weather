@@ -1,5 +1,6 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
+import android.app.AlertDialog;
 import android.content.*;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -122,7 +123,7 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.startLocationUpdates();
     }
 
-    /*Enables toggling of the nav drawer and displays with username within said drawer aswell*/
+    /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
@@ -512,15 +513,22 @@ public class HomeActivity extends AppCompatActivity
                             notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
                                     getResources().getColor( R.color.colorLightBluePurple ) );
                         }
+
                     } else if ( jObj.getString( "type" ).contains( "request" ) ) {
-                        //TODO: foreground notifications
-                        Log.i( "HomeActivity", "let the user know we have a new request" );
-                        //mConnectionsNode.loadRequests();
+                        Log.i( "HomeActivity", "we have a new request" );
+                        //show the dialog
+                        ShowConnectionRequestAlert( jObj.getString( "sender" ) +
+                                        " has sent you a connection request!",
+                                "View Request", mConnectionsNode::loadRequests );
+
                     } else if ( jObj.getString( "type" ).contains( "accepted" ) ) {
-                        //TODO: foreground notifications
-                        Log.i( "HomeActivity", "let the user know someone accepted our request" );
-                        //Fragment frag = new ConnectionListFragment();
-                        //mConnectionsNode.loadConnections(frag);
+                        Log.i( "HomeActivity", "someone accepted our request" );
+                        //show the dialog
+                        ShowConnectionRequestAlert( jObj.getString( "sender" ) +
+                                        " has accepted your connection request!",
+                                "View Connection",
+                                () -> mConnectionsNode.loadConnections( new ConnectionListFragment() ) );
+
                     }
                 } catch ( JSONException e ) {
                     e.printStackTrace();
@@ -528,4 +536,18 @@ public class HomeActivity extends AppCompatActivity
             }
         }
     }
+    private void ShowConnectionRequestAlert(String msg, String positive, final Runnable action) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(msg)
+                .setPositiveButton(positive, (dialog, id) -> { //anonymous onclick listener
+                    action.run();
+                })
+                .setNegativeButton("View Later", (dialog, id) -> {
+                    //do nothing
+                });
+        // 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }
