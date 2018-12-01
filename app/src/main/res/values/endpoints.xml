@@ -22,6 +22,7 @@
     <string name="ep_requestConnection">initiateContact</string>
     <string name="ep_verifyConnection">verifyContact</string>
     <string name="ep_getRequests">getRequests</string>
+    <string name="ep_removeConnection">remove</string>
 
     <!--________________Messaging________________-->
     <string name="ep_messaging">messaging</string>

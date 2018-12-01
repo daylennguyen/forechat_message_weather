@@ -1,6 +1,8 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,17 +49,31 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         holder.mItem = (mConnections).get(position);
         holder.mUsername.setText(mConnections.get(position).getUsername());
 
+        try {
+            if (!(holder.mItem.getIsMine())) {
+                holder.mUsername.setTextColor(Color.GRAY);
+            }
+        } catch (Exception e) {
+            Log.e("CONNECTION VIEW HOLDER", "my isMine value is weird!! " + e);
+        }
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    /*
-                        Notify the active callbacks interface (the activity, if the
-                        fragment is attached to one) that an item has been selected.
-                     */
-
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    /* Notify the active callbacks interface (the activity, if the
+                       fragment is attached to one) that an item has been selected.*/
+                    mListener.onConnectionsListFragmentInteraction(holder.mItem);
                 }
+            }
+        });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    mListener.onConnectionsListFragmentLongInteraction(holder.mItem);
+                }
+                return true;
             }
         });
     }

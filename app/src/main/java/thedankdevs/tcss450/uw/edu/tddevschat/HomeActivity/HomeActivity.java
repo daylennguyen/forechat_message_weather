@@ -236,10 +236,10 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_connections:
-                setTitle( "Connections" );
                 Fragment frag = new ConnectionListFragment();
                 mConnectionsNode.loadConnections( frag );
                 break;
+
             case R.id.nav_weather:
                 setTitle( "Weather" );
                 if ( mLocationNode.getmCurrentLocation() != null ) {
@@ -269,7 +269,6 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_connectionRequests:
-                setTitle( "Pending Requests" );
                 mConnectionsNode.loadRequests();
                 break;
 
@@ -343,8 +342,13 @@ public class HomeActivity extends AppCompatActivity
 
 
     @Override
-    public void onListFragmentInteraction( Connection item ) {
+    public void onConnectionsListFragmentInteraction( Connection item ) {
         mConnectionsNode.onListFragmentInteraction( item );
+    }
+
+    @Override
+    public void onConnectionsListFragmentLongInteraction( Connection item ) {
+        mConnectionsNode.onConnectionsListFragmentLongInteraction( item );
     }
 
     @Override
@@ -419,6 +423,13 @@ public class HomeActivity extends AppCompatActivity
                 0, s.length(), 0 );
         menuItem.setTitle( s );
     }
+
+    /**
+     *
+     */
+//    private void SuccessOrFailToast() {
+//
+//    }
 
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
@@ -502,6 +513,15 @@ public class HomeActivity extends AppCompatActivity
                             notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
                                     getResources().getColor( R.color.colorLightBluePurple ) );
                         }
+                    } else if (jObj.getString("type").contains("request")) {
+                        //TODO: foreground notifications
+                        Log.i("HomeActivity", "let the user know we have a new request");
+                        //mConnectionsNode.loadRequests();
+                    } else if (jObj.getString("type").contains("accepted")) {
+                        //TODO: foreground notifications
+                        Log.i("HomeActivity", "let the user know someone accepted our request");
+                        //Fragment frag = new ConnectionListFragment();
+                        //mConnectionsNode.loadConnections(frag);
                     }
                 } catch ( JSONException e ) {
                     e.printStackTrace();

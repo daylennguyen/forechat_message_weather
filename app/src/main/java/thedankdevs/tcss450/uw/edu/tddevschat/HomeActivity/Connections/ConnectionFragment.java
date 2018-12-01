@@ -51,12 +51,6 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         if (getArguments() != null) {
             Connection theConnection = (Connection) getArguments().getSerializable(getString(R.string.key_connection_connection));
             mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.key_credential));
-            /*mTheirEmail = getArguments().getString(getString(R.string.key_connection_email));
-            mTheirUsername = getArguments().getString(getString(R.string.key_connection_username));
-            mTheirFirstName = getArguments().getString(getString(R.string.key_connection_first));
-            mTheirLastName = getArguments().getString(getString(R.string.key_connection_last));
-            mOurChatID = getArguments().getInt(getString(R.string.key_connection_chatID));
-            mIsMine = getArguments().getBoolean(getString(R.string.key_connection_isMine));*/
             mTheirEmail = theConnection.getEmail();
             mTheirUsername = theConnection.getUsername();
             mTheirFirstName = theConnection.getFirstName();
@@ -148,7 +142,9 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         JSONObject requestJson = new JSONObject();
         try {
             requestJson.put("myMemberID", mCredentials.getMemberID());
-            requestJson.put("theirEmail", mTheirEmail);
+            requestJson.put("myUsername", mCredentials.getUsername());
+            requestJson.put("theirUsername", mTheirUsername);
+            Log.d("REQUESTING CONNECTION", requestJson.toString());
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
