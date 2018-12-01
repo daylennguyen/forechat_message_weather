@@ -224,10 +224,10 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_connections:
-                setTitle("Connections");
                 Fragment frag = new ConnectionListFragment();
                 mConnectionsNode.loadConnections(frag);
                 break;
+
             case R.id.nav_weather:
                 setTitle("Weather");
                 if ((mLocationNode.getmCurrentLocation() != null)
@@ -252,7 +252,6 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_connectionRequests:
-                setTitle("Pending Requests");
                 mConnectionsNode.loadRequests();
                 break;
 
@@ -328,8 +327,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(Connection item) {
+    public void onConnectionsListFragmentInteraction(Connection item) {
         mConnectionsNode.onListFragmentInteraction(item);
+    }
+
+    @Override
+    public void onConnectionsListFragmentLongInteraction(Connection item) {
+        mConnectionsNode.onConnectionsListFragmentLongInteraction(item);
     }
 
     @Override
@@ -404,6 +408,13 @@ public class HomeActivity extends AppCompatActivity
         menuItem.setTitle(s);
     }
 
+    /**
+     *
+     */
+//    private void SuccessOrFailToast() {
+//
+//    }
+
     @Override
     public void RemoveMemberInteraction(ArrayList<String> users, int theChatID) {
         mChatNode.RemoveMembersFromChat(users, theChatID);
@@ -466,7 +477,7 @@ public class HomeActivity extends AppCompatActivity
                 try {
                     jObj = new JSONObject(data);
                     Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
-                    if (jObj.has("message") && jObj.has("sender")) {
+                    if (jObj.has("message") && jObj.has("sender")) { //from a chat related notification
                         String sender = jObj.getString("sender");
                         Log.wtf("sender", sender);
                         Log.wtf("username", mCredential.getUsername());
@@ -486,6 +497,15 @@ public class HomeActivity extends AppCompatActivity
                             notifyUI(getResources().getColor(R.color.colorLightBluePurple),
                                     getResources().getColor(R.color.colorLightBluePurple));
                         }
+                    } else if (jObj.getString("type").contains("request")) {
+                        //TODO: foreground notifications
+                        Log.i("HomeActivity", "let the user know we have a new request");
+                        //mConnectionsNode.loadRequests();
+                    } else if (jObj.getString("type").contains("accepted")) {
+                        //TODO: foreground notifications
+                        Log.i("HomeActivity", "let the user know someone accepted our request");
+                        //Fragment frag = new ConnectionListFragment();
+                        //mConnectionsNode.loadConnections(frag);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

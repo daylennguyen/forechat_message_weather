@@ -3,7 +3,8 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.
 import java.io.Serializable;
 
 /**
- * Class to encapsulate a Connection Request. Building an Object requires a username.
+ * Class to encapsulate a Connection Request. Building an Object requires a username
+ * and a boolean value representing if the user received this request (true) or sent it (false).
  *
  * Optional fields include nothing for now.
  *

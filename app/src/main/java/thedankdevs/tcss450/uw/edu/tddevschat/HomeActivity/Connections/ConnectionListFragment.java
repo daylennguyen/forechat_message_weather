@@ -1,5 +1,6 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,6 +61,10 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
 
     boolean mExistsLocally;
 
+    private SearchView mSearchView;
+
+    private MenuItem mSearch;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -67,13 +72,13 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     public ConnectionListFragment() {
     }
 
-    public static ConnectionListFragment newInstance(int connectionsList) { //TODO: fix
-        ConnectionListFragment fragment = new ConnectionListFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_CONNECTIONS_LIST, connectionsList);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static ConnectionListFragment newInstance(int connectionsList) { //TODO: fix
+//        ConnectionListFragment fragment = new ConnectionListFragment();
+//        Bundle args = new Bundle();
+//        args.putInt(ARG_CONNECTIONS_LIST, connectionsList);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -82,9 +87,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             mConnections = (ArrayList) getArguments().getSerializable(ARG_CONNECTIONS_LIST);
-
         }
-
     }
 
     /**
@@ -96,11 +99,12 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        MenuItem search = menu.findItem(R.id.action_search_contacts);
-        search.setVisible(true);
-        SearchView searchView = (SearchView) search.getActionView();
-        searchView.setVisibility(View.VISIBLE);
-        searchView.setOnQueryTextListener(this);
+        mSearch = menu.findItem(R.id.action_search_contacts);
+        mSearch.setVisible(true);
+        //SearchView searchView = (SearchView) search.getActionView();
+        mSearchView = (SearchView) mSearch.getActionView();
+        mSearchView.setVisibility(View.VISIBLE);
+        mSearchView.setOnQueryTextListener(this);
     }
 
     @Override
@@ -109,25 +113,36 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         View view = inflater.inflate(R.layout.fragment_connections_list, container, false);
         Log.d(getClass().getSimpleName(), "I am on create view");
 
-        // Set the adapter
+            // Set the adapter
         if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            mRecyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            /*
-                set local adapter to be the primary list used so that this list
-                is displayed first and so that search is looked through this list first
-             */
-
-            mLocalAdapter = new ConnectionListRecyclerViewAdapter(mConnections, mListener);
-            mGlobalAdapter = null;
-            mRecyclerView.setAdapter(mLocalAdapter);
-
-
+                Context context = view.getContext();
+                mRecyclerView = (RecyclerView) view;
+                if (mColumnCount <= 1) {
+                    mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+                } else {
+                    mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                }
+            /*  set local adapter to be the primary list used so that this list
+                is displayed first and so that search is looked through this list first */
+                mLocalAdapter = new ConnectionListRecyclerViewAdapter(mConnections, mListener);
+                mGlobalAdapter = null;
+                mRecyclerView.setAdapter(mLocalAdapter);
+        }
+        if (mConnections.size() == 0) {
+            //Alert the user that they don't have any connections and give them the option to search
+            //for ones to add
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("You don't have any connections!")
+                    .setPositiveButton("Search for new connections", (dialog, id) -> { //anonymous onclick listener
+                        mSearch.expandActionView();
+                        mSearchView.setQueryHint("username, email, first or last");
+                    })
+                    .setNegativeButton("Cancel", (dialog, id) -> {
+                        //do nothing
+                    });
+            // 3. Get the AlertDialog from create()
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
         return view;
     }
@@ -287,6 +302,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
      * activity.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Connection item);
+        void onConnectionsListFragmentInteraction(Connection item);
+        void onConnectionsListFragmentLongInteraction(Connection item);
     }
 }

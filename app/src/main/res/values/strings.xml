@@ -38,9 +38,12 @@
     <string name="connection_requestsent">request sent</string>
     <string name="connection_requestfailed">request failed</string>
     <string name="connection_acceptrequest">Accept</string>
+    <string name="connection_removesent">connection removed</string>
+    <string name="connection_removefailed">Accept</string>
     <string name="chats_list_newChat">Create New Chat</string>
     <string name="create_new_chat_select">Select your connection(s) for the new chat</string>
     <string name="remove_chat_members">Select the members of the chat you wish to remove.</string>
+
 
     <string name="remove_remove">Remove</string>
     <!--ERROR NOTIFICATIONS-->

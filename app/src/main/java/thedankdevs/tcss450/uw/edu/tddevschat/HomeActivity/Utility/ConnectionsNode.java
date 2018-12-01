@@ -1,11 +1,13 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -114,6 +116,7 @@ public class ConnectionsNode {
             loadingFragment.setArguments(args);
             mMaster.onWaitFragmentInteractionHide();
             mMaster.loadFragment(loadingFragment);
+            mMaster.setTitle("Connections");
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -136,15 +139,65 @@ public class ConnectionsNode {
         //Could this be just one item being sent?
         args.putSerializable(mMaster.getString(R.string.key_connection_connection), item);
         args.putSerializable(mMaster.getString(R.string.key_credential), mCredential);
-        /*args.putSerializable(mMaster.getString(R.string.key_connection_email), item.getEmail());
-        args.putSerializable(mMaster.getString(R.string.key_connection_username), item.getUsername());
-        args.putSerializable(mMaster.getString(R.string.key_connection_first), item.getFirstName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_last), item.getLastName());
-        args.putSerializable(mMaster.getString(R.string.key_connection_chatID), item.getChatID()); */
         connectionFragment.setArguments(args);
         mMaster.loadFragment(connectionFragment);
     }
 
+    public void onConnectionsListFragmentLongInteraction(Connection item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mMaster);
+            builder.setMessage(item.getUsername() + " Options")
+                    .setPositiveButton("Remove this connection", (dialog, id) -> { //anonymous onclick listener
+                        removeConnection(mCredential.getMemberID(), item.getEmail());
+                    })
+                    .setNegativeButton("Cancel", (dialog, id) -> {
+                        //do nothing
+                    });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void removeConnection(int memberID, String email) {
+        JSONObject removeJson = new JSONObject();
+        try {
+            removeJson.put("myMemberID", memberID);
+            removeJson.put("theirEmail", email);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+        }
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(mMaster.getString(R.string.base_url))
+                .appendPath(mMaster.getString((R.string.ep_connections)))
+                .appendPath(mMaster.getString(R.string.ep_removeConnection))
+                .build();
+        Log.w("removeConnection() - URL for removing a connection:", uri.toString());
+        new SendPostAsyncTask.Builder(uri.toString(), removeJson)
+                .onPreExecute(mMaster::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleRemoveOnPostExecute)
+                .onCancelled(error -> Log.e("removeConnection() - ERROR MICHELLE", error))
+                .build().execute();
+    }
+
+    private void handleRemoveOnPostExecute(String result) {
+        try {
+            Log.w("REMOVE CONNECTION POST RESULT", result);
+            //This is the result from the web service
+            JSONObject res = new JSONObject(result);
+            String toastMsg;
+            if (res.has("success") && res.getBoolean("success")) {
+                loadConnections(new ConnectionListFragment()); // TODO: test----------------------------------
+                toastMsg = mMaster.getString(R.string.connection_removesent);
+            } else {
+                toastMsg = mMaster.getString(R.string.connection_removefailed);
+            }
+            Toast toast = Toast.makeText(mMaster.getApplicationContext(),
+                    toastMsg, Toast.LENGTH_SHORT);
+            mMaster.onWaitFragmentInteractionHide();
+            toast.show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -183,18 +236,19 @@ public class ConnectionsNode {
                 myConnRequests.add(new Request.Builder(username, true)
                         .build());
             }
-//            JSONArray jsonSentRequests = resultsJSON.getJSONArray("sent");
-//            for (int i = 0; i < jsonSentRequests.length(); i++) {
-//                JSONObject connection = jsonSentRequests.getJSONObject(i);
-//                String username = connection.getString("username");
-//                myConnRequests.add(new Request.Builder(username, false)
-//                        .build());
-//            }
+            JSONArray jsonSentRequests = resultsJSON.getJSONArray("sent");
+            for (int i = 0; i < jsonSentRequests.length(); i++) {
+                JSONObject connection = jsonSentRequests.getJSONObject(i);
+                String username = connection.getString("username");
+                myConnRequests.add(new Request.Builder(username, false)
+                        .build());
+            }
             Bundle args = new Bundle();
             args.putSerializable(RequestFragment.ARG_REQUESTS_LIST, myConnRequests);
             Fragment connRequestsFragment = new RequestFragment();
             connRequestsFragment.setArguments(args);
             mMaster.loadFragment(connRequestsFragment);
+            mMaster.setTitle("Pending Requests");
         } catch (JSONException e) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -208,9 +262,8 @@ public class ConnectionsNode {
         JSONObject acceptJson = new JSONObject();
         try {
             acceptJson.put("myMemberID", mCredential.getMemberID());
-            Log.w("my member id", " " + mCredential.getMemberID());
+            acceptJson.put("myUsername", mCredential.getUsername());
             acceptJson.put("theirUsername", theirUsername);
-            Log.w("their email", " " + theirUsername);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }

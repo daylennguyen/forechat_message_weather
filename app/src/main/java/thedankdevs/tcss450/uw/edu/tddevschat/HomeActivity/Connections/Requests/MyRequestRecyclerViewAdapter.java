@@ -18,7 +18,6 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Request} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestRecyclerViewAdapter.ViewHolder> {
 
@@ -41,6 +40,16 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mRequests.get(position);
         holder.mUsernameView.setText(mRequests.get(position).getUsername());
+        try {
+            if (!(holder.mItem.getIReceived())) {
+                holder.mAcceptButton.setEnabled(false);
+                holder.mAcceptButton.setBackgroundColor(Color.WHITE);
+                holder.mAcceptButton.setText("Pending");
+                holder.mUsernameView.setTextColor(Color.GRAY);
+            }
+        } catch (Exception e) {
+            Log.e("REQUEST VIEW HOLDER", "my iReceived value is weird!! " + e);
+        }
     }
 
     @Override
