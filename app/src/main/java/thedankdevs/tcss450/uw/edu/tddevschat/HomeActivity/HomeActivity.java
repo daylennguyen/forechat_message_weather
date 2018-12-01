@@ -431,7 +431,6 @@ public class HomeActivity extends AppCompatActivity
 //    private void SuccessOrFailToast() {
 //
 //    }
-
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
         mChatNode.RemoveMembersFromChat( users, theChatID );
@@ -514,20 +513,22 @@ public class HomeActivity extends AppCompatActivity
                             notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
                                     getResources().getColor( R.color.colorLightBluePurple ) );
                         }
-                    } else if (jObj.getString("type").contains("request")) {
-                        Log.i("HomeActivity", "we have a new request");
-                        //show the dialog
-                        ShowConnectionRequestAlert(jObj.getString("sender") +
-                                        " has sent you a connection request!",
-                                "View Request", mConnectionsNode::loadRequests);
 
-                    } else if (jObj.getString("type").contains("accepted")) {
-                        Log.i("HomeActivity", "someone accepted our request");
+                    } else if ( jObj.getString( "type" ).contains( "request" ) ) {
+                        Log.i( "HomeActivity", "we have a new request" );
                         //show the dialog
-                        ShowConnectionRequestAlert(jObj.getString("sender") +
+                        ShowConnectionRequestAlert( jObj.getString( "sender" ) +
+                                        " has sent you a connection request!",
+                                "View Request", mConnectionsNode::loadRequests );
+
+                    } else if ( jObj.getString( "type" ).contains( "accepted" ) ) {
+                        Log.i( "HomeActivity", "someone accepted our request" );
+                        //show the dialog
+                        ShowConnectionRequestAlert( jObj.getString( "sender" ) +
                                         " has accepted your connection request!",
                                 "View Connection",
-                                () -> mConnectionsNode.loadConnections(new ConnectionListFragment()));
+                                () -> mConnectionsNode.loadConnections( new ConnectionListFragment() ) );
+
                     }
                 } catch ( JSONException e ) {
                     e.printStackTrace();
