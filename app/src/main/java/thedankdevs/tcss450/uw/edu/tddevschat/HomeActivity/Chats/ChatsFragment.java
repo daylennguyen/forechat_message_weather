@@ -6,19 +6,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import java.util.ArrayList;
-
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ChatNode;
-import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
  * A fragment representing a list of Items.
@@ -72,8 +68,8 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
         // Set the adapter
         if (view instanceof LinearLayout) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+            Context      context      = view.getContext();
+            RecyclerView recyclerView = view.findViewById( R.id.list );
 
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
