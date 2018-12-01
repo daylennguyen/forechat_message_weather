@@ -430,7 +430,6 @@ public class HomeActivity extends AppCompatActivity
 //    private void SuccessOrFailToast() {
 //
 //    }
-
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
         mChatNode.RemoveMembersFromChat( users, theChatID );
@@ -513,13 +512,13 @@ public class HomeActivity extends AppCompatActivity
                             notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
                                     getResources().getColor( R.color.colorLightBluePurple ) );
                         }
-                    } else if (jObj.getString("type").contains("request")) {
+                    } else if ( jObj.getString( "type" ).contains( "request" ) ) {
                         //TODO: foreground notifications
-                        Log.i("HomeActivity", "let the user know we have a new request");
+                        Log.i( "HomeActivity", "let the user know we have a new request" );
                         //mConnectionsNode.loadRequests();
-                    } else if (jObj.getString("type").contains("accepted")) {
+                    } else if ( jObj.getString( "type" ).contains( "accepted" ) ) {
                         //TODO: foreground notifications
-                        Log.i("HomeActivity", "let the user know someone accepted our request");
+                        Log.i( "HomeActivity", "let the user know someone accepted our request" );
                         //Fragment frag = new ConnectionListFragment();
                         //mConnectionsNode.loadConnections(frag);
                     }
