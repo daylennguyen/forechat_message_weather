@@ -28,7 +28,7 @@ public class LocationNode implements Serializable {
     /*Location Services*/
     private static final long                        UPDATE_INTERVAL_IN_MILLISECONDS         = 10000;
     private static final long                        FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    private static final int                         MY_PERMISSIONS_LOCATIONS                = 8414;
+    public static final  int                         MY_PERMISSIONS_LOCATIONS                = 8414;
     private              AppCompatActivity           myNodeMaster;
     private              LocationRequest             mLocationRequest;
     private              Location                    mCurrentLocation;
@@ -45,10 +45,10 @@ public class LocationNode implements Serializable {
 
         if ( ActivityCompat.checkSelfPermission( MasterActivity, Manifest.permission.ACCESS_FINE_LOCATION )
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission( MasterActivity,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions( MasterActivity,
-                    new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
+                && ActivityCompat.checkSelfPermission( MasterActivity, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+
+            ActivityCompat.requestPermissions( MasterActivity, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
         } else {
             //The user has already allowed the use of Locations. Get the current location.
             requestLocation();
