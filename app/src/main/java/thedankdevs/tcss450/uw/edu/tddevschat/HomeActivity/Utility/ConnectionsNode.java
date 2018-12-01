@@ -111,6 +111,8 @@ public class ConnectionsNode {
             }
             Bundle args = new Bundle();
             args.putSerializable(ConnectionListFragment.ARG_CONNECTIONS_LIST, myConnections);
+            args.putInt(ConnectionListFragment.ARG_CREDENTIALS, mCredential.getMemberID());
+
             //Fragment connectionListFragment = new ConnectionListFragment();
             //connectionListFragment.setArguments(args);
             loadingFragment.setArguments(args);
