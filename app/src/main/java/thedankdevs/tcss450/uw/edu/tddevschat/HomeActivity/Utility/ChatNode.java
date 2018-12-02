@@ -167,7 +167,7 @@ public class ChatNode {
         JSONObject chatName = new JSONObject();
         String urlname = "";
             try {
-            if (chatRoomName.equals("NA")) {
+            if (chatRoomName.equals("NA") || chatRoomName.equals("")) {
                 if(theOtherReceiverUsernames.size() == 1) {
                     defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsernames.get(0);
                     urlname = mMaster.getString(R.string.ep_messaging_new_individual);
