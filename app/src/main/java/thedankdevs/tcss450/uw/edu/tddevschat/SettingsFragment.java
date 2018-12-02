@@ -62,7 +62,7 @@ public class SettingsFragment extends Fragment {
         super.onDestroy();
         // Get from the SharedPreferences
         SharedPreferences settings = Objects.requireNonNull(this.getContext()).getSharedPreferences(METRIC_PREF, 0);
-        int METRICPREF = settings.getInt(METRIC_PREF, 0);
+        String METRICPREF = settings.getString(METRIC_PREF, "0");
         Log.e("DAYLEN", String.valueOf(METRICPREF));
         /*update the shared preference fields within settings node*/
         if (home != null && home.mSettingsNode != null) {

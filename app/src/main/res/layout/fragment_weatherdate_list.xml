@@ -21,7 +21,7 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorDarkPurple"
+                android:background="?attr/primaryDarkBackground"
                 android:fontFamily="@font/roboto"
                 android:lineSpacingExtra="8sp"
                 android:text="@string/_16_day_weather_forecast"
@@ -33,7 +33,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/colorDarkPurple"
+                android:background="?attr/primaryDarkBackground"
                 android:orientation="horizontal"
                 android:paddingBottom="5dp">
 
@@ -70,10 +70,10 @@
             android:layout_gravity="bottom|right"
             android:clickable="true"
             android:focusable="true"
-            app:backgroundTint="@color/colorMedPurple"
+            app:backgroundTint="?attr/primaryMediumBackground"
             app:elevation="16dp"
             app:fabSize="normal"
-            app:rippleColor="@color/colorLightPurple"
+            app:rippleColor="?attr/primaryLightBackground"
             app:srcCompat="@drawable/ic_location"
             app:useCompatPadding="true" />
 

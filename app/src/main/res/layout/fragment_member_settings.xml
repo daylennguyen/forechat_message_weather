@@ -20,7 +20,7 @@
         android:typeface="normal"
         android:textSize="24sp"
         android:textColor="@color/colorLightestGrey"
-        android:background="@color/colorDarkPurple"/>
+        android:background="?attr/colorPrimary"/>
 
 
     <GridLayout
@@ -48,7 +48,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="left|fill_horizontal"
             android:inputType="textPersonName"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <Button
             android:id="@+id/btn_member_settings_firstname"
@@ -67,7 +68,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="left|fill_horizontal"
             android:inputType="textPersonName"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <Button
             android:id="@+id/btn_member_settings_lastname"
@@ -86,7 +88,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="left|fill_horizontal"
             android:inputType="textPersonName"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <Button
             android:id="@+id/btn_member_settings_username"
@@ -105,7 +108,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="left|fill_horizontal"
             android:inputType="textEmailAddress"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <!--Testing purposes only while email endpoint is not set up-->
         <Space
@@ -129,7 +133,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="left|fill_horizontal"
             android:inputType="textPassword"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <Button
             android:id="@+id/btn_member_settings_password"
@@ -149,7 +154,8 @@
             android:layout_columnSpan="5"
             android:layout_gravity="fill_horizontal"
             android:inputType="textPassword"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:background="@drawable/edittext_states"/>
 
         <Space
             android:layout_columnSpan="1"/>
@@ -162,7 +168,7 @@
             android:layout_columnSpan="3"
             android:text="Apply"
             android:layout_gravity="right"
-            android:background="@color/colorPrimary"
+            android:background="?attr/colorPrimaryDark"
             android:layout_margin="5dp" />
 
         <!--Cancel Button-->
@@ -170,7 +176,7 @@
             android:id="@+id/btn_member_settings_cancel"
             android:layout_columnSpan="3"
             android:text="Cancel"
-            android:background="@color/colorAccent"
+            android:background="?attr/colorAccent"
             android:layout_margin="5dp"/>
 
 
