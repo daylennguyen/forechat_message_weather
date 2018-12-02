@@ -117,7 +117,7 @@ public class ChatNode {
 
         if (chatID == -1) {
             theOtherReceiverUsernames.add(username);
-            createNewChat();
+            createNewChat("NA");
         } else {
             mChatID = chatID;
             loadAllMessages();
@@ -163,18 +163,30 @@ public class ChatNode {
      * @Author Emmett Kang
      * @Version 15 November 2018
      */
-    private void createNewChat() {
+    private void createNewChat(String chatRoomName) {
         JSONObject chatName = new JSONObject();
         String urlname = "";
-        try {
-            //Create default chat name for current user and user to be chatting.
-            if (theOtherReceiverUsernames.size() == 1) {
-                defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsernames.get(0);
-                urlname = mMaster.getString(R.string.ep_messaging_new_individual);
+            try {
+            if (chatRoomName.equals("NA") || chatRoomName.equals("")) {
+                if(theOtherReceiverUsernames.size() == 1) {
+                    defaultChatName = mCredential.getUsername() + " & " + theOtherReceiverUsernames.get(0);
+                    urlname = mMaster.getString(R.string.ep_messaging_new_individual);
+                }else {
+                    defaultChatName = "Group Chat";
+                    urlname = mMaster.getString(R.string.ep_messaging_new_group);
+                }
+
             } else {
-                defaultChatName = "Group Chat";
-                urlname = mMaster.getString(R.string.ep_messaging_new_group);
+                defaultChatName = chatRoomName;
+                if (theOtherReceiverUsernames.size() == 1) {
+                    urlname = mMaster.getString(R.string.ep_messaging_new_individual);
+                } else {
+                    urlname = mMaster.getString(R.string.ep_messaging_new_group);
+                }
+
             }
+
+            //Create default chat name for current user and user to be chatting.
             chatName.put("name", defaultChatName);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
@@ -519,7 +531,8 @@ public class ChatNode {
 
         }
     */
-    public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList) {
+    public void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,
+                                         String chatTitle) {
 
         for (CheckBox checkBox : cbList) {
             if (checkBox.isChecked()) {
@@ -535,7 +548,7 @@ public class ChatNode {
                 if(c.getUsername() == theOtherReceiverUsernames.get(0)) {
                     int tempChatID = c.getChatID();
                     if (tempChatID == -1) {
-                        createNewChat();
+                        createNewChat(chatTitle);
                     } else {
                         mChatID = tempChatID;
                         loadAllMessages();
@@ -545,7 +558,7 @@ public class ChatNode {
             }
         } else {
             Log.wtf("SIZE", "Should come here");
-            createNewChat();
+            createNewChat(chatTitle);
         }
     }
 

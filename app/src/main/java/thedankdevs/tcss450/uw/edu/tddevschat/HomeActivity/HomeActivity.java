@@ -432,7 +432,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     @Override
-    public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList ) {
+    public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,
+                                          String chatTitle) {
         StringBuilder checkedBoxesSB = checkedBoxes(cbList);
         boolean flag = false;
         for (CheckBox checkBox : cbList) {
@@ -442,7 +443,7 @@ public class HomeActivity extends AppCompatActivity
             }
         }
         if (flag) {
-            mChatNode.CreateNewChatInteraction( cbList, connectionList );
+            mChatNode.CreateNewChatInteraction( cbList, connectionList, chatTitle);
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
             toast.show();
@@ -579,7 +580,7 @@ public class HomeActivity extends AppCompatActivity
                                     getResources().getColor( R.color.colorLightBluePurple ) );
                         }
 
-                    } else if ( jObj.getString( "type" ).contains( "request" ) ) {
+                    } else if ( jObj.getString( "type" ).contains( "sent" ) ) {
                         Log.i( "HomeActivity", "we have a new request" );
                         //show the dialog
                         ShowConnectionRequestAlert( jObj.getString( "sender" ) +
