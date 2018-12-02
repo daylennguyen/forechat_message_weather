@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -52,12 +53,14 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.RemoveChatMembers;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ThemeUtils;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.ThemesFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -127,7 +130,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTheme(R.style.AppTheme_Mint);
+        ThemeUtils.onActivityCreateTheme(this);
 
         setContentView(R.layout.activity_home);
         setTitle("Main Page");
@@ -153,6 +156,16 @@ public class HomeActivity extends AppCompatActivity
         TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
         nav_user.setText(mCredential.getUsername()); //Set the header username.
         mLocationNode.startLocationUpdates();
+
+        if (savedInstanceState == null) {
+            if (findViewById(R.id.frame_home_container) != null ) {
+                FragmentManager fm = getSupportFragmentManager();
+
+                // add homeFragment to back stack
+                fm.beginTransaction().add(R.id.frame_home_container, new HomeFragment()).addToBackStack(null).commit();
+
+            }
+        }
     }
 
     /*Helper class to create node objects*/
@@ -174,16 +187,35 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("BRYAN", "backstack count: " + backstackCount);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_home_container);
             if (currentFragment instanceof ChatFragment) {
                 mChatNode.loadAllChats();
-                Log.wtf("wtf", "NOT ENTERING");
             } else {
-                super.onBackPressed();
+
+                int i = 1;
+                while (i < backstackCount) {
+                    getSupportFragmentManager().popBackStackImmediate();
+                    i++;
+                }
             }
+            backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+            Log.d("BRYAN", "backstack after popping: " + backstackCount);
+            if (backstackCount == 1) {
+                loadFragmentWithoutBackStack(new HomeFragment());
+            }
+            super.onBackPressed();
+
+
+
+
+
+
+
         }
 
 
@@ -225,7 +257,6 @@ public class HomeActivity extends AppCompatActivity
 
         /*depending on the ID of the nav_item, route them to the appropriate fragment*/
         boolean loadingFromDifferentMethods = false;
-
         switch (item.getItemId()) {
 
             case R.id.nav_home:
@@ -271,6 +302,10 @@ public class HomeActivity extends AppCompatActivity
                 setTitle("Pending Requests");
                 mConnectionsNode.loadRequests();
                 break;
+            case R.id.nav_theme:
+                setTitle("Change Theme");
+                fragment = new ThemesFragment();
+                break;
 
             default:
 
@@ -279,7 +314,8 @@ public class HomeActivity extends AppCompatActivity
             /*Send the args to the fragment before displaying*/
             fragment.setArguments(args);
             /*display the fragment*/
-            loadFragment(fragment);
+            loadFragmentWithoutBackStack(fragment);
+
         }
         /*after we display the fragment, close the drawer*/
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -317,7 +353,7 @@ public class HomeActivity extends AppCompatActivity
     public void loadFragment(Fragment frag) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frame_home_container, frag, frag.getClass().getSimpleName())
+                .replace(R.id.frame_home_container, frag, "Home Fragment")
                 .addToBackStack(null);
         // Commit the transaction
         transaction.commit();
@@ -325,9 +361,18 @@ public class HomeActivity extends AppCompatActivity
 
     /*Helper method to load an instance of the given fragment into the current activity*/
     public void loadFragmentWithoutBackStack(Fragment frag) {
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
+        int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("BRYAN", "backstack before loading: " + backstackCount);
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction()
                 .replace(R.id.frame_home_container, frag);
+
+
+        if (fm.getBackStackEntryCount() < 1) {
+            transaction.addToBackStack(null);
+        }
+
+
         // Commit the transaction
         transaction.commit();
     }

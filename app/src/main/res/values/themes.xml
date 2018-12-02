@@ -6,7 +6,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/colorLightPurple</item>
-        <item name="colorPrimaryDark">@color/colorDarkestGrey</item>
+        <item name="colorPrimaryDark">@color/colorDarkPurple</item>
         <item name="colorAccent">@color/colorMedPurple</item>
         <item name="android:statusBarColor">@color/colorLightPurple</item>
         <item name="colorBackground">@color/colorLightestGrey</item>
@@ -20,6 +20,7 @@
         <item name="primaryDarkBackground">@color/colorDarkPurple</item>
         <item name="primaryMediumBackground">@color/colorMedPurple</item>
         <item name="primaryLightBackground">@color/colorLightPurple</item>
+        <item name="appBarColor">@color/colorDarkPurple</item>
     </style>
 
     <style name="AppTheme.Mint" parent="Theme.AppCompat.Light.DarkActionBar">
