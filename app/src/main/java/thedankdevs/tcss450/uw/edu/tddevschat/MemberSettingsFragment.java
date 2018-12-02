@@ -128,7 +128,7 @@ public class MemberSettingsFragment extends Fragment {
         ENABLED_TEXT_COLOR = getContext().getColor(R.color.colorPrimary);
         ENABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_enabled);
         DISABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_disabled);
-
+        Log.d("BRYAN", "my tag: "+ getTag());
         setDefault();
 
         return mView;
