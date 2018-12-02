@@ -67,8 +67,7 @@ public class MemberSettingsNode {
             JSONObject jsonObject = new JSONObject(result);
             boolean success = jsonObject.getBoolean("success");
             FragmentManager fm = mMaster.getSupportFragmentManager();
-            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentById(
-                    R.id.linear_member_settings_container);
+            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentByTag("MemberSettingsFragment");
             FragmentTransaction transaction = fm.beginTransaction();
 
             if (success) {
