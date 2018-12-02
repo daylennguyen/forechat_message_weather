@@ -111,7 +111,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mEmail = mEmailField.getText().toString();
                 mPassword = mPasswordField.getText().toString();
                 //getMemberID();//CHANGED
-                getFirebaseToken(); //THIS IS NOW DONE AFTER getMemberID
+                getFirebaseToken(mEmail, mPassword); //THIS IS NOW DONE AFTER getMemberID
                 //to guarantee that we get the memberID before we continue.
               /*  if (!isLoginValid(email, password)) {
                     break;
@@ -169,6 +169,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mUsername = jsonMemberID.getString( "username" );
             mFirstname = jsonMemberID.getString( "firstname" );
             mLastname = jsonMemberID.getString( "lastname" );
+
             mCredentials.setMemberID(mMemberID);
             Log.d( "VALUE OF MEMBERID", String.valueOf( mMemberID ) );
             Log.d( getClass().getSimpleName(), "Value of JSON Post: " + resultsJSON );
@@ -338,8 +339,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             emailEdit.setText( mEmail );
             EditText passwordEdit = getActivity().findViewById( R.id.et_login_password );
             passwordEdit.setText( mPassword );
-            getMemberID(); //CHANGED
-            //getFirebaseToken(email, password); //THIS IS NOW DONE AFTER getMemberID
+            //getMemberID(); //CHANGED
+            getFirebaseToken(mEmail, mPassword); //THIS IS NOW DONE AFTER getMemberID
             //to guarantee that we get the memberID before we continue.
             //buildLoginServerCredentials(email, password);
 
@@ -352,7 +353,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
-    private void getFirebaseToken(/*final String email, final String password*/ ) {
+    private void getFirebaseToken(final String email, final String password ) {
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic( "all" );
         //the call to getInstanceId happens asynchronously. task is an onCompleteListener
