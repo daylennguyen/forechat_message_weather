@@ -358,7 +358,7 @@ public class HomeActivity extends AppCompatActivity
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() )
+                .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName())
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
@@ -370,7 +370,7 @@ public class HomeActivity extends AppCompatActivity
         Log.d("BRYAN", "backstack before loading: " + backstackCount);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
-                .replace(R.id.frame_home_container, frag);
+                .replace(R.id.frame_home_container, frag, frag.getClass().getSimpleName());
 
 
         if (fm.getBackStackEntryCount() < 1) {
