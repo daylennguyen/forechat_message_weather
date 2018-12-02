@@ -528,6 +528,7 @@ public class ChatNode {
             }
         }
 
+
         if (theOtherReceiverUsernames.size() == 1) {
             Log.wtf("SIZE", "Shouldn't come here");
             for (Connection c : connectionList) {

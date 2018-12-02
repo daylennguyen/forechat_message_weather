@@ -18,7 +18,7 @@ public class Credentials implements Serializable {
     private static final long serialVersionUID = -1634677417576883013L;
 
 
-    private final String mUsername;
+    private  String mUsername;
     private final String mPassword;
 
 
@@ -77,6 +77,36 @@ public class Credentials implements Serializable {
     public void setMemberID( int id ) {
         mMemberID = id;
     }
+
+    /**
+     * Get the memberID
+     *
+     * @return the memberID
+     * @param
+     */
+    public void setUsername(String username ) {
+        mUsername = username;
+    }
+
+    /**
+     * Get the memberID
+     *
+     * @return the memberID
+     */
+    public void setFirstname(String firstname) {
+        mFirstName= firstname;
+    }
+
+    /**
+     * Get the memberID
+     *
+     * @return the memberID
+     */
+    public void setLastname(String lastName ) {
+        mLastName = lastName;
+    }
+
+
 
     /**
      * Get the first name or the empty string if no first name was provided.

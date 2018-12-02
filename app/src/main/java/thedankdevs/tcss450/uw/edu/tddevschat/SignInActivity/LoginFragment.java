@@ -171,6 +171,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mLastname = jsonMemberID.getString( "lastname" );
 
             mCredentials.setMemberID(mMemberID);
+            mCredentials.setUsername( mUsername );
+            mCredentials.setFirstname( mFirstname );
+            mCredentials.setLastname( mLastname );
+
             Log.d( "VALUE OF MEMBERID", String.valueOf( mMemberID ) );
             Log.d( getClass().getSimpleName(), "Value of JSON Post: " + resultsJSON );
             mListener.onLoginSuccess( mCredentials );
@@ -257,9 +261,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         //getMemberID(email);
         Log.d( "MEMBERID", String.valueOf( mMemberID ) );
         mCredentials = new Credentials.Builder( email, password )
-                .addUsername( mUsername )
-                .addFirstName( mFirstname )
-                .addLastName( mLastname )
                 .build();
         Uri uri = new Uri.Builder()
                 .scheme( "https" )

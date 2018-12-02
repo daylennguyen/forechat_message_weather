@@ -433,11 +433,24 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList ) {
-        StringBuilder checkedBoxesSB = checkedBoxes( cbList );
-        int           duration       = Toast.LENGTH_SHORT;
-        Toast         toast          = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
-        toast.show();
-        mChatNode.CreateNewChatInteraction( cbList, connectionList );
+        StringBuilder checkedBoxesSB = checkedBoxes(cbList);
+        boolean flag = false;
+        for (CheckBox checkBox : cbList) {
+            if (checkBox.isChecked()) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag) {
+            mChatNode.CreateNewChatInteraction( cbList, connectionList );
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
+            toast.show();
+        } else {
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this, "You have not selected anyone!", duration );
+            toast.show();
+        }
 
     }
 
