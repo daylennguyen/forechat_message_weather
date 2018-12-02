@@ -7,7 +7,7 @@
     android:layout_marginTop="8dp"
     android:layout_marginRight="5dp"
     android:background="@color/colorLightestGrey"
-    app:cardBackgroundColor="@color/colorDarkPurple">
+    app:cardBackgroundColor="?attr/primaryDarkTextColor">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:gravity="center"
             android:text="@string/date_sampl_weath"
             android:textAlignment="center"
-            android:textColor="@color/colorDarkPurple"
+            android:textColor="?attr/primaryDarkTextColor"
             android:textColorLink="@color/colorLightestGrey"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -35,7 +35,7 @@
             android:id="@+id/tv_chatslist_chatReceiver"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorDarkPurple"
+            android:background="?attr/primaryDarkBackground"
             android:fontFamily="@font/roboto"
             android:text="@string/date_sampl_weath"
             android:textAlignment="center"
