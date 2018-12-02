@@ -12,6 +12,7 @@ import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,6 @@ public class MemberSettingsFragment extends Fragment {
     private Credentials mCredentials;
     private OnFragmentInteractionListener mListener;
     private Map<Integer, UpdateValue> mCredentialsMap;
-    private Set<Integer> mEnabledInputTypes;
     private GridLayout mGridLayout;
     private int mEnabledChangeButtons;
     private Button mApplyButton;
@@ -107,16 +107,23 @@ public class MemberSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+//        // create ContextThemeWrapper from the original Activity Context with the custom theme
+//        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme_Material);
+//
+//        // clone the inflater using the ContextThemeWrapper
+//        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+
+
+
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_member_settings, container, false);
+
         mGridLayout = mView.findViewById(R.id.gl_member_settings);
         mPassword_et = mView.findViewById(R.id.et_member_settings_password);
         mConfirmPassword_et = mView.findViewById(R.id.et_member_settings_confirm_password);
         mConfirmPassword_tv = mView.findViewById(R.id.tv_member_settings_confirmpass);
         mApplyButton = mView.findViewById(R.id.btn_member_settings_apply);
-        mEnabledInputTypes = new HashSet<>();
-        mEnabledInputTypes.add(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        mEnabledInputTypes.add(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
+
         ENABLED_TEXT_COLOR = getContext().getColor(R.color.colorPrimary);
         ENABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_enabled);
         DISABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_disabled);
@@ -138,8 +145,8 @@ public class MemberSettingsFragment extends Fragment {
             if (childView instanceof EditText) {
                 EditText et = (EditText) childView;
                 if (id == R.id.et_member_settings_confirm_password) {
-                    et.setBackground(ENABLED_ET_COLOR);
-                    et.setTextColor(ENABLED_TEXT_COLOR);
+//                    et.setBackground(ENABLED_ET_COLOR);
+//                    et.setTextColor(ENABLED_TEXT_COLOR);
                     et.setVisibility(View.GONE);
                     mConfirmPassword_tv.setVisibility(View.GONE);
                     continue;
@@ -148,8 +155,8 @@ public class MemberSettingsFragment extends Fragment {
                 UpdateValue updateValue = mCredentialsMap.get(id);
                 String value = updateValue.getValue();
                 et.setText(value);
-                et.setBackground(DISABLED_ET_COLOR);
-                et.setTextColor(DISABLED_TEXT_COLOR);
+//                et.setBackground(DISABLED_ET_COLOR);
+//                et.setTextColor(DISABLED_TEXT_COLOR);
                 et.setEnabled(false);
 
             } else if(childView instanceof Button) {
@@ -306,15 +313,15 @@ public class MemberSettingsFragment extends Fragment {
         int key = et.getId();
         if (!et.isEnabled()) {
             et.setEnabled(true);
-            et.setBackground(ENABLED_ET_COLOR);
-            et.setTextColor(ENABLED_TEXT_COLOR);
+//            et.setBackground(ENABLED_ET_COLOR);
+//            et.setTextColor(ENABLED_TEXT_COLOR);
             btn.setText(UNDO_BTN_TEXT);
             mEnabledChangeButtons += 1;
         } else {
             et.setEnabled(false);
             et.setText(mCredentialsMap.get(key).getValue());
-            et.setBackground(DISABLED_ET_COLOR);
-            et.setTextColor(DISABLED_TEXT_COLOR);
+//            et.setBackground(DISABLED_ET_COLOR);
+//            et.setTextColor(DISABLED_TEXT_COLOR);
             btn.setText(CHANGE_BTN_TEXT);
             mEnabledChangeButtons -= 1;
         }
@@ -327,8 +334,8 @@ public class MemberSettingsFragment extends Fragment {
         if (!pass_et.isEnabled()) {
             Log.d(TAG, "I am enabling et");
             pass_et.setEnabled(true);
-            pass_et.setBackground(ENABLED_ET_COLOR);
-            pass_et.setTextColor(ENABLED_TEXT_COLOR);
+//            pass_et.setBackground(ENABLED_ET_COLOR);
+//            pass_et.setTextColor(ENABLED_TEXT_COLOR);
             confirmpass_et.setVisibility(View.VISIBLE);
             mConfirmPassword_tv.setVisibility(View.VISIBLE);
             btn.setText(UNDO_BTN_TEXT);
@@ -340,8 +347,8 @@ public class MemberSettingsFragment extends Fragment {
             Log.e(TAG, "I am disabling et");
             pass_et.setEnabled(false);
             pass_et.setText(mCredentialsMap.get(key).getValue());
-            pass_et.setBackground(DISABLED_ET_COLOR);
-            pass_et.setTextColor(DISABLED_TEXT_COLOR);
+//            pass_et.setBackground(DISABLED_ET_COLOR);
+//            pass_et.setTextColor(DISABLED_TEXT_COLOR);
             confirmpass_et.setVisibility(View.GONE);
             mConfirmPassword_tv.setVisibility(View.GONE);
             btn.setText(CHANGE_BTN_TEXT);

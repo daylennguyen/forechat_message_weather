@@ -1,5 +1,7 @@
 <resources>
-	<string name = "app_name">forechat</string>
+    <string name="app_name">forechat</string>
+    <string name="current_theme">current theme</string>
+
 
 	<!--SIGN IN ACTIVITY-->
 	<string name = "loginRegister_email">Email</string>

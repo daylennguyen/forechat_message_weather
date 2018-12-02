@@ -45,7 +45,7 @@
 					android:layout_marginTop = "15dp"
 					android:layout_marginBottom = "10dp"
 					android:text = "@string/weather_settings"
-					android:textColor = "@color/colorDarkPurple"
+                    android:textColor="?attr/primaryDarkTextColor"
 					android:textSize = "24sp" />
 
 				<TextView
@@ -54,7 +54,7 @@
 					android:layout_height = "wrap_content"
 					android:text = "@string/weather_metric"
 					android:textAlignment = "textStart"
-					android:textColor = "@color/colorDarkPurple"
+                    android:textColor="?attr/primaryDarkTextColor"
 					android:textSize = "14sp" />
 
 				<RadioGroup
@@ -95,7 +95,7 @@
 					android:layout_marginTop = "10dp"
 					android:text = "@string/location_determinant"
 					android:textAlignment = "textStart"
-					android:textColor = "@color/colorDarkPurple"
+					android:textColor = "?attr/primaryDarkTextColor"
 					android:textSize = "14sp" />
 
 				<Spinner
@@ -103,7 +103,7 @@
 					style = "@android:style/Widget.Holo.Spinner"
 					android:layout_width = "wrap_content"
 					android:layout_height = "43dp"
-					android:backgroundTint = "@color/colorMedPurple"
+					android:backgroundTint = "?attr/primaryMediumBackground"
 					android:entries = "@array/location_set"
 					android:pointerIcon = "arrow"
 					android:popupBackground = "@android:color/white"
@@ -116,15 +116,15 @@
 					android:orientation = "vertical"
 					android:visibility = "gone">
 
-					<TextView
-						android:layout_width = "wrap_content"
-						android:layout_height = "0dp"
-						android:layout_marginTop = "10dp"
-						android:layout_weight = "1"
-						android:text = "@string/city"
-						android:textAlignment = "textStart"
-						android:textColor = "@color/colorDarkPurple"
-						android:textSize = "18sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/city"
+                    android:textAlignment="textStart"
+                    android:textColor="?attr/primaryDarkTextColor"
+                    android:textSize="18sp" />
 
 					<EditText
 						android:id = "@+id/city_txtvjew"
@@ -136,19 +136,19 @@
 						android:hint = "@string/ex_seattle"
 						android:inputType = "textPostalAddress"
 						android:textAlignment = "textStart"
-						android:textColor = "@color/colorDarkPurple"
-						android:textColorHint = "@color/colorLightPurple"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textColorHint = "?attr/primaryLightTextColor"
 						tools:targetApi = "o" />
 
-					<TextView
-						android:layout_width = "match_parent"
-						android:layout_height = "0dp"
-						android:layout_marginTop = "10dp"
-						android:layout_weight = "1"
-						android:text = "@string/state_abbreviation"
-						android:textAlignment = "textStart"
-						android:textColor = "@color/colorDarkPurple"
-						android:textSize = "18sp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/state_abbreviation"
+                    android:textAlignment="textStart"
+                    android:textColor="?attr/primaryDarkTextColor"
+                    android:textSize="18sp" />
 
 					<EditText
 						android:id = "@+id/state_txtentry"
@@ -161,8 +161,8 @@
 						android:inputType = "textPostalAddress"
 						android:textAlignment = "textStart"
 						android:textAllCaps = "true"
-						android:textColor = "@color/colorDarkPurple"
-						android:textColorHint = "@color/colorLightPurple"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textColorHint = "?attr/primaryLightTextColor"
 						tools:targetApi = "o" />
 
 					<Button
@@ -187,7 +187,7 @@
 						android:layout_marginTop = "10dp"
 						android:text = "@string/zip_code"
 						android:textAlignment = "textStart"
-						android:textColor = "@color/colorDarkPurple"
+                        android:textColor="?attr/primaryDarkTextColor"
 						android:textColorHint = "@color/colorLightBluePurple"
 						android:textSize = "14sp" />
 
@@ -219,7 +219,7 @@
 				android:layout_height = "0dp"
 				android:layout_margin = "10dp"
 				android:layout_marginBottom = "8dp"
-				app:cardBackgroundColor = "@color/colorLightPurple"
+				app:cardBackgroundColor = "?attr/primaryLightBackground"
 				app:layout_constraintBottom_toBottomOf = "parent"
 				app:layout_constraintEnd_toEndOf = "parent"
 				app:layout_constraintHorizontal_bias = "0.5"
