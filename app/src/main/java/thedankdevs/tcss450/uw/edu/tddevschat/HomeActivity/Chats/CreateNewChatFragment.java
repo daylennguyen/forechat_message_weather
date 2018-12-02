@@ -10,12 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
@@ -28,6 +27,7 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
     ArrayList<CheckBox> checkBoxList;
     ArrayList<Connection> connectionList;
     private OnCreateNewChatButtonListener mListener;
+    private EditText mChatTitleEditText;
     public CreateNewChatFragment() {
         // Required empty public constructor
     }
@@ -55,6 +55,8 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
 
         }
 
+
+        mChatTitleEditText = v.findViewById(R.id.et_chatroom_title);
         Button createNewChatButton = v.findViewById(R.id.btn_create_new_chat);
         createNewChatButton.setOnClickListener(this);
         return v;
@@ -65,7 +67,8 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
         if (mListener != null) {
             switch (v.getId()) {
                 case R.id.btn_create_new_chat:
-                    mListener.CreateNewChatInteraction(checkBoxList, connectionList);
+                    String ChatTitle = mChatTitleEditText.getText().toString();
+                    mListener.CreateNewChatInteraction(checkBoxList, connectionList, ChatTitle);
                     break;
             }
         }
@@ -94,6 +97,6 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
      * activity.
      */
     public interface OnCreateNewChatButtonListener {
-        void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList);
+        void CreateNewChatInteraction(ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList, String ChatTitle);
     }
 }
