@@ -103,7 +103,7 @@
 					style = "@android:style/Widget.Holo.Spinner"
 					android:layout_width = "wrap_content"
 					android:layout_height = "43dp"
-					android:backgroundTint = "@color/colorMedPurple"
+					android:backgroundTint = "?attr/primaryMediumBackground"
 					android:entries = "@array/location_set"
 					android:pointerIcon = "arrow"
 					android:popupBackground = "@android:color/white"
@@ -136,8 +136,8 @@
 						android:hint = "@string/ex_seattle"
 						android:inputType = "textPostalAddress"
 						android:textAlignment = "textStart"
-						android:textColor = "@color/colorDarkPurple"
-						android:textColorHint = "@color/colorLightPurple"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textColorHint = "?attr/primaryLightTextColor"
 						tools:targetApi = "o" />
 
                 <TextView
@@ -161,8 +161,8 @@
 						android:inputType = "textPostalAddress"
 						android:textAlignment = "textStart"
 						android:textAllCaps = "true"
-						android:textColor = "@color/colorDarkPurple"
-						android:textColorHint = "@color/colorLightPurple"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textColorHint = "?attr/primaryLightTextColor"
 						tools:targetApi = "o" />
 
 					<Button
@@ -219,7 +219,7 @@
 				android:layout_height = "0dp"
 				android:layout_margin = "10dp"
 				android:layout_marginBottom = "8dp"
-				app:cardBackgroundColor = "@color/colorLightPurple"
+				app:cardBackgroundColor = "?attr/primaryLightBackground"
 				app:layout_constraintBottom_toBottomOf = "parent"
 				app:layout_constraintEnd_toEndOf = "parent"
 				app:layout_constraintHorizontal_bias = "0.5"

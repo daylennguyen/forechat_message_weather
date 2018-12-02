@@ -41,7 +41,6 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
-import thedankdevs.tcss450.uw.edu.tddevschat.Settings.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.ThemesFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
