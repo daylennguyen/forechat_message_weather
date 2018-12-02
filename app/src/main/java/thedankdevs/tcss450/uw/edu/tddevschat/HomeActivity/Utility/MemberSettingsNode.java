@@ -63,10 +63,12 @@ public class MemberSettingsNode {
 
     private void handleOnPostExecute(String result) {
         try {
+
             JSONObject jsonObject = new JSONObject(result);
             boolean success = jsonObject.getBoolean("success");
             FragmentManager fm = mMaster.getSupportFragmentManager();
-            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentByTag("MemberSettingsFragment");
+            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentById(
+                    R.id.linear_member_settings_container);
             FragmentTransaction transaction = fm.beginTransaction();
 
             if (success) {

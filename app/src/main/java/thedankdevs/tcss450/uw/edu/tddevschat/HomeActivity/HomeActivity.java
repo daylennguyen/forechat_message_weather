@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -35,10 +36,13 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Connection
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.RequestFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.*;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ThemeUtils;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.ThemesFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
@@ -103,12 +107,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-        /*initialize the view with the xml content*/
-        setContentView( R.layout.activity_home );
-        setTitle( "Main Page" );
-        findViewById( R.id.nav_view );
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ThemeUtils.onActivityCreateTheme(this);
+
+        setContentView(R.layout.activity_home);
+        setTitle("Main Page");
+        findViewById(R.id.nav_view);
 
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
@@ -121,6 +127,15 @@ public class HomeActivity extends AppCompatActivity
         initializeActionDrawerToggle( drawer, toolbar );
 
         mLocationNode.startLocationUpdates();
+        if (savedInstanceState == null) {
+            if (findViewById(R.id.frame_home_container) != null ) {
+                FragmentManager fm = getSupportFragmentManager();
+
+                // add homeFragment to back stack
+                fm.beginTransaction().add(R.id.frame_home_container, new HomeFragment()).addToBackStack(null).commit();
+
+            }
+        }
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
@@ -128,11 +143,15 @@ public class HomeActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
-        NavigationView navigationView = findViewById( R.id.nav_view );
-        View           hView          = navigationView.getHeaderView( 0 );
-        navigationView.setNavigationItemSelectedListener( this );
-        TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
-        nav_user.setText( mCredential.getUsername() ); //Set the header username.
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        navigationView.setNavigationItemSelectedListener(this);
+        TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
+        nav_user.setText(mCredential.getUsername()); //Set the header username.
+        mLocationNode.startLocationUpdates();
+
+
+
     }
 
     /*Helper class to create node objects*/
@@ -152,17 +171,36 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById( R.id.drawer_layout );
-        if ( drawer.isDrawerOpen( GravityCompat.START ) ) {
-            drawer.closeDrawer( GravityCompat.START );
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("BRYAN", "backstack count: " + backstackCount);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
         } else {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById( R.id.frame_home_container );
             if ( currentFragment instanceof ChatFragment ) {
                 mChatNode.loadAllChats();
-                Log.wtf( "wtf", "NOT ENTERING" );
             } else {
-                super.onBackPressed();
+
+                int i = 1;
+                while (i < backstackCount) {
+                    getSupportFragmentManager().popBackStackImmediate();
+                    i++;
+                }
             }
+            backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+            Log.d("BRYAN", "backstack after popping: " + backstackCount);
+            if (backstackCount == 1) {
+                loadFragmentWithoutBackStack(new HomeFragment());
+            }
+            super.onBackPressed();
+
+
+
+
+
+
+
         }
 
 
@@ -228,7 +266,6 @@ public class HomeActivity extends AppCompatActivity
 
         /*depending on the ID of the nav_item, route them to the appropriate fragment*/
         boolean loadingFromDifferentMethods = false;
-
         switch ( item.getItemId() ) {
 
             case R.id.nav_home:
@@ -272,6 +309,10 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_connectionRequests:
                 mConnectionsNode.loadRequests();
                 break;
+            case R.id.nav_theme:
+                setTitle("Change Theme");
+                fragment = new ThemesFragment();
+                break;
 
             default:
 
@@ -280,7 +321,8 @@ public class HomeActivity extends AppCompatActivity
             /*Send the args to the fragment before displaying*/
             fragment.setArguments( args );
             /*display the fragment*/
-            loadFragment( fragment );
+            loadFragmentWithoutBackStack(fragment);
+
         }
         /*after we display the fragment, close the drawer*/
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
@@ -323,10 +365,19 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /*Helper method to load an instance of the given fragment into the current activity*/
-    public void loadFragmentWithoutBackStack( Fragment frag ) {
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
-                .replace( R.id.frame_home_container, frag );
+    public void loadFragmentWithoutBackStack(Fragment frag) {
+        int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d("BRYAN", "backstack before loading: " + backstackCount);
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction()
+                .replace(R.id.frame_home_container, frag);
+
+
+        if (fm.getBackStackEntryCount() < 1) {
+            transaction.addToBackStack(null);
+        }
+
+
         // Commit the transaction
         transaction.commit();
     }

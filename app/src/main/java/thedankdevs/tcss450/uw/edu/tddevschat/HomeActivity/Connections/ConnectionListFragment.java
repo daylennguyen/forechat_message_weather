@@ -44,6 +44,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
      */
     private ArrayList<Connection> mConnections;
     public static final String ARG_CONNECTIONS_LIST = "connections list";
+    public static final String ARG_CREDENTIALS = "credentials";
 
     /** Adapter for existing connections */
     private ConnectionListRecyclerViewAdapter mLocalAdapter;
@@ -64,6 +65,8 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     private SearchView mSearchView;
 
     private MenuItem mSearch;
+
+    private int mMemberId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -87,6 +90,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             mConnections = (ArrayList) getArguments().getSerializable(ARG_CONNECTIONS_LIST);
+            mMemberId = (int) getArguments().getInt(ARG_CREDENTIALS);
         }
     }
 
@@ -226,6 +230,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         JSONObject searchAllContacts = new JSONObject();
         try {
             searchAllContacts.put("values", text);
+            searchAllContacts.put("memberid", mMemberId);
             Log.d(getClass().getSimpleName(), "JSON request: " + searchAllContacts.toString());
         } catch (JSONException e) {
             Log.e(getClass().getSimpleName(), "JSON object creation failed: " + e);

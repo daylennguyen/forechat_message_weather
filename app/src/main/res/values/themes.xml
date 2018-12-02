@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorLightPurple</item>
+        <item name="colorPrimaryDark">@color/colorDarkPurple</item>
+        <item name="colorAccent">@color/colorMedPurple</item>
+        <item name="android:statusBarColor">@color/colorLightPurple</item>
+        <item name="colorBackground">@color/colorLightestGrey</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:windowBackground">@color/colorLightestGrey</item>
+        <item name="android:navigationBarColor">@color/colorLightPurple</item>
+        <item name="primaryBorderColor">@color/colorBlack</item>
+        <item name="primaryEnabledColor">@color/colorWhite</item>
+        <item name="primaryDisabledColor">@color/colorMedGrey</item>
+        <item name="primaryDarkTextColor">@color/colorDarkPurple</item>
+        <item name="primaryLightTextColor">@color/colorLightPurple</item>
+        <item name="primaryDarkBackground">@color/colorDarkPurple</item>
+        <item name="primaryMediumBackground">@color/colorMedPurple</item>
+        <item name="primaryLightBackground">@color/colorLightPurple</item>
+        <item name="appBarColor">@color/colorDarkPurple</item>
+    </style>
+
+    <style name="AppTheme.Mint" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/mintColorPrimary</item>
+        <item name="colorPrimaryDark">@color/mintColorPrimaryDark</item>
+        <item name="colorAccent">@color/mintColorAccent</item>
+        <item name="colorBackground">@color/colorLightestGrey</item>
+        <item name="android:colorBackground">@color/colorLightestGrey</item>
+        <item name="appBarColor">@color/mintColorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/mintColorPrimary</item>
+        <item name="android:statusBarColor">@color/mintColorPrimary</item>
+        <item name="navigationBarColor">@color/mintColorPrimary</item>
+        <item name="statusBarColor">@color/mintColorPrimary</item>
+        <item name="primaryBorderColor">@color/mintColorPrimaryDark</item>
+        <item name="primaryDisabledColor">@color/mintColorPrimary</item>
+        <item name="primaryEnabledColor">@color/colorWhite</item>
+        <item name="primaryDarkTextColor">@color/mintDark</item>
+        <item name="primaryDarkBackground">@color/mintDark</item>
+        <item name="primaryMediumBackground">@color/mintColorPrimaryDark</item>
+        <item name="primaryLightBackground">@color/mintColorPrimary</item>
+        <item name="primaryLightTextColor">@color/mintColorPrimary</item>
+
+    </style>
+
+
+
+    
+</resources>
