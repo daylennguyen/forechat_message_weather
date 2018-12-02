@@ -170,7 +170,6 @@ public class Credentials implements Serializable {
             return this;
         }
 
-
         /**
          * Add an optional first name.
          *
