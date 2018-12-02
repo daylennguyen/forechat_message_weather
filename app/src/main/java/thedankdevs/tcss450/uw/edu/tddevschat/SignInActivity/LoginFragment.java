@@ -110,8 +110,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_login_login:
                 mEmail = mEmailField.getText().toString();
                 mPassword = mPasswordField.getText().toString();
-                getMemberID();//CHANGED
-                //getFirebaseToken(); //THIS IS NOW DONE AFTER getMemberID
+                //getMemberID();//CHANGED
+                getFirebaseToken(); //THIS IS NOW DONE AFTER getMemberID
                 //to guarantee that we get the memberID before we continue.
               /*  if (!isLoginValid(email, password)) {
                     break;
@@ -169,9 +169,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mUsername = jsonMemberID.getString( "username" );
             mFirstname = jsonMemberID.getString( "firstname" );
             mLastname = jsonMemberID.getString( "lastname" );
+            mCredentials.setMemberID(mMemberID);
             Log.d( "VALUE OF MEMBERID", String.valueOf( mMemberID ) );
             Log.d( getClass().getSimpleName(), "Value of JSON Post: " + resultsJSON );
-            getFirebaseToken();
+            mListener.onLoginSuccess( mCredentials );
+            mListener.onWaitFragmentInteractionHide();
+            // getFirebaseToken();
         } catch ( JSONException e ) {
             //It appears that the web service didnt return a JSON formatted String
             // or it didn’t have what we expected in it.
@@ -253,7 +256,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         //getMemberID(email);
         Log.d( "MEMBERID", String.valueOf( mMemberID ) );
         mCredentials = new Credentials.Builder( email, password )
-                .addMemberID( mMemberID )
                 .addUsername( mUsername )
                 .addFirstName( mFirstname )
                 .addLastName( mLastname )
@@ -393,8 +395,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                 saveCredentials( mCredentials );
                 //Login was successful. Inform the Activity so it can do its thing.
-                mListener.onLoginSuccess( mCredentials );
-                mListener.onWaitFragmentInteractionHide();
+                getMemberID();
             } else {
                 String verified = resultsJSON.getString( "message" );
                 if ( verified.equals( "NV" ) ) { //If User's account was not verified, send another one.

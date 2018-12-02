@@ -196,7 +196,22 @@ public class SignInActivity extends AppCompatActivity
      */
     @Override
     public void onVerificationSuccess( Credentials c ) {
-        openMain( c );
+
+        //Tell the user that they're not verified.
+        Context      context  = getApplicationContext();
+        CharSequence text     = "Verification success!";
+        int          duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText( context, text, duration );
+        toast.show();
+
+        LoginFragment fragment = new LoginFragment();
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace( R.id.frame_signin_container, fragment )
+                .addToBackStack( null );
+        // Commit the transaction
+        transaction.commit();
     }
 
 
