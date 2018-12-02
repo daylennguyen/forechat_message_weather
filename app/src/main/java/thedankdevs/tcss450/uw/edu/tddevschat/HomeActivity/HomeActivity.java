@@ -458,7 +458,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     public void updateNotifiedChats( int openedChatID ) {
-        notifiedChats.remove( openedChatID );
+        Log.w("CRASH CHAT", String.valueOf(openedChatID));
+        notifiedChats.remove(notifiedChats.indexOf(openedChatID));
 
     }
 
