@@ -47,7 +47,6 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
@@ -68,7 +67,8 @@ public class HomeActivity extends AppCompatActivity
         WaitFragment.OnFragmentInteractionListener,
         RequestFragment.OnListFragmentInteractionListener,
         RemoveChatMembers.OnRemoveMemberListener,
-        MemberSettingsFragment.OnFragmentInteractionListener {
+        MemberSettingsFragment.OnFragmentInteractionListener,
+        ThemesFragment.OnFragmentInteractionListener {
 
     /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public  SettingsNode            mSettingsNode;
@@ -84,8 +84,6 @@ public class HomeActivity extends AppCompatActivity
 
     /*Used to toggle the opened/closed state of the nav drawer*/
     private ActionBarDrawerToggle toggle;
-
-    private MemberSettingsNode mMemberSettingsNode;
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -115,6 +113,11 @@ public class HomeActivity extends AppCompatActivity
 
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
+
+        if (mCredential == null) {
+            mCredential = (Credentials) getIntent().getSerializableExtra( getString(R.string.keys_credential_member_settings));
+        }
+
         initializeNodes();
 
         /*insert option items into the tool bar and initialize the drawer*/
@@ -133,10 +136,33 @@ public class HomeActivity extends AppCompatActivity
 
             }
         }
+
+        if (getIntent().getBooleanExtra(getString(R.string.reload_themes), false)) {
+            setTitle(getString(R.string.theme_title));
+            loadFragmentWithoutBackStack(new ThemesFragment());
+        }
+
+        // reload member Settings fragment
+        if (getIntent().getBooleanExtra(getString(R.string.reload_member_settings), false)) {
+            setTitle(getString(R.string.member_settings_header));
+            Bundle args = new Bundle();
+            MemberSettingsFragment frag = new MemberSettingsFragment();
+            args.putSerializable(getString(R.string.nav_membersettings), mCredential);
+            frag.setArguments(args);
+            loadFragmentWithoutBackStack(frag);
+        }
+
+
+
+
+
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
+
+        Log.d("BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername());
+
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
@@ -148,6 +174,14 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.startLocationUpdates();
 
 
+    }
+
+    private void reinitializeNavigationDrawer() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        navigationView.setNavigationItemSelectedListener(this);
+        TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
+        nav_user.setText(mCredential.getUsername()); //Set the header username.
     }
 
     /*Helper class to create node objects*/
@@ -162,7 +196,6 @@ public class HomeActivity extends AppCompatActivity
         mChatNode = new ChatNode( this, mCredential );
         /*   Weather     */
 //        mWeatherNode = new WeatherNode(this, mLocationNode);
-        mMemberSettingsNode = new MemberSettingsNode( this, mCredential );
     }
 
     @Override
@@ -292,6 +325,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_member_settings:
+                setTitle(getString(R.string.member_settings_header));
                 fragment = new MemberSettingsFragment();
                 args.putSerializable( getString( R.string.nav_membersettings ), mCredential );
                 fragment.setArguments( args );
@@ -301,7 +335,7 @@ public class HomeActivity extends AppCompatActivity
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
-                setTitle( "Change Theme" );
+                setTitle(getString(R.string.theme_title));
                 fragment = new ThemesFragment();
                 break;
 
@@ -353,6 +387,7 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     /*Helper method to load an instance of the given fragment into the current activity*/
@@ -371,6 +406,7 @@ public class HomeActivity extends AppCompatActivity
 
         // Commit the transaction
         transaction.commit();
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override
@@ -379,8 +415,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onChangeMemberInfo( Map<String, String> info ) {
-        mMemberSettingsNode.onChangeMemberInfo( info );
+    public void onChangeMemberInfo(Credentials credentials) {
+        mCredential = credentials;
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra(getString(R.string.keys_credential_member_settings), mCredential);
+        intent.putExtra(getString(R.string.reload_member_settings), true);
+        finish();
+        startActivity(intent);
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
 
@@ -491,6 +533,18 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
         mChatNode.RemoveMembersFromChat( users, theChatID );
+    }
+
+    @Override
+    public void onChangeTheme(String theme) {
+
+        Intent intent = new Intent( this, HomeActivity.class);
+        intent.putExtra(getString(R.string.key_credential), mCredential);
+        intent.putExtra(getString(R.string.reload_themes), true);
+        finish();
+        startActivity(intent);
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
     }
 
     private void ShowConnectionRequestAlert( String msg, String positive, final Runnable action ) {

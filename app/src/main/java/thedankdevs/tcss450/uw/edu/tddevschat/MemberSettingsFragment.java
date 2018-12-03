@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -18,11 +19,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
+
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -36,24 +41,21 @@ import java.util.Objects;
 public class MemberSettingsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String                        ARG_MEMBER_SETTINGS = "member_settings";
-    private static final String[]                      KEYS                = { "firstname", "lastname", "username", "email", "password" };
-    private static final String                        CHANGE_BTN_TEXT     = "Change";
-    private static final String                        UNDO_BTN_TEXT       = "Undo";
-    private final        int                           DISABLED_TEXT_COLOR = Color.WHITE;
-    private final        String                        TAG                 = getClass().getSimpleName();
-    private              int                           ENABLED_TEXT_COLOR;
-    private              Drawable                      ENABLED_ET_COLOR;
-    private              Drawable                      DISABLED_ET_COLOR;
-    private              Credentials                   mCredentials;
-    private              OnFragmentInteractionListener mListener;
-    private              Map<Integer, UpdateValue>     mCredentialsMap;
-    private              GridLayout                    mGridLayout;
-    private              int                           mEnabledChangeButtons;
-    private              Button                        mApplyButton;
-    private              EditText                      mPassword_et;
-    private              EditText                      mConfirmPassword_et;
-    private              TextView                      mConfirmPassword_tv;
+    private static final String ARG_MEMBER_SETTINGS = "member_settings";
+    private static final String[] KEYS = {"firstname", "lastname", "username", "email", "password"};
+    private static final String CHANGE_BTN_TEXT = "Change";
+    private static final String UNDO_BTN_TEXT = "Undo";
+    private final String TAG = getClass().getSimpleName();
+    private Credentials mCredentials;
+    private OnFragmentInteractionListener mListener;
+    private Map<Integer, UpdateValue> mCredentialsMap;
+    private Map<String, String> mUpdateMap;
+    private GridLayout mGridLayout;
+    private int mEnabledChangeButtons;
+    private Button mApplyButton;
+    private EditText mPassword_et;
+    private EditText mConfirmPassword_et;
+    private TextView mConfirmPassword_tv;
 
     private View mView;
 
@@ -75,6 +77,50 @@ public class MemberSettingsFragment extends Fragment {
         fragment.setArguments( args );
         return fragment;
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCredentialsMap = new HashMap<>();
+        if (getArguments() != null) {
+            mCredentials = (Credentials) getArguments().getSerializable(getString(R.string.nav_membersettings));
+            UpdateValue firstname = new UpdateValue(KEYS[0], mCredentials.getFirstName());
+            UpdateValue lastname = new UpdateValue(KEYS[1], mCredentials.getLastName());
+            UpdateValue username = new UpdateValue(KEYS[2], mCredentials.getUsername());
+            UpdateValue email = new UpdateValue(KEYS[3], mCredentials.getEmail());
+            UpdateValue password = new UpdateValue(KEYS[4], mCredentials.getPassword());
+
+            mCredentialsMap.put(R.id.et_member_settings_firstname, firstname);
+            mCredentialsMap.put(R.id.et_member_settings_lastname, lastname);
+            mCredentialsMap.put(R.id.et_member_settings_username, username);
+            mCredentialsMap.put(R.id.et_member_settings_email, email);
+            mCredentialsMap.put(R.id.et_member_settings_password, password);
+
+            Log.d(TAG, "Finished initializing mCredentialsMap: " + mCredentialsMap);
+
+
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment
+        mView = inflater.inflate(R.layout.fragment_member_settings, container, false);
+
+        mGridLayout = mView.findViewById(R.id.gl_member_settings);
+        mPassword_et = mView.findViewById(R.id.et_member_settings_password);
+        mConfirmPassword_et = mView.findViewById(R.id.et_member_settings_confirm_password);
+        mConfirmPassword_tv = mView.findViewById(R.id.tv_member_settings_confirmpass);
+        mApplyButton = mView.findViewById(R.id.btn_member_settings_apply);
+
+        Log.d("BRYAN", "my tag: "+ getTag());
+        setDefault();
+
+        return mView;
+    }
+
 
     // helper methods to setting the default values and state of the layout
     private void setDefault() {
@@ -214,8 +260,8 @@ public class MemberSettingsFragment extends Fragment {
         if ( mPassword_et.isEnabled() ) {
             String pass         = mPassword_et.getText().toString();
             String confirm_pass = mConfirmPassword_et.getText().toString();
-            if ( !arePasswordsValid( pass, confirm_pass ) ) {
-                // do nothing
+            if (!arePasswordsValid(pass, confirm_pass)) {
+                mPassword_et.setError("Passwords do not match!");
                 return;
             }
         }
@@ -342,17 +388,16 @@ public class MemberSettingsFragment extends Fragment {
 
     private void attachListener() {
 
-        Map<String, String> updateMap = new HashMap<>();
-        for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
-            View childView = mGridLayout.getChildAt( i );
-            if ( childView instanceof EditText ) {
-                EditText et = ( EditText ) childView;
-                int      id = et.getId();
-                if ( et.isEnabled() && id != R.id.et_member_settings_confirm_password ) {
-                    UpdateValue obj = mCredentialsMap.get( id );
-                    assert obj != null;
-                    updateMap.put( obj.getKey(), et.getText().toString() );
-                    Log.d( TAG, "Added object to updateMap: " + obj.getKey() + "=" + et.getText().toString() );
+        mUpdateMap = new HashMap<>();
+        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
+            View childView = mGridLayout.getChildAt(i);
+            if (childView instanceof EditText) {
+                EditText et = (EditText) childView;
+                int id = et.getId();
+                if (et.isEnabled() && id != R.id.et_member_settings_confirm_password) {
+                    UpdateValue obj = mCredentialsMap.get(id);
+                    mUpdateMap.put(obj.getKey(), et.getText().toString());
+                    Log.d(TAG, "Added object to mUpdateMap: " + obj.getKey() + "=" + et.getText().toString());
 
                 }
 
@@ -360,28 +405,35 @@ public class MemberSettingsFragment extends Fragment {
             }
         }
 
-        if ( updateMap.isEmpty() ) {
-            Log.d( TAG, "Why is my update map empty?" );
+        if (mUpdateMap.isEmpty()) {
+            Log.d(TAG, "Why is my update map empty?");
         }
-        Log.d( TAG, "I'm sending this map: " + updateMap );
-        mListener.onChangeMemberInfo( updateMap );
-        Log.d( TAG, "mListener attached" );
+
+        MemberSettingsNode node = new MemberSettingsNode((HomeActivity)getActivity());
+        node.onChangeMemberInfo(mUpdateMap, mCredentials.getMemberID());
+
     }
 
     // dialog boxes for when the update is successful and unsuccessful
     public void successfulUpdateDialog() {
         Context             context = getContext();
         AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
-
-        builder.setTitle( "Succesful Update" )
-                .setMessage( "Information has been successfully updated" )
-                .setNeutralButton( "OK",
-                        ( DialogInterface dialog, int which ) -> dialog.dismiss() )
-                .setIcon( R.drawable.ic_check_black_24dp )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle("Succesful Update")
+                .setMessage("Information has been successfully updated")
+                .setNeutralButton("OK",
+                        (DialogInterface dialog, int which) ->
+                        {
+                            dialog.dismiss();
+                            Credentials newCredentials = updateCredentials();
+                            mListener.onChangeMemberInfo(newCredentials);
+                        })
+                .setIcon(R.drawable.ic_check_black_24dp)
                 .show();
-
-
     }
 
     public void unSuccessfulUpdateDialog() {
@@ -399,6 +451,81 @@ public class MemberSettingsFragment extends Fragment {
         setDefault();
     }
 
+    private Credentials updateCredentials() {
+
+
+        String email = mCredentials.getEmail();
+        String password = mCredentials.getPassword();
+        Set<String> keys = mUpdateMap.keySet();
+
+        Log.d(TAG, "Keys updated: " + keys);
+
+        if (mUpdateMap.containsKey("email")) {
+            email = mUpdateMap.get("email");
+            keys.remove("email");
+        }
+
+        // endpoint doesn't handle this properly yet
+        // server needs to apply hash before updating password in database
+        if (mUpdateMap.containsKey("password")) {
+            password = mUpdateMap.get("password");
+            keys.remove("password");
+        }
+
+
+        Credentials.Builder builder = new Credentials.Builder(email, password);
+        boolean firstnameAdded = false;
+        boolean lastnameAdded = false;
+        boolean usernameAdded = false;
+        for (String key : keys) {
+            String value = mUpdateMap.get(key);
+            switch (key) {
+                case "firstname":
+                    builder.addFirstName(value);
+                    firstnameAdded = true;
+                    break;
+                case "lastname":
+                    builder.addLastName(value);
+                    lastnameAdded = true;
+                    break;
+                case "username":
+                    builder.addUsername(value);
+                    usernameAdded = true;
+                    break;
+                default:
+                    Log.d(TAG, "The key should've been one of the 3. What is this?");
+            }
+        }
+
+        if (!firstnameAdded) {
+            builder.addFirstName(mCredentials.getFirstName());
+        }
+
+        if (!lastnameAdded) {
+            builder.addLastName(mCredentials.getLastName());
+        }
+
+        if (!usernameAdded) {
+            builder.addUsername(mCredentials.getUsername());
+        }
+        builder.addMemberID(mCredentials.getMemberID());
+        Credentials newCredentials = builder.build();
+        // credentials object should have a toString() method...
+        Log.d(TAG, "New Credentials");
+        Log.d(TAG, "firstname: " + newCredentials.getFirstName());
+        Log.d(TAG, "lastname: " + newCredentials.getLastName());
+        Log.d(TAG, "email: " + newCredentials.getEmail());
+        Log.d(TAG, "username:  " + newCredentials.getUsername());
+
+        // after all this work to update the Credentials object on the client side
+        // the app might be better off
+        // sending a new request to an endpoint (with the new email and/or password if changed)
+        // and get the new credentials object from that.
+
+        return newCredentials;
+    }
+
+
     @Override
     public void onAttach( Context context ) {
         super.onAttach( context );
@@ -410,59 +537,8 @@ public class MemberSettingsFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-        mCredentialsMap = new HashMap<>();
-        if ( getArguments() != null ) {
-            mCredentials = ( Credentials ) getArguments().getSerializable( getString( R.string.nav_membersettings ) );
-            assert mCredentials != null;
-            UpdateValue firstname = new UpdateValue( KEYS[ 0 ], mCredentials.getFirstName() );
-            UpdateValue lastname  = new UpdateValue( KEYS[ 1 ], mCredentials.getLastName() );
-            UpdateValue username  = new UpdateValue( KEYS[ 2 ], mCredentials.getUsername() );
-            UpdateValue email     = new UpdateValue( KEYS[ 3 ], mCredentials.getEmail() );
-            UpdateValue password  = new UpdateValue( KEYS[ 4 ], mCredentials.getPassword() );
-
-            mCredentialsMap.put( R.id.et_member_settings_firstname, firstname );
-            mCredentialsMap.put( R.id.et_member_settings_lastname, lastname );
-            mCredentialsMap.put( R.id.et_member_settings_username, username );
-            mCredentialsMap.put( R.id.et_member_settings_email, email );
-            mCredentialsMap.put( R.id.et_member_settings_password, password );
-
-            Log.d( TAG, "Finished initializing mCredentialsMap: " + mCredentialsMap );
 
 
-        }
-    }
-
-    @Override
-    public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState ) {
-
-//        // create ContextThemeWrapper from the original Activity Context with the custom theme
-//        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme_Material);
-//
-//        // clone the inflater using the ContextThemeWrapper
-//        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
-
-
-        // Inflate the layout for this fragment
-        mView = inflater.inflate( R.layout.fragment_member_settings, container, false );
-
-        mGridLayout = mView.findViewById( R.id.gl_member_settings );
-        mPassword_et = mView.findViewById( R.id.et_member_settings_password );
-        mConfirmPassword_et = mView.findViewById( R.id.et_member_settings_confirm_password );
-        mConfirmPassword_tv = mView.findViewById( R.id.tv_member_settings_confirmpass );
-        mApplyButton = mView.findViewById( R.id.btn_member_settings_apply );
-
-        ENABLED_TEXT_COLOR = Objects.requireNonNull( getContext() ).getColor( R.color.colorPrimary );
-        ENABLED_ET_COLOR = getContext().getDrawable( R.drawable.member_settings_btn_enabled );
-        DISABLED_ET_COLOR = getContext().getDrawable( R.drawable.member_settings_btn_disabled );
-        Log.d( "BRYAN", "my tag: " + getTag() );
-        setDefault();
-
-        return mView;
-    }
 
     @Override
     public void onDetach() {
@@ -483,7 +559,7 @@ public class MemberSettingsFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        void onChangeMemberInfo( Map<String, String> info );
+        void onChangeMemberInfo(Credentials credentials);
     }
 
     // helper class for storing the default values
