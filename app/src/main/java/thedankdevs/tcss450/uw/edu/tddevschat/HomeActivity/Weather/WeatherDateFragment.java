@@ -40,9 +40,9 @@ public class WeatherDateFragment extends Fragment {
     static final String TAG = "WEATHER";
 
     /*  UNITS OF MEASUREMENT  */
-    private static final String METRIC     = "M";       // - [DEFAULT] Metric (Celcius, m/s, mm)
-    private static final String SCIENTIFIC = "S";   // - Scientific (Kelvin, m/s, mm)
-    private static final String MURICA     = "I";       // - Fahrenheit (F, mph, in)
+    public static final String METRIC     = "M";       // - [DEFAULT] Metric (Celcius, m/s, mm)
+    public static final String SCIENTIFIC = "S";   // - Scientific (Kelvin, m/s, mm)
+    public static final String MURICA     = "I";       // - Fahrenheit (F, mph, in)
 
     /*  Response from server will push content to list  */
     private List<WeatherDate> currentWeatherData;

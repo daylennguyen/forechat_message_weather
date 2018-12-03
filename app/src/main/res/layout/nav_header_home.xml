@@ -6,18 +6,10 @@
     android:background = "@color/colorDarkestGrey"
     android:theme = "@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id = "@+id/imageView3"
-        android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
-        android:background = "@color/colorDarkPurple"
-        android:contentDescription = "picture"
-        android:foreground = "@color/transparentDark"
-        android:scaleType = "centerCrop" />
-
     <LinearLayout
         android:layout_width = "match_parent"
         android:layout_height = "match_parent"
+        android:background = "@color/colorLightPurple"
         android:gravity = "bottom"
         android:orientation = "vertical"
         android:paddingLeft = "25dp"
