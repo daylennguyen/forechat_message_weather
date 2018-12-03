@@ -25,4 +25,7 @@
 	<string name = "keys_credential_member_settings">updated credentials</string>
 
 
+	<string name = "keys_intent_notification_connections">connections notification</string>
+
+
 </resources>

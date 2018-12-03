@@ -127,10 +127,18 @@ public class HomeActivity extends AppCompatActivity
         initializeActionDrawerToggle( drawer, toolbar );
 
         mLocationNode.startLocationUpdates();
-        if ( savedInstanceState == null ) {
-            if ( findViewById( R.id.frame_home_container ) != null ) {
-                FragmentManager fm = getSupportFragmentManager();
 
+        if (savedInstanceState == null) {
+            FragmentManager fm = getSupportFragmentManager();
+            String connectionNotification = getIntent().getStringExtra(getString(R.string.keys_intent_notification_connections));
+            if (connectionNotification != null ) {
+                if (connectionNotification.equals(getString(R.string.notification_requested))) {
+                    mConnectionsNode.loadRequests();
+                } else if (connectionNotification.equals(getString(R.string.notification_accepted))) {
+                    mConnectionsNode.loadConnections( new ConnectionListFragment() );
+                }
+            }
+            if (findViewById(R.id.frame_home_container) != null ) {
                 // add homeFragment to back stack
                 fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
 
@@ -197,6 +205,7 @@ public class HomeActivity extends AppCompatActivity
         /*   Weather     */
 //        mWeatherNode = new WeatherNode(this, mLocationNode);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -462,7 +471,6 @@ public class HomeActivity extends AppCompatActivity
     public void onChatsListFragmentLongInteraction( Chat item ) {
         mChatNode.onChatsListFragmentLongInteraction( item );
     }
-
 
     @Override
     public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,

@@ -13,7 +13,7 @@
         <item name="android:colorBackground">@android:color/background_light</item>
         <item name="android:windowBackground">@color/colorLightestGrey</item>
         <item name="android:navigationBarColor">@color/colorLightPurple</item>
-        <item name="primaryBorderColor">@color/colorBlack</item>
+        <item name="primaryBorderColor">@color/transparentDark</item>
         <item name="primaryEnabledColor">@color/colorWhite</item>
         <item name="primaryDisabledColor">@color/colorMedGrey</item>
         <item name="primaryDarkTextColor">@color/colorDarkPurple</item>
