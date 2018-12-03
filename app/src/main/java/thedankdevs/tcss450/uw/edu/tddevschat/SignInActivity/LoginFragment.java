@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,8 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
+
+import java.util.Objects;
 
 
 /**
@@ -101,7 +104,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick( View viewClicked ) {
-        mEmailField = getActivity().findViewById( R.id.et_login_email );
+        mEmailField = Objects.requireNonNull( getActivity() ).findViewById( R.id.et_login_email );
         mPasswordField = getActivity().findViewById( R.id.et_login_password );
         switch ( viewClicked.getId() ) {
             case R.id.btn_login_register:
@@ -111,7 +114,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 mEmail = mEmailField.getText().toString();
                 mPassword = mPasswordField.getText().toString();
                 //getMemberID();//CHANGED
-                getFirebaseToken(mEmail, mPassword); //THIS IS NOW DONE AFTER getMemberID
+                getFirebaseToken( mEmail, mPassword ); //THIS IS NOW DONE AFTER getMemberID
                 //to guarantee that we get the memberID before we continue.
               /*  if (!isLoginValid(email, password)) {
                     break;
@@ -170,7 +173,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mFirstname = jsonMemberID.getString( "firstname" );
             mLastname = jsonMemberID.getString( "lastname" );
 
-            mCredentials.setMemberID(mMemberID);
+            mCredentials.setMemberID( mMemberID );
             mCredentials.setUsername( mUsername );
             mCredentials.setFirstname( mFirstname );
             mCredentials.setLastname( mLastname );
@@ -311,7 +314,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * @return inflated view of fragment_login.xml
      */
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
+    public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
         mView = inflater.inflate( R.layout.fragment_login, container, false );
@@ -327,7 +330,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
         SharedPreferences prefs =
-                getActivity().getSharedPreferences(
+                Objects.requireNonNull( getActivity() ).getSharedPreferences(
                         getString( R.string.keys_shared_prefs ),
                         Context.MODE_PRIVATE );
         //retrieve the stored credentials from SharedPrefs
@@ -341,7 +344,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             EditText passwordEdit = getActivity().findViewById( R.id.et_login_password );
             passwordEdit.setText( mPassword );
             //getMemberID(); //CHANGED
-            getFirebaseToken(mEmail, mPassword); //THIS IS NOW DONE AFTER getMemberID
+            getFirebaseToken( mEmail, mPassword ); //THIS IS NOW DONE AFTER getMemberID
             //to guarantee that we get the memberID before we continue.
             //buildLoginServerCredentials(email, password);
 
@@ -354,7 +357,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
-    private void getFirebaseToken(final String email, final String password ) {
+    private void getFirebaseToken( final String email, final String password ) {
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic( "all" );
         //the call to getInstanceId happens asynchronously. task is an onCompleteListener
@@ -367,7 +370,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         return;
                     }
                     // Get new Instance ID token
-                    mFirebaseToken = task.getResult().getToken();
+                    mFirebaseToken = Objects.requireNonNull( task.getResult() ).getToken();
                     Log.d( "FCM: ", mFirebaseToken );
                     //the helper method that initiates login service
                     doLogin();
@@ -404,7 +407,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     resendVerificationCode();
                 } else {
                     //Login was unsuccessful. Don’t switch fragments and inform the user
-                    ( ( TextView ) getView().findViewById( R.id.et_login_email ) )
+                    ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                             .setError( "Login Unsuccessful" );
                 }
             }
@@ -415,7 +418,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     + System.lineSeparator()
                     + e.getMessage() );
             mListener.onWaitFragmentInteractionHide();
-            ( ( TextView ) getView().findViewById( R.id.et_login_email ) )
+            ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Login Unsuccessful" );
         }
     }
@@ -432,7 +435,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private void saveCredentials( final Credentials credentials ) {
         SharedPreferences prefs =
-                getActivity().getSharedPreferences(
+                Objects.requireNonNull( getActivity() ).getSharedPreferences(
                         getString( R.string.keys_shared_prefs ),
                         Context.MODE_PRIVATE );
         //Store the credentials in SharedPrefs
@@ -489,7 +492,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 //After sending the email, send the user to verification fragment.
                 mListener.onNotVerified( mCredentials );
             } else {
-                ( ( TextView ) getView().findViewById( R.id.et_login_email ) )
+                ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                         .setError( "Sending email unsuccessful" );
             }
         } catch ( JSONException e ) {
@@ -499,7 +502,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     + System.lineSeparator()
                     + e.getMessage() );
             mListener.onWaitFragmentInteractionHide();
-            ( ( TextView ) getView().findViewById( R.id.et_login_email ) )
+            ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Verification couldn't be sent" );
         }
     }

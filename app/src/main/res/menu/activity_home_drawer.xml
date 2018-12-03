@@ -1,60 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+<menu xmlns:android = "http://schemas.android.com/apk/res/android"
+	xmlns:tools = "http://schemas.android.com/tools"
+	tools:showIn = "navigation_view">
+	<item
+		android:id = "@+id/nav_home"
+		android:icon = "@drawable/ic_menu_home"
+		android:title = "@string/nav_home" />
+	<item
+		android:id = "@+id/nav_weather"
+		android:icon = "@drawable/ic_menu_weather"
+		android:title = "@string/nav_weather" />
+	<item android:title = "@string/messaging">
 
-    <group android:checkableBehavior="single">
-        <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/ic_menu_home"
-        android:title="@string/nav_home" />
-        <item
-            android:id="@+id/nav_chat"
-            android:icon="@drawable/ic_menu_chat"
-            android:title="@string/nav_chat" />
-        <item
-            android:id="@+id/nav_connections"
-            android:icon="@drawable/ic_menu_connections"
-            android:title="@string/nav_contacts" />
-        <item
-            android:id="@+id/nav_connectionRequests"
-            android:icon="@drawable/ic_menu_requests"
-            android:title="@string/nav_requests" />
-        <item
-            android:id="@+id/nav_weather"
-            android:icon="@drawable/ic_menu_weather"
-            android:title="@string/nav_weather" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_settings"
-            android:title="@string/settings_txt" />
-        <item
-            android:id="@+id/nav_member_settings"
-            android:icon="@drawable/ic_settings"
-            android:title="@string/nav_membersettings"/>
+		<menu>
+			<group>
 
-        <item
-            android:id="@+id/nav_theme"
-            android:icon="@drawable/ic_settings"
-            android:title="Change Theme"/>
+				<item
+					android:id = "@+id/nav_chat"
+					android:icon = "@drawable/ic_menu_chat"
+					android:title = "@string/nav_chat" />
+				<item
+					android:id = "@+id/nav_connections"
+					android:icon = "@drawable/ic_menu_connections"
+					android:title = "@string/nav_contacts" />
+				<item
+					android:id = "@+id/nav_connectionRequests"
+					android:icon = "@drawable/ic_menu_requests"
+					android:title = "@string/nav_requests" />
+			</group>
+		</menu>
+	</item>
 
-        <!--<item-->
-            <!--android:id="@+id/nav_signout"-->
-            <!--android:icon="@drawable/ic_menu_manage"-->
-            <!--android:title="@string/nav_signout" />-->
-    </group>
 
-    <!--<item android:title="Communicate">-->
-        <!--<menu>-->
-            <!--<item-->
-                <!--android:id="@+id/nav_share"-->
-                <!--android:icon="@drawable/ic_menu_share"-->
-                <!--android:title="Share" />-->
-            <!--<item-->
-                <!--android:id="@+id/nav_send"-->
-                <!--android:icon="@drawable/ic_menu_send"-->
-                <!--android:title="Send" />-->
-        <!--</menu>-->
-    <!--</item>-->
+	<item android:title = "@string/settings">
+		<group>
+			<menu>
+				<item
+					android:id = "@+id/nav_settings"
+					android:icon = "@drawable/weather_sett_ic"
+					android:title = "@string/settings_txt" />
+				<item
+					android:id = "@+id/nav_member_settings"
+					android:icon = "@drawable/ic_person"
+					android:title = "@string/nav_membersettings" />
+				<item
+					android:id = "@+id/nav_theme"
+					android:icon = "@drawable/ic_brush"
+					android:title = "@string/change_theme" />
+			</menu>
+		</group>
+	</item>
+	<!--<item android:title="Communicate">-->
+	<!--<menu>-->
+	<!--<item-->
+	<!--android:id="@+id/nav_share"-->
+	<!--android:icon="@drawable/ic_menu_share"-->
+	<!--android:title="Share" />-->
+	<!--<item-->
+	<!--android:id="@+id/nav_send"-->
+	<!--android:icon="@drawable/ic_menu_send"-->
+	<!--android:title="Send" />-->
+	<!--</menu>-->
+	<!--</item>-->
 
 </menu>

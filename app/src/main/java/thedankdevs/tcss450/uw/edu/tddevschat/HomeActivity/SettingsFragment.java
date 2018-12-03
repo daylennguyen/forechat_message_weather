@@ -2,6 +2,7 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class SettingsFragment extends Fragment {
     MapView            mMap;
     boolean            gpsIsActive;
     MapIsReadyCallback mCallback;
+    Spinner            locate_spinner;
 
     public SettingsFragment() {/*Required empty public constructor*/
         home = ( HomeActivity ) getActivity();
@@ -65,17 +67,19 @@ public class SettingsFragment extends Fragment {
                   - Select Location on Map
                   - Postal Code
                   - City State              */
-        Spinner locate_spinner = view.findViewById( R.id.locate_spinner );
+        locate_spinner = view.findViewById( R.id.locate_spinner );
         locate_spinner.setOnItemSelectedListener( new SettingsNode.LocationDeterminantDropdownListener( view ) );
 
         /* Weather degree metric; which radio button is checked? */
         mWeatherMetricRGroup = view.findViewById( R.id.radiogroup_weather_metric );
         mWeatherMetricRGroup.setOnCheckedChangeListener( SettingsNode::onRadioButtonSelection );
         view.findViewById( R.id.map_container ).setVisibility( View.GONE );
+
         /*Retrieve the ui to receive input from the user & assign onClick action*/
         mCityView = view.findViewById( R.id.city_txtvjew );
         mStateView = view.findViewById( R.id.state_txtentry );
         mZipView = view.findViewById( R.id.zipcode_txtvjew );
+
 
 
         /*Check if permissions were granted yet*/
@@ -84,15 +88,15 @@ public class SettingsFragment extends Fragment {
                 && ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             gpsIsActive = false;
             /*if not, then ask for them again*/
-            ActivityCompat.requestPermissions( home, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
-
+            ActivityCompat.requestPermissions( this.getActivity(), new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
             if ( ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_FINE_LOCATION )
                     != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
                 /*if they still deny gps, then tell them gps functionality will be deactivated.*/
                 home.stopGPS();
                 gpsIsActive = false;
-                Toast.makeText( home, "Permissions were denied, closing.", Toast.LENGTH_SHORT ).show();
+                Toast.makeText( home, "Location Permission has not been accepted, closing.", Toast.LENGTH_LONG ).show();
                 home.finishAndRemoveTask();
             } else {
                 //The user has already allowed the use of Locations. Get the current location.
@@ -104,54 +108,54 @@ public class SettingsFragment extends Fragment {
 
         Button mapLocationButton = view.findViewById( R.id.select_location_button );
         mCallback = new MapIsReadyCallback( home );
-
-
         view.findViewById( R.id.citystate_apply_button ).setOnClickListener( this::cityStateActionListener );
         view.findViewById( R.id.zip_apply_button ).setOnClickListener( this::zipActionListener );
 
-        int determin_pref = view.getContext().getSharedPreferences( DETERMINANT_PREF, 0 ).getInt( DETERMINANT_PREF, 1 );
-
-
-        switch ( determin_pref ) {
-            case SettingsNode.GPS_DATA:
-                if ( gpsIsActive ) {
-                    locate_spinner.setSelection( SettingsNode.GPS_DATA );
-                } else {
-                    locate_spinner.setSelection( SettingsNode.POSTAL_CODE );
-                }
-
-                break;
-            case SettingsNode.SELECT_FROM_MAP:
-                locate_spinner.setSelection( SettingsNode.SELECT_FROM_MAP );
-                break;
-            case SettingsNode.POSTAL_CODE:
-                locate_spinner.setSelection( SettingsNode.POSTAL_CODE );
-                break;
-            case SettingsNode.CITY_STATE:
-                locate_spinner.setSelection( SettingsNode.CITY_STATE );
-                break;
-            default:
-                locate_spinner.setSelection( SettingsNode.CITY_STATE );
-                break;
-        }
-
         mMap = view.findViewById( R.id.fragment_map );
         mapLocationButton.setOnClickListener( mCallback );
-
         mMap.onCreate( savedInstanceState );
-
         /*Retrieve preferences*/
         setMetricViewFromSavedPreference();
         mMap.getMapAsync( mCallback );
-//        mMap.setOnClickListener( mCallback );
         mapLocationButton.setOnClickListener( mCallback );
-
+//        view.findViewById(  )
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        SharedPreferences determin_sp   = getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+        int               determin_pref = determin_sp.getInt( DETERMINANT_PREF, -1 );
+        SharedPreferences sp = Objects.requireNonNull( getActivity() )
+                .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
+        Log.w( "DAYLENTEST", String.valueOf( determin_pref ) );
+        switch ( determin_pref ) {
+            case SettingsNode.GPS_DATA:
+                if ( gpsIsActive ) {
+                    locate_spinner.setSelection( SettingsNode.GPS_DATA );
+                } else {
+                    Toast.makeText( this.getActivity(), "Error Retrieving GPS Data", Toast.LENGTH_LONG ).show();
+                }
+                break;
+            case SettingsNode.SELECT_FROM_MAP:
+                locate_spinner.setSelection( SettingsNode.SELECT_FROM_MAP );
+                break;
+            case SettingsNode.POSTAL_CODE:
+                mZipView.setText( sp.getString( ZIP_KEY, "Ex. 98422" ), TextView.BufferType.EDITABLE );
+                locate_spinner.setSelection( SettingsNode.POSTAL_CODE );
+                break;
+            case SettingsNode.CITY_STATE:
+                //if they've already made a prefered city+state, set it in the field as the hint
+                locate_spinner.setSelection( SettingsNode.CITY_STATE );
+                mStateView.setText( sp.getString( STATE_KEY, "Ex. Tacoma" ), TextView.BufferType.EDITABLE );
+                mCityView.setText( sp.getString( CITY_KEY, "Ex. WA" ), TextView.BufferType.EDITABLE );
+                break;
+            default:
+                Log.d( "DAYLENTEST", String.valueOf( determin_pref ) );
+                locate_spinner.setSelection( SettingsNode.CITY_STATE );
+                break;
+        }
         mMap.onStart();
     }
 
@@ -176,24 +180,15 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        mMap.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMap.onLowMemory();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         // Get from the SharedPreferences
-        SharedPreferences metSet = Objects.requireNonNull( this.getContext() ).getSharedPreferences( METRIC_PREF, 0 );
-        SharedPreferences locSet = Objects.requireNonNull( this.getContext() ).getSharedPreferences( DETERMINANT_PREF, 0 );
-
-        String METRICPREF       = metSet.getString( METRIC_PREF, "C" );
-        int    DeterminantState = locSet.getInt( DETERMINANT_PREF, 1 );
+        SharedPreferences        metSet           = Objects.requireNonNull( this.getContext() ).getSharedPreferences( METRIC_PREF, 0 );
+        SharedPreferences        locSet           = Objects.requireNonNull( this.getContext() ).getSharedPreferences( DETERMINANT_PREF, 0 );
+        SharedPreferences.Editor determin_pref    = getActivity().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE ).edit();
+        int                      DeterminantState = locate_spinner.getSelectedItemPosition();
+        determin_pref.putInt( DETERMINANT_PREF, DeterminantState );
+        determin_pref.commit();
+        String METRICPREF = metSet.getString( METRIC_PREF, "C" );
+//        int    DeterminantState = locSet.getInt( DETERMINANT_PREF, 1 );
         /*if the gps setting is not active, disable the gps*/
         switch ( DeterminantState ) {
             case SettingsNode.SELECT_FROM_MAP:
@@ -209,6 +204,19 @@ public class SettingsFragment extends Fragment {
                 Objects.requireNonNull( home ).stopGPS();
                 break;
         }
+        mMap.onStop();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMap.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
         mMap.onDestroy();
     }
 
@@ -225,7 +233,7 @@ public class SettingsFragment extends Fragment {
                 try {
                     Integer.parseInt( inputZip );
                     e.putString( ZIP_KEY, mZipView.getText().toString() );
-                    Toast.makeText( home, "Zip Code Applied", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( home, "Zip Code Applied\n" + inputZip, Toast.LENGTH_SHORT ).show();
 
                 } catch ( Exception except ) {
                     Log.e( "LOCATION INPUT INVALID", "[Settings Fragment]" + String.valueOf( except ) );
@@ -237,7 +245,7 @@ public class SettingsFragment extends Fragment {
         } else {
             mZipView.setError( "Enter a Zip Code" );
         }
-        e.apply();
+        e.commit();
     }
 
     private void cityStateActionListener( View v ) {
@@ -254,12 +262,12 @@ public class SettingsFragment extends Fragment {
             /*Insert City and State into the shared preferences*/
             e.putString( CITY_KEY, city );
             e.putString( STATE_KEY, state );
-            e.apply();
+            e.commit();
+
             /*Turn off the GPS*/
-            Toast.makeText( home, "City and State Applied", Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getActivity(), state + "," + city + " applied to Location", Toast.LENGTH_LONG ).show();
             Objects.requireNonNull( home ).stopGPS();
         } else {
-            /* TODO:  */
             if ( city.isEmpty() ) mCityView.setError( "Enter a City" );
             if ( state.isEmpty() ) mStateView.setError( "Enter a State" );
         }
@@ -304,30 +312,46 @@ public class SettingsFragment extends Fragment {
         @Override
         public void onMapReady( GoogleMap googleMap ) {
             this.googleMap = googleMap;
+            SharedPreferences sp = Objects.requireNonNull( getActivity() )
+                    .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
+            float  lat             = sp.getFloat( MAP_LAT_KEY, 0f ); // val 0 if none
+            float  lon             = sp.getFloat( MAP_LON_KEY, 0f );
+            LatLng CurrentLocation = new LatLng( 0f, 0f );
 
             try {
-                LatLng CurrentLocation = new LatLng( mMaster.getCurrentLat(), mMaster.getCurrentLon() );
-                mCircle = new CircleOptions()
-                        .center( CurrentLocation )
-                        .radius( 10000 )
-                        .strokeColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.colorLightPurple ) )
-                        .fillColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.transparentcolorLightPurple ) );
-                currentMarker = new MarkerOptions().position( CurrentLocation ).title( "Current Location" );
-                googleMap.addMarker( currentMarker );
+                /*Attempt to retrieve shared preferences*/
+                if ( lat != 0f && lon != 0f ) {
+                    /*If the user had previously set the location preference, display a circle and pin correspondingly*/
+                    CurrentLocation = new LatLng( lat, lon );
+                    mCircle = new CircleOptions()
+                            .center( CurrentLocation )
+                            .radius( 30000 )
+                            .strokeColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.colorLightPurple ) )
+                            .fillColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.transparentcolorLightPurple ) );
+                    currentMarker = new MarkerOptions().position( CurrentLocation ).title( "Current Location" );
+                } else {
+                    /*No shared preferences? then get their gps coordinates and display that instead*/
+                    CurrentLocation = new LatLng( mMaster.getCurrentLat(), mMaster.getCurrentLon() );
+                    mCircle = new CircleOptions()
+                            .center( CurrentLocation )
+                            .radius( 30000 )
+                            .strokeColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.colorLightPurple ) )
+                            .fillColor( ContextCompat.getColor( Objects.requireNonNull( getContext() ), R.color.transparentcolorLightPurple ) );
+                    currentMarker = new MarkerOptions().position( CurrentLocation ).title( "Current Location" );
+                }
                 googleMap.moveCamera( CameraUpdateFactory.newLatLngZoom( CurrentLocation, 5.0f ) );
-                googleMap.setOnMapClickListener( this );
                 googleMap.addCircle( mCircle );
-
             } catch ( Exception e ) {
+                /*If we are unable to find the users current location nor the stored location then set the view
+                 to an over view of America*/
+                CurrentLocation = new LatLng( AMERICA_CENTER_LAT, AMERICA_CENTER_LON );
                 Toast.makeText( mMaster, "Error Retrieving your current location! " +
-                        "Check your Settings and Notifications", Toast.LENGTH_SHORT ).show();
-                LatLng CurrentLocation = new LatLng( AMERICA_CENTER_LAT, AMERICA_CENTER_LON );
+                        "\nCheck your Settings and Notifications", Toast.LENGTH_LONG ).show();
                 currentMarker = new MarkerOptions().position( CurrentLocation ).title( "Anerica" );
-                googleMap.addMarker( currentMarker );
                 googleMap.moveCamera( CameraUpdateFactory.newLatLngZoom( CurrentLocation, 1.0f ) );
+            } finally {
                 googleMap.setOnMapClickListener( this );
-//                googleMap.addCircle( mCircle );
-
+                googleMap.addMarker( currentMarker );
             }
             googleMap.setOnMapClickListener( this::onMapClick );
         }
@@ -362,17 +386,17 @@ public class SettingsFragment extends Fragment {
                 e.putFloat( MAP_LON_KEY, curLon );
                 Toast.makeText( mMaster, "Latitude: "
                                 .concat( String.valueOf( curLat ) )
-                                .concat( " and\nLongitude: " )
+                                .concat( " and Longitude: " )
                                 .concat( String.valueOf( curLon ) )
                                 .concat( " have been applied" ),
                         Toast.LENGTH_SHORT )
                         .show();
             } else {
                 /*Toast.makeText( mMaster, "Error setting the location, check your GPS settings and permissions", Toast.LENGTH_SHORT ).show();*/
-                Toast.makeText( mMaster, "Error setting the location; tap a location to drop a pin", Toast.LENGTH_SHORT ).show();
+                Toast.makeText( mMaster, "Error setting the location; tap a location to drop a pin", Toast.LENGTH_LONG ).show();
             }
 
-            e.apply();
+            e.commit();
         }
     }
 }

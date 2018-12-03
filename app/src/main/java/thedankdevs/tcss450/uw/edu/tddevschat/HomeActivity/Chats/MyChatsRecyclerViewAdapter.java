@@ -1,5 +1,6 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,46 +18,41 @@ import java.util.List;
  */
 public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Chat> mValues;
+    private final List<Chat>                             mValues;
     private final OnChatsListFragmentInteractionListener mListener;
 
-    public MyChatsRecyclerViewAdapter(List<Chat> items, ChatsFragment.OnChatsListFragmentInteractionListener listener) {
+    MyChatsRecyclerViewAdapter( List<Chat> items, ChatsFragment.OnChatsListFragmentInteractionListener listener ) {
         mValues = items;
         mListener = listener;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_chats, parent, false);
-        return new ViewHolder(view);
+    public ViewHolder onCreateViewHolder( @NonNull ViewGroup parent, int viewType ) {
+        View view = LayoutInflater.from( parent.getContext() )
+                .inflate( R.layout.fragment_chats, parent, false );
+        return new ViewHolder( view );
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mChatName.setText(mValues.get(position).getChatName());
+    public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
+        holder.mItem = mValues.get( position );
+        holder.mChatName.setText( mValues.get( position ).getChatName() );
         holder.mReceiver.setText( mValues.get( position ).getChatMembers() );
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onChatsListFragmentInteraction(holder.mItem);
-                }
+        holder.mView.setOnClickListener( v -> {
+            if ( null != mListener ) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                mListener.onChatsListFragmentInteraction( holder.mItem );
             }
-        });
-        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (null != mListener) {
-                    mListener.onChatsListFragmentLongInteraction(holder.mItem);
-                }
-                return true;
+        } );
+        holder.mView.setOnLongClickListener( v -> {
+            if ( null != mListener ) {
+                mListener.onChatsListFragmentLongInteraction( holder.mItem );
             }
-        });
+            return true;
+        } );
     }
 
     @Override
@@ -65,18 +61,18 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mChatName;
-        public final TextView mReceiver;
-        public Chat mItem;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View     mView;
+        final TextView mChatName;
+        final TextView mReceiver;
+        Chat mItem;
 
 
-        public ViewHolder(View view) {
-            super(view);
+        ViewHolder( View view ) {
+            super( view );
             mView = view;
-            mChatName = view.findViewById(R.id.tv_chatslist_chatName);
-            mReceiver = view.findViewById(R.id.tv_chatslist_chatReceiver);
+            mChatName = view.findViewById( R.id.tv_chatslist_chatName );
+            mReceiver = view.findViewById( R.id.tv_chatslist_chatReceiver );
 
         }
     }

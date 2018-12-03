@@ -10,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,21 +37,16 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Connection
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.Requests.RequestFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.*;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.ThemeUtils;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.R;
+import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.ThemesFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
@@ -71,7 +67,8 @@ public class HomeActivity extends AppCompatActivity
         WaitFragment.OnFragmentInteractionListener,
         RequestFragment.OnListFragmentInteractionListener,
         RemoveChatMembers.OnRemoveMemberListener,
-        MemberSettingsFragment.OnFragmentInteractionListener {
+        MemberSettingsFragment.OnFragmentInteractionListener,
+        ThemesFragment.OnFragmentInteractionListener {
 
     /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public  SettingsNode            mSettingsNode;
@@ -87,8 +84,6 @@ public class HomeActivity extends AppCompatActivity
 
     /*Used to toggle the opened/closed state of the nav drawer*/
     private ActionBarDrawerToggle toggle;
-
-    private MemberSettingsNode mMemberSettingsNode;
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -107,17 +102,22 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate( Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
 
-        ThemeUtils.onActivityCreateTheme(this);
+        ThemeUtils.onActivityCreateTheme( this );
 
-        setContentView(R.layout.activity_home);
-        setTitle("Main Page");
-        findViewById(R.id.nav_view);
+        setContentView( R.layout.activity_home );
+        setTitle( "Main Page" );
+        findViewById( R.id.nav_view );
 
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
+
+        if (mCredential == null) {
+            mCredential = (Credentials) getIntent().getSerializableExtra( getString(R.string.keys_credential_member_settings));
+        }
+
         initializeNodes();
 
         /*insert option items into the tool bar and initialize the drawer*/
@@ -127,6 +127,7 @@ public class HomeActivity extends AppCompatActivity
         initializeActionDrawerToggle( drawer, toolbar );
 
         mLocationNode.startLocationUpdates();
+
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
             String connectionNotification = getIntent().getStringExtra(getString(R.string.keys_intent_notification_connections));
@@ -139,26 +140,56 @@ public class HomeActivity extends AppCompatActivity
             }
             if (findViewById(R.id.frame_home_container) != null ) {
                 // add homeFragment to back stack
-                fm.beginTransaction().add(R.id.frame_home_container, new HomeFragment()).addToBackStack(null).commit();
+                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
 
             }
         }
+
+        if (getIntent().getBooleanExtra(getString(R.string.reload_themes), false)) {
+            setTitle(getString(R.string.theme_title));
+            loadFragmentWithoutBackStack(new ThemesFragment());
+        }
+
+        // reload member Settings fragment
+        if (getIntent().getBooleanExtra(getString(R.string.reload_member_settings), false)) {
+            setTitle(getString(R.string.member_settings_header));
+            Bundle args = new Bundle();
+            MemberSettingsFragment frag = new MemberSettingsFragment();
+            args.putSerializable(getString(R.string.nav_membersettings), mCredential);
+            frag.setArguments(args);
+            loadFragmentWithoutBackStack(frag);
+        }
+
+
+
+
+
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
+
+        Log.d("BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername());
+
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
+        NavigationView navigationView = findViewById( R.id.nav_view );
+        View           hView          = navigationView.getHeaderView( 0 );
+        navigationView.setNavigationItemSelectedListener( this );
+        TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
+        nav_user.setText( mCredential.getUsername() ); //Set the header username.
+        mLocationNode.startLocationUpdates();
+
+
+    }
+
+    private void reinitializeNavigationDrawer() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         View hView = navigationView.getHeaderView(0);
         navigationView.setNavigationItemSelectedListener(this);
         TextView nav_user = hView.findViewById(R.id.tv_drawerheader_username);
         nav_user.setText(mCredential.getUsername()); //Set the header username.
-        mLocationNode.startLocationUpdates();
-
-
-
     }
 
     /*Helper class to create node objects*/
@@ -173,17 +204,16 @@ public class HomeActivity extends AppCompatActivity
         mChatNode = new ChatNode( this, mCredential );
         /*   Weather     */
 //        mWeatherNode = new WeatherNode(this, mLocationNode);
-        mMemberSettingsNode = new MemberSettingsNode( this, mCredential );
     }
 
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
-        Log.d("BRYAN", "backstack count: " + backstackCount);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        DrawerLayout drawer         = findViewById( R.id.drawer_layout );
+        int          backstackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d( "BRYAN", "backstack count: " + backstackCount );
+        if ( drawer.isDrawerOpen( GravityCompat.START ) ) {
+            drawer.closeDrawer( GravityCompat.START );
         } else {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById( R.id.frame_home_container );
             if ( currentFragment instanceof ChatFragment ) {
@@ -191,22 +221,17 @@ public class HomeActivity extends AppCompatActivity
             } else {
 
                 int i = 1;
-                while (i < backstackCount) {
+                while ( i < backstackCount ) {
                     getSupportFragmentManager().popBackStackImmediate();
                     i++;
                 }
             }
             backstackCount = getSupportFragmentManager().getBackStackEntryCount();
-            Log.d("BRYAN", "backstack after popping: " + backstackCount);
-            if (backstackCount == 1) {
-                loadFragmentWithoutBackStack(new HomeFragment());
+            Log.d( "BRYAN", "backstack after popping: " + backstackCount );
+            if ( backstackCount == 1 ) {
+                loadFragmentWithoutBackStack( new HomeFragment() );
             }
             super.onBackPressed();
-
-
-
-
-
 
 
         }
@@ -309,7 +334,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_member_settings:
-                setTitle( "Change Personal Information" );
+                setTitle(getString(R.string.member_settings_header));
                 fragment = new MemberSettingsFragment();
                 args.putSerializable( getString( R.string.nav_membersettings ), mCredential );
                 fragment.setArguments( args );
@@ -319,7 +344,7 @@ public class HomeActivity extends AppCompatActivity
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
-                setTitle("Change Theme");
+                setTitle(getString(R.string.theme_title));
                 fragment = new ThemesFragment();
                 break;
 
@@ -330,7 +355,7 @@ public class HomeActivity extends AppCompatActivity
             /*Send the args to the fragment before displaying*/
             fragment.setArguments( args );
             /*display the fragment*/
-            loadFragmentWithoutBackStack(fragment);
+            loadFragmentWithoutBackStack( fragment );
 
         }
         /*after we display the fragment, close the drawer*/
@@ -367,28 +392,30 @@ public class HomeActivity extends AppCompatActivity
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName())
+                .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() )
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     /*Helper method to load an instance of the given fragment into the current activity*/
-    public void loadFragmentWithoutBackStack(Fragment frag) {
+    public void loadFragmentWithoutBackStack( Fragment frag ) {
         int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
-        Log.d("BRYAN", "backstack before loading: " + backstackCount);
+        Log.d( "BRYAN", "backstack before loading: " + backstackCount );
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
-                .replace(R.id.frame_home_container, frag, frag.getClass().getSimpleName());
+                .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
 
 
-        if (fm.getBackStackEntryCount() < 1) {
-            transaction.addToBackStack(null);
+        if ( fm.getBackStackEntryCount() < 1 ) {
+            transaction.addToBackStack( null );
         }
 
 
         // Commit the transaction
         transaction.commit();
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override
@@ -397,8 +424,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onChangeMemberInfo( Map<String, String> info ) {
-        mMemberSettingsNode.onChangeMemberInfo( info );
+    public void onChangeMemberInfo(Credentials credentials) {
+        mCredential = credentials;
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra(getString(R.string.keys_credential_member_settings), mCredential);
+        intent.putExtra(getString(R.string.reload_member_settings), true);
+        finish();
+        startActivity(intent);
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
 
@@ -441,23 +474,23 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,
-                                          String chatTitle) {
-        StringBuilder checkedBoxesSB = checkedBoxes(cbList);
-        boolean flag = false;
-        for (CheckBox checkBox : cbList) {
-            if (checkBox.isChecked()) {
+                                          String chatTitle ) {
+        StringBuilder checkedBoxesSB = checkedBoxes( cbList );
+        boolean       flag           = false;
+        for ( CheckBox checkBox : cbList ) {
+            if ( checkBox.isChecked() ) {
                 flag = true;
                 break;
             }
         }
-        if (flag) {
-            mChatNode.CreateNewChatInteraction( cbList, connectionList, chatTitle);
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
+        if ( flag ) {
+            mChatNode.CreateNewChatInteraction( cbList, connectionList, chatTitle );
+            int   duration = Toast.LENGTH_SHORT;
+            Toast toast    = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
             toast.show();
         } else {
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this, "You have not selected anyone!", duration );
+            int   duration = Toast.LENGTH_SHORT;
+            Toast toast    = Toast.makeText( this, "You have not selected anyone!", duration );
             toast.show();
         }
 
@@ -480,8 +513,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     public void updateNotifiedChats( int openedChatID ) {
-        Log.w("CRASH CHAT", String.valueOf(openedChatID));
-        notifiedChats.remove(notifiedChats.indexOf(openedChatID));
+        Log.w( "CRASH CHAT", String.valueOf( openedChatID ) );
+        notifiedChats.remove( openedChatID );
 
     }
 
@@ -510,11 +543,37 @@ public class HomeActivity extends AppCompatActivity
         mChatNode.RemoveMembersFromChat( users, theChatID );
     }
 
+    @Override
+    public void onChangeTheme(String theme) {
+
+        Intent intent = new Intent( this, HomeActivity.class);
+        intent.putExtra(getString(R.string.key_credential), mCredential);
+        intent.putExtra(getString(R.string.reload_themes), true);
+        finish();
+        startActivity(intent);
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+    }
+
+    private void ShowConnectionRequestAlert( String msg, String positive, final Runnable action ) {
+        AlertDialog.Builder builder = new AlertDialog.Builder( this );
+        builder.setMessage( msg )
+                .setPositiveButton( positive, ( dialog, id ) -> { //anonymous onclick listener
+                    action.run();
+                } )
+                .setNegativeButton( "View Later", ( dialog, id ) -> {
+                    //do nothing
+                } );
+        // 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private HomeActivity mMaster;
 
-        public DeleteTokenAsyncTask( HomeActivity master ) {
+        DeleteTokenAsyncTask( HomeActivity master ) {
             mMaster = master;
         }
 
@@ -563,7 +622,7 @@ public class HomeActivity extends AppCompatActivity
             if ( intent.hasExtra( "DATA" ) ) {
                 String data = intent.getStringExtra( "DATA" );
                 Log.w( "FCM DATA", data );
-                JSONObject jObj = null;
+                JSONObject jObj;
                 try {
                     jObj = new JSONObject( data );
                     Fragment currentFragment = getSupportFragmentManager().findFragmentById( R.id.frame_home_container );
@@ -578,14 +637,14 @@ public class HomeActivity extends AppCompatActivity
                                 Log.wtf( "currChatID: ", String.valueOf( currentChatID ) );
                                 if ( currentChatID != chatID ) {
                                     notifiedChats.add( chatID );
-                                    notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
-                                            getResources().getColor( R.color.colorLightBluePurple ) );
+                                    notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ),
+                                            ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ) );
                                 }
                             }
                         } else {
                             notifiedChats.add( chatID );
-                            notifyUI( getResources().getColor( R.color.colorLightBluePurple ),
-                                    getResources().getColor( R.color.colorLightBluePurple ) );
+                            notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ),
+                                    ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ) );
                         }
 
                     } else if ( jObj.getString( "type" ).contains( "sent" ) ) {
@@ -609,19 +668,6 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
         }
-    }
-    private void ShowConnectionRequestAlert(String msg, String positive, final Runnable action) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(msg)
-                .setPositiveButton(positive, (dialog, id) -> { //anonymous onclick listener
-                    action.run();
-                })
-                .setNegativeButton("View Later", (dialog, id) -> {
-                    //do nothing
-                });
-        // 3. Get the AlertDialog from create()
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
 }

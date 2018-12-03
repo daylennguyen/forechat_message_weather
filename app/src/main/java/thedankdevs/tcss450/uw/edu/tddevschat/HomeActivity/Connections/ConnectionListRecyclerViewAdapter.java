@@ -1,20 +1,20 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment.OnListFragmentInteractionListener;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionListFragment.OnListFragmentInteractionListener;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
-import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Connection} and makes a call to the
@@ -25,57 +25,52 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
  */
 public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionListRecyclerViewAdapter.ViewHolder> {
 
-    private List<Connection> mConnections;
-    private final List<Connection> mCopyConnections;
+    private final List<Connection>                  mCopyConnections;
     private final OnListFragmentInteractionListener mListener;
+    private       List<Connection>                  mConnections;
 
-    public ConnectionListRecyclerViewAdapter(List<Connection> items, OnListFragmentInteractionListener listener) {
+    ConnectionListRecyclerViewAdapter( List<Connection> items, OnListFragmentInteractionListener listener ) {
         mConnections = items;
         mListener = listener;
         mCopyConnections = new ArrayList<>();
-        mCopyConnections.addAll(mConnections);
+        mCopyConnections.addAll( mConnections );
     }
 
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_connections, parent, false);
-        return new ViewHolder(view);
+    public ViewHolder onCreateViewHolder( @NonNull ViewGroup parent, int viewType ) {
+        View view = LayoutInflater.from( parent.getContext() )
+                .inflate( R.layout.fragment_connections, parent, false );
+        return new ViewHolder( view );
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = (mConnections).get(position);
-        holder.mUsername.setText(mConnections.get(position).getUsername());
+    public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
+        holder.mItem = ( mConnections ).get( position );
+        holder.mUsername.setText( mConnections.get( position ).getUsername() );
 
         try {
-            if (!(holder.mItem.getIsMine())) {
-                holder.mUsername.setTextColor(Color.GRAY);
+            if ( !( holder.mItem.getIsMine() ) ) {
+                holder.mUsername.setTextColor( Color.GRAY );
             }
-        } catch (Exception e) {
-            Log.e("CONNECTION VIEW HOLDER", "my isMine value is weird!! " + e);
+        } catch ( Exception e ) {
+            Log.e( "CONNECTION VIEW HOLDER", "my isMine value is weird!! " + e );
         }
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    /* Notify the active callbacks interface (the activity, if the
-                       fragment is attached to one) that an item has been selected.*/
-                    mListener.onConnectionsListFragmentInteraction(holder.mItem);
-                }
+        holder.mView.setOnClickListener( v -> {
+            if ( null != mListener ) {
+                /* Notify the active callbacks interface (the activity, if the
+                   fragment is attached to one) that an item has been selected.*/
+                mListener.onConnectionsListFragmentInteraction( holder.mItem );
             }
-        });
-        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (null != mListener) {
-                    mListener.onConnectionsListFragmentLongInteraction(holder.mItem);
-                }
-                return true;
+        } );
+        holder.mView.setOnLongClickListener( v -> {
+            if ( null != mListener ) {
+                mListener.onConnectionsListFragmentLongInteraction( holder.mItem );
             }
-        });
+            return true;
+        } );
     }
 
     @Override
@@ -93,7 +88,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
      * sequence of the text passed in
      */
 
-    public boolean filter(String text) {
+    boolean filter( String text ) {
 
         /*
             Clearing the list each time is needed because of the way that the logic
@@ -104,14 +99,14 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
          */
 
         mConnections.clear();
-        if (text.isEmpty()) {
-            mConnections.addAll(mCopyConnections);
+        if ( text.isEmpty() ) {
+            mConnections.addAll( mCopyConnections );
             return true;
         }
 
-        for (Connection c : mCopyConnections) {
-            if (containsText(c, text)) {
-                mConnections.add(c);
+        for ( Connection c : mCopyConnections ) {
+            if ( containsText( c, text ) ) {
+                mConnections.add( c );
             }
         }
 
@@ -135,12 +130,22 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
      * @param text search query
      * @return
      */
-    private boolean containsText(Connection c, String text) {
+    private boolean containsText( Connection c, String text ) {
 
-        return c.getFirstName().toLowerCase().contains(text) ||
-                c.getLastName().toLowerCase().contains(text) ||
-                c.getUsername().toLowerCase().contains(text) ||
-                c.getEmail().toLowerCase().contains(text);
+        return c.getFirstName().toLowerCase().contains( text ) ||
+                c.getLastName().toLowerCase().contains( text ) ||
+                c.getUsername().toLowerCase().contains( text ) ||
+                c.getEmail().toLowerCase().contains( text );
+    }
+
+    /**
+     * Hashes the field mCopyConnections to complement the overriden equals() method.
+     *
+     * @return hash of mCopyConnections
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash( mCopyConnections );
     }
 
     /**
@@ -151,39 +156,27 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
      * @return
      */
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
+    public boolean equals( Object obj ) {
+        if ( obj == this ) {
             return true;
         }
-        if (!(obj instanceof RecyclerView.Adapter)) {
+        if ( !( obj instanceof RecyclerView.Adapter ) ) {
             return false;
         }
 
-        ConnectionListRecyclerViewAdapter theOther = (ConnectionListRecyclerViewAdapter) obj;
-        return mConnections.equals(theOther.mCopyConnections);
+        ConnectionListRecyclerViewAdapter theOther = ( ConnectionListRecyclerViewAdapter ) obj;
+        return mConnections.equals( theOther.mCopyConnections );
     }
 
-    /**
-     * Hashes the field mCopyConnections to complement the overriden equals() method.
-     *
-     * @return hash of mCopyConnections
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(mCopyConnections);
-    }
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View     mView;
+        final TextView mUsername;
+        Connection mItem;
 
-
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mUsername;
-        public Connection mItem;
-
-        public ViewHolder(View view) {
-            super(view);
+        ViewHolder( View view ) {
+            super( view );
             mView = view;
-            mUsername = view.findViewById(R.id.tv_connectionslist_username);
+            mUsername = view.findViewById( R.id.tv_connectionslist_username );
         }
 
     }

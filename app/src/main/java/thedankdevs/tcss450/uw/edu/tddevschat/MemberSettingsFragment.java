@@ -7,12 +7,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +19,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
+
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -43,14 +45,11 @@ public class MemberSettingsFragment extends Fragment {
     private static final String[] KEYS = {"firstname", "lastname", "username", "email", "password"};
     private static final String CHANGE_BTN_TEXT = "Change";
     private static final String UNDO_BTN_TEXT = "Undo";
-    private final int DISABLED_TEXT_COLOR = Color.WHITE;
-    private int ENABLED_TEXT_COLOR;
-    private Drawable ENABLED_ET_COLOR;
-    private Drawable DISABLED_ET_COLOR;
     private final String TAG = getClass().getSimpleName();
     private Credentials mCredentials;
     private OnFragmentInteractionListener mListener;
     private Map<Integer, UpdateValue> mCredentialsMap;
+    private Map<String, String> mUpdateMap;
     private GridLayout mGridLayout;
     private int mEnabledChangeButtons;
     private Button mApplyButton;
@@ -71,11 +70,11 @@ public class MemberSettingsFragment extends Fragment {
      * @return A new instance of fragment MemberSettingsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MemberSettingsFragment newInstance(Credentials credentials) {
+    public static MemberSettingsFragment newInstance( Credentials credentials ) {
         MemberSettingsFragment fragment = new MemberSettingsFragment();
-        Bundle args = new Bundle();
+        Bundle                 args     = new Bundle();
         args.putSerializable( ARG_MEMBER_SETTINGS, credentials );
-        fragment.setArguments(args);
+        fragment.setArguments( args );
         return fragment;
     }
 
@@ -107,14 +106,6 @@ public class MemberSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        // create ContextThemeWrapper from the original Activity Context with the custom theme
-//        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme_Material);
-//
-//        // clone the inflater using the ContextThemeWrapper
-//        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
-
-
-
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_member_settings, container, false);
 
@@ -124,9 +115,6 @@ public class MemberSettingsFragment extends Fragment {
         mConfirmPassword_tv = mView.findViewById(R.id.tv_member_settings_confirmpass);
         mApplyButton = mView.findViewById(R.id.btn_member_settings_apply);
 
-        ENABLED_TEXT_COLOR = getContext().getColor(R.color.colorPrimary);
-        ENABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_enabled);
-        DISABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_disabled);
         Log.d("BRYAN", "my tag: "+ getTag());
         setDefault();
 
@@ -139,226 +127,211 @@ public class MemberSettingsFragment extends Fragment {
         Context context = getContext();
         mEnabledChangeButtons = 0;
 //        displayETIds();
-        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
-            View childView = mGridLayout.getChildAt(i);
-            int id = childView.getId();
-            if (childView instanceof EditText) {
-                EditText et = (EditText) childView;
-                if (id == R.id.et_member_settings_confirm_password) {
+        for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
+            View childView = mGridLayout.getChildAt( i );
+            int  id        = childView.getId();
+            if ( childView instanceof EditText ) {
+                EditText et = ( EditText ) childView;
+                if ( id == R.id.et_member_settings_confirm_password ) {
 //                    et.setBackground(ENABLED_ET_COLOR);
 //                    et.setTextColor(ENABLED_TEXT_COLOR);
-                    et.setVisibility(View.GONE);
-                    mConfirmPassword_tv.setVisibility(View.GONE);
+                    et.setVisibility( View.GONE );
+                    mConfirmPassword_tv.setVisibility( View.GONE );
                     continue;
                 }
 
-                UpdateValue updateValue = mCredentialsMap.get(id);
-                String value = updateValue.getValue();
-                et.setText(value);
+                UpdateValue updateValue = mCredentialsMap.get( id );
+                String      value       = null;
+                if ( updateValue != null ) {
+                    value = updateValue.getValue();
+                }
+                et.setText( value );
 //                et.setBackground(DISABLED_ET_COLOR);
 //                et.setTextColor(DISABLED_TEXT_COLOR);
-                et.setEnabled(false);
+                et.setEnabled( false );
 
-            } else if(childView instanceof Button) {
-                Button btn = (Button) childView;
-                if (id == R.id.btn_member_settings_cancel) {
-                    btn.setOnClickListener(view -> onCancelButtonClick(childView));
-                } else if (id == R.id.btn_member_settings_apply) {
-                    btn.setOnClickListener(view -> onApplyButtonClick(childView));
-                    btn.setEnabled(false);
+            } else if ( childView instanceof Button ) {
+                Button btn = ( Button ) childView;
+                if ( id == R.id.btn_member_settings_cancel ) {
+                    btn.setOnClickListener( view -> onCancelButtonClick( childView ) );
+                } else if ( id == R.id.btn_member_settings_apply ) {
+                    btn.setOnClickListener( view -> onApplyButtonClick( childView ) );
+                    btn.setEnabled( false );
                 } else {
-                    btn.setOnClickListener(view -> onChangeButtonClick(childView));
-                    btn.setText(CHANGE_BTN_TEXT);
-                    setButtonTags(btn);
+                    btn.setOnClickListener( view -> onChangeButtonClick( childView ) );
+                    btn.setText( CHANGE_BTN_TEXT );
+                    setButtonTags( btn );
                 }
 
             }
 
         }
-        mPassword_et.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        mPassword_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
 
     }
-    private void setButtonTags(Button btn) {
+
+    private void setButtonTags( Button btn ) {
 
         EditText et;
-        int id = btn.getId();
-        switch (id) {
+        int      id = btn.getId();
+        switch ( id ) {
             case R.id.btn_member_settings_firstname:
-                et = mView.findViewById(R.id.et_member_settings_firstname);
+                et = mView.findViewById( R.id.et_member_settings_firstname );
                 break;
             case R.id.btn_member_settings_lastname:
-                et = mView.findViewById(R.id.et_member_settings_lastname);
+                et = mView.findViewById( R.id.et_member_settings_lastname );
                 break;
             case R.id.btn_member_settings_username:
-                et = mView.findViewById(R.id.et_member_settings_username);
+                et = mView.findViewById( R.id.et_member_settings_username );
                 break;
             // remove email actions until email endpoint is implemented
 //            case R.id.btn_member_settings_email:
 //                et = mView.findViewById(R.id.et_member_settings_email);
 //                break;
             case R.id.btn_member_settings_password:
-                Log.d(TAG, "I am password button");
-                et = mView.findViewById(R.id.et_member_settings_password);
+                Log.d( TAG, "I am password button" );
+                et = mView.findViewById( R.id.et_member_settings_password );
                 break;
             default:
-                Log.e(TAG, "Unknown button clicked");
+                Log.e( TAG, "Unknown button clicked" );
                 throw new IllegalArgumentException();
         }
 
-        btn.setTag(et);
+        btn.setTag( et );
     }
 
     // onClick Event handlers
-    public void onCancelButtonClick(View v) {
-        if (mEnabledChangeButtons == 0) {
+    public void onCancelButtonClick( View v ) {
+        if ( mEnabledChangeButtons == 0 ) {
             return;
-        } else if (mEnabledChangeButtons < 0) {
-            Log.d(TAG, "mEnabledChangeButtons < 0? = " + mEnabledChangeButtons);
+        } else if ( mEnabledChangeButtons < 0 ) {
+            Log.d( TAG, "mEnabledChangeButtons < 0? = " + mEnabledChangeButtons );
         }
 
-        Context context = getContext();
+        Context             context = getContext();
         AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
-        builder.setTitle("Cancel Update")
-                .setMessage("Are you sure you want to undo all your changes?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        setDefault();
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(R.drawable.ic_cancel_black_24dp)
+        builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
+        builder.setTitle( "Cancel Update" )
+                .setMessage( "Are you sure you want to undo all your changes?" )
+                .setPositiveButton( android.R.string.yes, ( dialog, which ) -> setDefault() )
+                .setNegativeButton( android.R.string.no, ( dialog, which ) -> {
+                    // do nothing
+                } )
+                .setIcon( R.drawable.ic_cancel_black_24dp )
                 .show();
 
     }
-    public void onChangeButtonClick(View v) {
-        Button btnClicked = (Button) v;
+
+    public void onChangeButtonClick( View v ) {
+        Button   btnClicked = ( Button ) v;
         EditText et;
-        if (v.getTag() instanceof EditText) {
-            et = (EditText) v.getTag();
+        if ( v.getTag() instanceof EditText ) {
+            et = ( EditText ) v.getTag();
         } else {
-            Log.e(TAG, "unknown tag");
+            Log.e( TAG, "unknown tag" );
             throw new IllegalArgumentException();
         }
         int id = et.getId();
-        if (id != R.id.et_member_settings_password) {
-            flipTextFields(et, btnClicked);
-            Log.d(TAG, "I flipped non-password fields");
+        if ( id != R.id.et_member_settings_password ) {
+            flipTextFields( et, btnClicked );
+            Log.d( TAG, "I flipped non-password fields" );
         } else {
-            flipPasswordFields(mPassword_et, mConfirmPassword_et, btnClicked);
-            Log.d(TAG, "I flipped password fields");
+            flipPasswordFields( mPassword_et, mConfirmPassword_et, btnClicked );
+            Log.d( TAG, "I flipped password fields" );
         }
 
         // check apply button state
-        if (mEnabledChangeButtons > 0 && !mApplyButton.isEnabled()) {
-            mApplyButton.setEnabled(true);
-        } else if (mEnabledChangeButtons == 0 && mApplyButton.isEnabled()) {
-            mApplyButton.setEnabled(false);
+        if ( mEnabledChangeButtons > 0 && !mApplyButton.isEnabled() ) {
+            mApplyButton.setEnabled( true );
+        } else if ( mEnabledChangeButtons == 0 && mApplyButton.isEnabled() ) {
+            mApplyButton.setEnabled( false );
         }
 
 
     }
-    public void onApplyButtonClick(View v) {
 
-        if (!areFieldsValid()) {
+    public void onApplyButtonClick( View v ) {
+
+        if ( !areFieldsValid() ) {
             return;
         }
 
         // check if password fields are enabled and if they're matching
-        if (mPassword_et.isEnabled()) {
-            String pass = mPassword_et.getText().toString();
+        if ( mPassword_et.isEnabled() ) {
+            String pass         = mPassword_et.getText().toString();
             String confirm_pass = mConfirmPassword_et.getText().toString();
             if (!arePasswordsValid(pass, confirm_pass)) {
-                // do nothing
                 mPassword_et.setError("Passwords do not match!");
                 return;
             }
         }
 
-        Context context = getContext();
+        Context             context = getContext();
         AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
-        builder.setTitle("Update Information")
-                .setMessage("Are you sure you want to update the fields selected?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        attachListener();
-
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(R.drawable.ic_settings_thumb_up_black_24dp)
+        builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
+        builder.setTitle( "Update Information" )
+                .setMessage( "Are you sure you want to update the fields selected?" )
+                .setPositiveButton( android.R.string.yes, ( dialog, which ) -> attachListener() )
+                .setNegativeButton( android.R.string.no, ( dialog, which ) -> {
+                    // do nothing
+                } )
+                .setIcon( R.drawable.ic_settings_thumb_up_black_24dp )
                 .show();
 
     }
 
     // helper methods for when the change button is clicked
-    private void flipTextFields(EditText et, Button btn) {
+    private void flipTextFields( EditText et, Button btn ) {
 
         int key = et.getId();
-        if (!et.isEnabled()) {
-            et.setEnabled(true);
+        if ( !et.isEnabled() ) {
+            et.setEnabled( true );
 //            et.setBackground(ENABLED_ET_COLOR);
 //            et.setTextColor(ENABLED_TEXT_COLOR);
-            btn.setText(UNDO_BTN_TEXT);
+            btn.setText( UNDO_BTN_TEXT );
             mEnabledChangeButtons += 1;
         } else {
-            et.setEnabled(false);
-            et.setText(mCredentialsMap.get(key).getValue());
+            et.setEnabled( false );
+            et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
 //            et.setBackground(DISABLED_ET_COLOR);
 //            et.setTextColor(DISABLED_TEXT_COLOR);
-            btn.setText(CHANGE_BTN_TEXT);
+            btn.setText( CHANGE_BTN_TEXT );
             mEnabledChangeButtons -= 1;
         }
 
-        et.setError(null);
+        et.setError( null );
     }
-    private void flipPasswordFields(EditText pass_et, EditText confirmpass_et, Button btn) {
+
+    private void flipPasswordFields( EditText pass_et, EditText confirmpass_et, Button btn ) {
         int key = pass_et.getId();
 
-        if (!pass_et.isEnabled()) {
-            Log.d(TAG, "I am enabling et");
-            pass_et.setEnabled(true);
+        if ( !pass_et.isEnabled() ) {
+            Log.d( TAG, "I am enabling et" );
+            pass_et.setEnabled( true );
 //            pass_et.setBackground(ENABLED_ET_COLOR);
 //            pass_et.setTextColor(ENABLED_TEXT_COLOR);
-            confirmpass_et.setVisibility(View.VISIBLE);
-            mConfirmPassword_tv.setVisibility(View.VISIBLE);
-            btn.setText(UNDO_BTN_TEXT);
+            confirmpass_et.setVisibility( View.VISIBLE );
+            mConfirmPassword_tv.setVisibility( View.VISIBLE );
+            btn.setText( UNDO_BTN_TEXT );
 
-            pass_et.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-            confirmpass_et.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            pass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
+            confirmpass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
             mEnabledChangeButtons += 1;
         } else {
-            Log.e(TAG, "I am disabling et");
-            pass_et.setEnabled(false);
-            pass_et.setText(mCredentialsMap.get(key).getValue());
+            Log.e( TAG, "I am disabling et" );
+            pass_et.setEnabled( false );
+            pass_et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
 //            pass_et.setBackground(DISABLED_ET_COLOR);
 //            pass_et.setTextColor(DISABLED_TEXT_COLOR);
-            confirmpass_et.setVisibility(View.GONE);
-            mConfirmPassword_tv.setVisibility(View.GONE);
-            btn.setText(CHANGE_BTN_TEXT);
-            pass_et.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            confirmpass_et.setVisibility( View.GONE );
+            mConfirmPassword_tv.setVisibility( View.GONE );
+            btn.setText( CHANGE_BTN_TEXT );
+            pass_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
             mEnabledChangeButtons -= 1;
         }
 
         // clear error
-        pass_et.setError(null);
+        pass_et.setError( null );
 
     }
 
@@ -366,23 +339,21 @@ public class MemberSettingsFragment extends Fragment {
     private boolean areFieldsValid() {
         boolean valid = true;
 
-        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
-            View childView = mGridLayout.getChildAt(i);
+        for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
+            View childView = mGridLayout.getChildAt( i );
 
-            if (childView instanceof EditText) {
-                EditText et = (EditText) childView;
-                int type = et.getInputType();
-                int id = et.getId();
-                if (et.isEnabled() && id != R.id.et_member_settings_confirm_password) {
+            if ( childView instanceof EditText ) {
+                EditText et   = ( EditText ) childView;
+                int      type = et.getInputType();
+                int      id   = et.getId();
+                if ( et.isEnabled() && id != R.id.et_member_settings_confirm_password ) {
                     String newValue = et.getText().toString();
-                    String oldValue = mCredentialsMap.get(id).getValue();
-                    if (newValue.length() < 3) {
-                        et.setError("Field must contain at least 3 characters");
+                    String oldValue = Objects.requireNonNull( mCredentialsMap.get( id ) ).getValue();
+                    if ( newValue.length() < 3 ) {
+                        et.setError( "Field must contain at least 3 characters" );
                         valid = false;
-                    }
-
-                    else if(oldValue.equalsIgnoreCase(newValue)) {
-                        et.setError("The new value cannot match the existing value");
+                    } else if ( oldValue.equalsIgnoreCase( newValue ) ) {
+                        et.setError( "The new value cannot match the existing value" );
                         valid = false;
                     }
                 }
@@ -390,33 +361,34 @@ public class MemberSettingsFragment extends Fragment {
         }
 
 
-
         return valid;
     }
-    private boolean arePasswordsValid(String pass, String confirm_pass) {
+
+    private boolean arePasswordsValid( String pass, String confirm_pass ) {
         boolean valid = true;
 
         // check if any of the password fields are less than 6 characters
-        EditText[] et_arr = {mPassword_et, mConfirmPassword_et};
-        for (EditText et : et_arr) {
+        EditText[] et_arr = { mPassword_et, mConfirmPassword_et };
+        for ( EditText et : et_arr ) {
             String et_string = et.getText().toString();
-            if (et_string.length() < 6) {
-                et.setError("Passwords must be at least 6 characters long");
+            if ( et_string.length() < 6 ) {
+                et.setError( "Passwords must be at least 6 characters long" );
                 valid = false;
             }
         }
 
         // check for equality (case sensitive)
-        if (valid && !pass.equals(confirm_pass)) {
-            mConfirmPassword_et.setError("Passwords must match");
+        if ( valid && !pass.equals( confirm_pass ) ) {
+            mConfirmPassword_et.setError( "Passwords must match" );
             valid = false;
         }
 
         return valid;
     }
+
     private void attachListener() {
 
-        Map<String, String> updateMap = new HashMap<>();
+        mUpdateMap = new HashMap<>();
         for (int i = 0; i < mGridLayout.getChildCount(); i++) {
             View childView = mGridLayout.getChildAt(i);
             if (childView instanceof EditText) {
@@ -424,8 +396,8 @@ public class MemberSettingsFragment extends Fragment {
                 int id = et.getId();
                 if (et.isEnabled() && id != R.id.et_member_settings_confirm_password) {
                     UpdateValue obj = mCredentialsMap.get(id);
-                    updateMap.put(obj.getKey(), et.getText().toString());
-                    Log.d(TAG, "Added object to updateMap: " + obj.getKey() + "=" + et.getText().toString());
+                    mUpdateMap.put(obj.getKey(), et.getText().toString());
+                    Log.d(TAG, "Added object to mUpdateMap: " + obj.getKey() + "=" + et.getText().toString());
 
                 }
 
@@ -433,63 +405,140 @@ public class MemberSettingsFragment extends Fragment {
             }
         }
 
-        if (updateMap.isEmpty()) {
+        if (mUpdateMap.isEmpty()) {
             Log.d(TAG, "Why is my update map empty?");
         }
-        Log.d(TAG, "I'm sending this map: " + updateMap);
-        mListener.onChangeMemberInfo(updateMap);
-        Log.d(TAG, "mListener attached");
+
+        MemberSettingsNode node = new MemberSettingsNode((HomeActivity)getActivity());
+        node.onChangeMemberInfo(mUpdateMap, mCredentials.getMemberID());
+
     }
 
     // dialog boxes for when the update is successful and unsuccessful
     public void successfulUpdateDialog() {
-        Context context = getContext();
+        Context             context = getContext();
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(context);
         }
-
         builder.setTitle("Succesful Update")
                 .setMessage("Information has been successfully updated")
                 .setNeutralButton("OK",
-                        (DialogInterface dialog, int which) -> { dialog.dismiss(); })
+                        (DialogInterface dialog, int which) ->
+                        {
+                            dialog.dismiss();
+                            Credentials newCredentials = updateCredentials();
+                            mListener.onChangeMemberInfo(newCredentials);
+                        })
                 .setIcon(R.drawable.ic_check_black_24dp)
                 .show();
-
-
     }
-    public void unSuccessfulUpdateDialog() {
-        Context context = getContext();
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
 
-        builder.setTitle("Unsuccesful Update")
-                .setMessage("Information update failed")
-                .setNeutralButton("OK",
-                        (DialogInterface dialog, int which) -> { dialog.dismiss(); })
-                .setIcon(R.drawable.ic_cancel_black_24dp)
+    public void unSuccessfulUpdateDialog() {
+        Context             context = getContext();
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
+
+        builder.setTitle( "Unsuccesful Update" )
+                .setMessage( "Information update failed" )
+                .setNeutralButton( "OK",
+                        ( DialogInterface dialog, int which ) -> dialog.dismiss() )
+                .setIcon( R.drawable.ic_cancel_black_24dp )
                 .show();
 
         setDefault();
     }
 
+    private Credentials updateCredentials() {
+
+
+        String email = mCredentials.getEmail();
+        String password = mCredentials.getPassword();
+        Set<String> keys = mUpdateMap.keySet();
+
+        Log.d(TAG, "Keys updated: " + keys);
+
+        if (mUpdateMap.containsKey("email")) {
+            email = mUpdateMap.get("email");
+            keys.remove("email");
+        }
+
+        // endpoint doesn't handle this properly yet
+        // server needs to apply hash before updating password in database
+        if (mUpdateMap.containsKey("password")) {
+            password = mUpdateMap.get("password");
+            keys.remove("password");
+        }
+
+
+        Credentials.Builder builder = new Credentials.Builder(email, password);
+        boolean firstnameAdded = false;
+        boolean lastnameAdded = false;
+        boolean usernameAdded = false;
+        for (String key : keys) {
+            String value = mUpdateMap.get(key);
+            switch (key) {
+                case "firstname":
+                    builder.addFirstName(value);
+                    firstnameAdded = true;
+                    break;
+                case "lastname":
+                    builder.addLastName(value);
+                    lastnameAdded = true;
+                    break;
+                case "username":
+                    builder.addUsername(value);
+                    usernameAdded = true;
+                    break;
+                default:
+                    Log.d(TAG, "The key should've been one of the 3. What is this?");
+            }
+        }
+
+        if (!firstnameAdded) {
+            builder.addFirstName(mCredentials.getFirstName());
+        }
+
+        if (!lastnameAdded) {
+            builder.addLastName(mCredentials.getLastName());
+        }
+
+        if (!usernameAdded) {
+            builder.addUsername(mCredentials.getUsername());
+        }
+        builder.addMemberID(mCredentials.getMemberID());
+        Credentials newCredentials = builder.build();
+        // credentials object should have a toString() method...
+        Log.d(TAG, "New Credentials");
+        Log.d(TAG, "firstname: " + newCredentials.getFirstName());
+        Log.d(TAG, "lastname: " + newCredentials.getLastName());
+        Log.d(TAG, "email: " + newCredentials.getEmail());
+        Log.d(TAG, "username:  " + newCredentials.getUsername());
+
+        // after all this work to update the Credentials object on the client side
+        // the app might be better off
+        // sending a new request to an endpoint (with the new email and/or password if changed)
+        // and get the new credentials object from that.
+
+        return newCredentials;
+    }
+
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+    public void onAttach( Context context ) {
+        super.onAttach( context );
+        if ( context instanceof OnFragmentInteractionListener ) {
+            mListener = ( OnFragmentInteractionListener ) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new RuntimeException( context.toString()
+                    + " must implement OnFragmentInteractionListener" );
         }
     }
+
+
+
 
     @Override
     public void onDetach() {
@@ -510,7 +559,7 @@ public class MemberSettingsFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        void onChangeMemberInfo(Map<String, String> info);
+        void onChangeMemberInfo(Credentials credentials);
     }
 
     // helper class for storing the default values
@@ -520,26 +569,31 @@ public class MemberSettingsFragment extends Fragment {
         private String mKey;
         private String mValue;
 
-        public UpdateValue(String key, String value) {
+        UpdateValue( String key, String value ) {
             mKey = key;
             mValue = value;
-            if (key == null) {
+            if ( key == null ) {
                 mKey = "";
             }
 
-            if (value == null) {
+            if ( value == null ) {
                 mValue = "";
             }
 
         }
 
-        public String getKey() { return mKey; }
-        public String getValue() { return mValue; }
+        String getKey() {
+            return mKey;
+        }
 
+        public String getValue() {
+            return mValue;
+        }
+
+        @NonNull
         @Override
         public String toString() {
-            String formatted = String.format("{%s=%s}", mKey, mValue);
-            return formatted;
+            return String.format( "{%s=%s}", mKey, mValue );
         }
 
 

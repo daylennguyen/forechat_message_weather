@@ -21,14 +21,6 @@ public class ThemeUtils {
     }
 
 
-    public static void changeTheme(Activity activity, String theme) {
-        sTheme = theme;
-        //activity.finish();
-        //activity.startActivity(new Intent(activity, activity.getClass()));
-        activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        activity.recreate();
-    }
-
     public static void onActivityCreateTheme(Activity activity) {
 
         String prefKey = activity.getString(R.string.current_theme);
