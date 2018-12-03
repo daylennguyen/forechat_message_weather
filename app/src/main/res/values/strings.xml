@@ -76,7 +76,7 @@
 	<string name = "pref_title_ringtone">Ringtone</string>
 	<string name = "pref_ringtone_silent">Silent</string>
 	<string name = "pref_title_vibrate">Vibrate</string>
-	<string name = "settings_txt">Settings</string>
+	<string name = "settings_txt">Weather Settings</string>
 	<string name = "send_button">Send button</string>
 	<string name = "enter_a_message">Enter a Message</string>
 	<string name = "select_location_from_map">Apply Map Selection</string>

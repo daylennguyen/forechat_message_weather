@@ -22,13 +22,12 @@ public class LocationNode implements Serializable {
     public static final String MAP_LON_KEY = "MLON";
     public static final String MAP_LAT_KEY = "MLAT";
 
-    public static final String LONGITUDE_KEY = "LONGITUDE";
-    public static final String LATITUDE_KEY  = "LATITUDE";
-
+    public static final  String                      LONGITUDE_KEY                           = "LONGITUDE";
+    public static final  String                      LATITUDE_KEY                            = "LATITUDE";
+    public static final  int                         MY_PERMISSIONS_LOCATIONS                = 8414;
     /*Location Services*/
     private static final long                        UPDATE_INTERVAL_IN_MILLISECONDS         = 10000;
     private static final long                        FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    public static final  int                         MY_PERMISSIONS_LOCATIONS                = 8414;
     private              AppCompatActivity           myNodeMaster;
     private              LocationRequest             mLocationRequest;
     private              Location                    mCurrentLocation;

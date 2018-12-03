@@ -4,24 +4,45 @@ import java.io.Serializable;
 
 /**
  * Class to encapsulate a Connection. Building an Object requires a first name, last name and email.
- *
+ * <p>
  * Optional fields include nothing for now.
- *
  *
  * @author Michelle Brown
  * @version 11 November 2018
  */
 public class Chat implements Serializable {
 
-    private String mChatName;
-    private final int mChatID;
-    private String mChatMembers;
+    private final int    mChatID;
+    private       String mChatName;
+    private       String mChatMembers;
 
-    private Chat(String name, int chatID, String memberUsernames) {
+    private Chat( String name, int chatID, String memberUsernames ) {
 
         this.mChatName = name;
         this.mChatID = chatID;
         this.mChatMembers = memberUsernames;
+    }
+
+    private Chat( final Chat.Builder builder ) {
+        this.mChatMembers = builder.mMemberusernames;
+        this.mChatID = builder.mChatID;
+        this.mChatName = builder.mChatName;
+    }
+
+    public String getChatName() {
+        return mChatName;
+    }
+
+    public int getChatID() {
+        return mChatID;
+    }
+
+    public String getChatMembers() {
+        return mChatMembers;
+    }
+
+    public void notifiedChat() {
+        this.mChatName = "*" + this.getChatName();
     }
 
     /**
@@ -31,9 +52,9 @@ public class Chat implements Serializable {
      */
     public static class Builder {
 
-        private  String mChatName;
-        private final int mChatID;
-        private String mMemberusernames;
+        private final int    mChatID;
+        private       String mChatName;
+        private       String mMemberusernames;
 
 
         /**
@@ -43,9 +64,9 @@ public class Chat implements Serializable {
          * @param userNames email
          * @param chatID
          */
-        public Builder(String chatName, String userNames, int chatID) {
+        public Builder( String chatName, String userNames, int chatID ) {
 
-             this.mChatName = chatName;
+            this.mChatName = chatName;
             this.mMemberusernames = userNames;
             this.mChatID = chatID;
         }
@@ -63,32 +84,9 @@ public class Chat implements Serializable {
         }*/
 
         public Chat build() {
-            return new Chat(this);
+            return new Chat( this );
         }
 
-    }
-
-    private Chat(final Chat.Builder builder) {
-        this.mChatMembers = builder.mMemberusernames;
-        this.mChatID = builder.mChatID;
-        this.mChatName = builder.mChatName;
-    }
-
-
-    public String getChatName() {
-        return mChatName;
-    }
-
-    public int getChatID() {
-        return mChatID;
-    }
-
-    public String getChatMembers() {
-        return mChatMembers;
-    }
-
-    public void notifiedChat() {
-        this.mChatName = "*" + this.getChatName();
     }
 
 }

@@ -12,17 +12,17 @@ import java.util.function.Consumer;
 /**
  * Implemented AsyncTask that makes a Get call to a web service.  Builds the Task
  * requiring a fully formed URL.
- *
+ * <p>
  * Optional parameters include actions for onPreExecute, onProgressUpdate, onPostExecute, and
  * onCancelled.
- *
+ * <p>
  * An action for onProgressUpdate is included but a call to publishProgress is never made in
  * doInBackground rendering onProgressUpdate unused.
- *
+ * <p>
  * The method cancel() is called in doInBackGround during exception handling. Use the action
  * onCnCancelled to respond to exceptional situations resulting from doInBackground execution.
  * Note that external cancellation will cause the same action to execute.
- *
+ * <p>
  * Created by Charles Bryan on 3/22/2018.
  *
  * @author Charles Bryan
@@ -32,10 +32,77 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
 
     private final String mUrl;
 
-    private Runnable mOnPre;
+    private Runnable           mOnPre;
     private Consumer<String[]> mOnProgress;
-    private Consumer<String> mOnPost;
-    private Consumer<String> mOnCancel;
+    private Consumer<String>   mOnPost;
+    private Consumer<String>   mOnCancel;
+
+    /**
+     * Construct a SendPostAsyncTask internally from a builder.
+     *
+     * @param builder the builder used to construct this object
+     */
+    private GetAsyncTask( final Builder builder ) {
+        mUrl = builder.mUrl;
+
+        mOnPre = builder.onPre;
+        mOnProgress = builder.onProg;
+        mOnPost = builder.onPost;
+        mOnCancel = builder.onCancel;
+    }
+
+    @Override
+    protected String doInBackground( Void... voids ) {
+
+        StringBuilder     response      = new StringBuilder();
+        HttpURLConnection urlConnection = null;
+
+        try {
+            URL urlObject = new URL( mUrl );
+            urlConnection = ( HttpURLConnection ) urlObject.openConnection();
+
+            InputStream    content = urlConnection.getInputStream();
+            BufferedReader buffer  = new BufferedReader( new InputStreamReader( content ) );
+            String         s;
+            while ( ( s = buffer.readLine() ) != null ) {
+                response.append( s );
+            }
+            publishProgress();
+        } catch ( Exception e ) {
+            response = new StringBuilder( "Unable to connect, Reason: "
+                    + e.getMessage() );
+            cancel( true );
+        } finally {
+            if ( urlConnection != null ) {
+                urlConnection.disconnect();
+            }
+        }
+        return response.toString();
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mOnPre.run();
+    }
+
+    @Override
+    protected void onPostExecute( String result ) {
+        mOnPost.accept( result );
+    }
+
+    @Override
+    protected void onProgressUpdate( String... values ) {
+        super.onProgressUpdate( values );
+        mOnProgress.accept( values );
+
+    }
+
+    @Override
+    protected void onCancelled( String result ) {
+        super.onCancelled( result );
+        mOnCancel.accept( result );
+    }
 
     /**
      * Helper class for building PostAsyncTasks.
@@ -48,17 +115,21 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
         private final String mUrl;
 
         //Optional Parameters
-        private Runnable onPre = () -> {};
-        private Consumer<String[]> onProg = X -> {};
-        private Consumer<String> onPost = x -> {};
-        private Consumer<String> onCancel = x -> {};
+        private Runnable           onPre    = () -> {
+        };
+        private Consumer<String[]> onProg   = X -> {
+        };
+        private Consumer<String>   onPost   = x -> {
+        };
+        private Consumer<String>   onCancel = x -> {
+        };
 
         /**
          * Constructs a new Builder.
          *
          * @param url the fully-formed url of the web service this task will connect to
          */
-        public Builder(final String url) {
+        public Builder( final String url ) {
             mUrl = url;
         }
 
@@ -68,7 +139,7 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
          * @param val a action to perform during AsyncTask onPreExecute
          * @return
          */
-        public Builder onPreExecute(final Runnable val) {
+        public Builder onPreExecute( final Runnable val ) {
             onPre = val;
             return this;
         }
@@ -81,7 +152,7 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
          * @param val a action to perform during AsyncTask onProgressUpdate
          * @return
          */
-        public Builder onProgressUpdate(final Consumer<String[]> val) {
+        public Builder onProgressUpdate( final Consumer<String[]> val ) {
             onProg = val;
             return this;
         }
@@ -92,7 +163,7 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
          * @param val a action to perform during AsyncTask onPostExecute
          * @return
          */
-        public Builder onPostExecute(final Consumer<String> val) {
+        public Builder onPostExecute( final Consumer<String> val ) {
             onPost = val;
             return this;
         }
@@ -106,7 +177,7 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
          * @param val a action to perform during AsyncTask onCancelled
          * @return
          */
-        public Builder onCancelled(final Consumer<String> val) {
+        public Builder onCancelled( final Consumer<String> val ) {
             onCancel = val;
             return this;
         }
@@ -117,76 +188,9 @@ public class GetAsyncTask extends AsyncTask<Void, String, String> {
          * @return a SendPostAsyncTask with the current attributes
          */
         public GetAsyncTask build() {
-            return new GetAsyncTask(this);
+            return new GetAsyncTask( this );
         }
 
-    }
-
-    /**
-     * Construct a SendPostAsyncTask internally from a builder.
-     *
-     * @param builder the builder used to construct this object
-     */
-    private GetAsyncTask(final Builder builder) {
-        mUrl = builder.mUrl;
-
-        mOnPre = builder.onPre;
-        mOnProgress = builder.onProg;
-        mOnPost = builder.onPost;
-        mOnCancel = builder.onCancel;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        mOnPre.run();
-    }
-
-    @Override
-    protected String doInBackground(Void... voids) {
-
-        StringBuilder response = new StringBuilder();
-        HttpURLConnection urlConnection = null;
-
-        try {
-            URL urlObject = new URL(mUrl);
-            urlConnection = (HttpURLConnection) urlObject.openConnection();
-
-            InputStream content = urlConnection.getInputStream();
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-            String s = "";
-            while((s = buffer.readLine()) != null) {
-                response.append(s);
-            }
-            publishProgress();
-        } catch (Exception e) {
-            response = new StringBuilder("Unable to connect, Reason: "
-                    + e.getMessage());
-            cancel(true);
-        } finally {
-            if(urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-        return response.toString();
-    }
-
-    @Override
-    protected void onCancelled(String result) {
-        super.onCancelled(result);
-        mOnCancel.accept(result);
-    }
-
-    @Override
-    protected void onProgressUpdate(String... values) {
-        super.onProgressUpdate(values);
-        mOnProgress.accept(values);
-
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-        mOnPost.accept(result);
     }
 }
 

@@ -2,6 +2,7 @@ package thedankdevs.tcss450.uw.edu.tddevschat;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,21 +20,21 @@ public class WaitFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_wait, container, false);
+    public void onAttach( Context context ) {
+        super.onAttach( context );
+        if ( context instanceof OnFragmentInteractionListener ) {
+            mListener = ( OnFragmentInteractionListener ) context;
+        } else {
+            throw new RuntimeException( context.toString()
+                    + " must implement OnFragmentInteractionListener" );
+        }
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState ) {
+        // Inflate the layout for this fragment
+        return inflater.inflate( R.layout.fragment_wait, container, false );
     }
 
     @Override
@@ -54,6 +55,7 @@ public class WaitFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onWaitFragmentInteractionShow();
+
         void onWaitFragmentInteractionHide();
     }
 }

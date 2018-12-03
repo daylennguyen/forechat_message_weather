@@ -15,14 +15,10 @@ import java.io.Serializable;
  * @version 1 October 2018
  */
 public class Credentials implements Serializable {
-    private static final long serialVersionUID = -1634677417576883013L;
-
-
-    private  String mUsername;
-    private final String mPassword;
-
-
-    private int mMemberID;
+    private static final long   serialVersionUID = -1634677417576883013L;
+    private final        String mPassword;
+    private              String mUsername;
+    private              int    mMemberID;
 
     private String mFirstName;
     private String mLastName;
@@ -49,6 +45,16 @@ public class Credentials implements Serializable {
      */
     public String getUsername() {
         return mUsername;
+    }
+
+    /**
+     * Get the memberID
+     *
+     * @param
+     * @return the memberID
+     */
+    public void setUsername( String username ) {
+        mUsername = username;
     }
 
     /**
@@ -82,10 +88,9 @@ public class Credentials implements Serializable {
      * Get the memberID
      *
      * @return the memberID
-     * @param
      */
-    public void setUsername(String username ) {
-        mUsername = username;
+    public void setFirstname( String firstname ) {
+        mFirstName = firstname;
     }
 
     /**
@@ -93,19 +98,9 @@ public class Credentials implements Serializable {
      *
      * @return the memberID
      */
-    public void setFirstname(String firstname) {
-        mFirstName= firstname;
-    }
-
-    /**
-     * Get the memberID
-     *
-     * @return the memberID
-     */
-    public void setLastname(String lastName ) {
+    public void setLastname( String lastName ) {
         mLastName = lastName;
     }
-
 
 
     /**

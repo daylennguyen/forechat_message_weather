@@ -2,6 +2,7 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +16,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Items.
@@ -24,13 +26,11 @@ import java.util.ArrayList;
  */
 public class ChatsFragment extends Fragment implements View.OnClickListener {
 
-    private ArrayList<Chat> mChats;
     public static final String ARG_CHATS_LIST = "chats list";
-
-    private int mColumnCount = 1;
-
-    private OnChatsListFragmentInteractionListener mListener;
     MyChatsRecyclerViewAdapter adapter;
+    private ArrayList<Chat>                        mChats;
+    private int mColumnCount = 1;
+    private OnChatsListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,72 +40,63 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
-    public static ChatsFragment newInstance(int columnCount) { //TODO: fix
+    public static ChatsFragment newInstance( int columnCount ) { //TODO: fix
         ChatsFragment fragment = new ChatsFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_CHATS_LIST, columnCount);
-        fragment.setArguments(args);
+        Bundle        args     = new Bundle();
+        args.putInt( ARG_CHATS_LIST, columnCount );
+        fragment.setArguments( args );
         return fragment;
+    }
+
+    @Override
+    public void onAttach( Context context ) {
+        super.onAttach( context );
+        if ( context instanceof OnChatsListFragmentInteractionListener ) {
+            mListener = ( OnChatsListFragmentInteractionListener ) context;
+        } else {
+            throw new RuntimeException( context.toString()
+                    + " must implement OnListFragmentInteractionListener" );
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mChats = (ArrayList) getArguments().getSerializable(ARG_CHATS_LIST);
+    public void onCreate( Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+        if ( getArguments() != null ) {
+            mChats = ( ArrayList ) getArguments().getSerializable( ARG_CHATS_LIST );
         }
 
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState ) {
 
-        adapter = new MyChatsRecyclerViewAdapter(mChats, mListener);
-        View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
+        adapter = new MyChatsRecyclerViewAdapter( mChats, mListener );
+        View view = inflater.inflate( R.layout.fragment_chats_list, container, false );
         // Set the adapter
-        if (view instanceof LinearLayout) {
+        if ( view instanceof LinearLayout ) {
             Context      context      = view.getContext();
             RecyclerView recyclerView = view.findViewById( R.id.list );
 
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            if ( mColumnCount <= 1 ) {
+                recyclerView.setLayoutManager( new LinearLayoutManager( context ) );
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                recyclerView.setLayoutManager( new GridLayoutManager( context, mColumnCount ) );
             }
-            recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter( adapter );
         }
-        Button b = view.findViewById(R.id.btn_newChat_chats);
-        b.setOnClickListener(this);
+        Button b = view.findViewById( R.id.btn_newChat_chats );
+        b.setOnClickListener( this );
         return view;
     }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnChatsListFragmentInteractionListener) {
-            mListener = (OnChatsListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
 
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("Chat");
+        Objects.requireNonNull( getActivity() ).setTitle( "Chat" );
 
 
         adapter.notifyDataSetChanged();
@@ -114,8 +105,14 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onClick( View v ) {
+        switch ( v.getId() ) {
             case R.id.btn_newChat_chats:
                 mListener.onCreateNewChatButtonPressed();
         }
@@ -133,8 +130,10 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
      */
     public interface OnChatsListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onChatsListFragmentInteraction(Chat item);
+        void onChatsListFragmentInteraction( Chat item );
+
         void onCreateNewChatButtonPressed();
-        void onChatsListFragmentLongInteraction(Chat item);
+
+        void onChatsListFragmentLongInteraction( Chat item );
     }
 }

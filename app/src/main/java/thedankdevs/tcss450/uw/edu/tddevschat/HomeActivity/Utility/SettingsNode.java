@@ -23,16 +23,12 @@ public class SettingsNode {
     public static final String FAHRENHEIT = "F";
 
     /*Location Determinant*/
-    public static final int    GPS_DATA        = 0;
-    public static final int    SELECT_FROM_MAP = 1;
-    public static final int    POSTAL_CODE     = 2;
-    public static final int    CITY_STATE      = 3;
-    public static final String LOCATIONPREF    = "GPSSK";
-    public static final int    GPS_ISON        = 1;
-    public static final int    GPS_ISOFF       = 0;
-
-
-    private HomeActivity master;
+    public static final int          GPS_DATA        = 0;
+    public static final int          SELECT_FROM_MAP = 1;
+    public static final int          POSTAL_CODE     = 2;
+    public static final int          CITY_STATE      = 3;
+    public static final String       LOCATIONPREF    = "GPSSK";
+    private             HomeActivity master;
 
     /************************************************/
 
@@ -74,7 +70,7 @@ public class SettingsNode {
 
         @Override
         public void onItemSelected( AdapterView<?> parent, View aview, int position, long id ) {
-            SharedPreferences        settings     = view.getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+            SharedPreferences        settings     = aview.getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
             SharedPreferences.Editor editor       = settings.edit();
             Button                   locateButton = view.findViewById( R.id.select_location_button );
             View                     zippy        = view.findViewById( R.id.setting_section_zip );
