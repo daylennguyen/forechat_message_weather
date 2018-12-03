@@ -23,23 +23,12 @@ public class MemberSettingsNode {
     private HomeActivity mMaster;
     private Credentials mCredentials;
 
-    private Credentials mPendingCredentials;
-
     public MemberSettingsNode(HomeActivity master, Credentials credentials) {
         mMaster = master;
         mCredentials = credentials;
     }
 
     public void onChangeMemberInfo(Map<String, String> updateMap) {
-
-        //build pending Credentials
-        mPendingCredentials = new Credentials.Builder(updateMap.get("email"), updateMap.get("password"))
-                .addMemberID(mCredentials.getMemberID())
-                .addFirstName(updateMap.get("firstname"))
-                .addLastName(updateMap.get("lastname"))
-                .addUsername(updateMap.get("username"))
-                .build();
-
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .authority(mMaster.getString(R.string.base_url))
@@ -83,10 +72,6 @@ public class MemberSettingsNode {
             if (success) {
                 Log.d(TAG, "Member Settings Update successful");
                 frag.successfulUpdateDialog();
-
-                //update HomeActivity's Credentials
-                mCredentials = mPendingCredentials;
-                mMaster.onMemberUpdate(mCredentials);
 
             } else {
                 Log.d(TAG, "Member Settings Update failed");

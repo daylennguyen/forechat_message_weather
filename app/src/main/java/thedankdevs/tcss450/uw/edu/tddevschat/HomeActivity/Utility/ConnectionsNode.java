@@ -149,7 +149,7 @@ public class ConnectionsNode {
         AlertDialog.Builder builder = new AlertDialog.Builder(mMaster);
             builder.setMessage(item.getUsername() + " Options")
                     .setPositiveButton("Remove this connection", (dialog, id) -> { //anonymous onclick listener
-                        removeConnection(mCredential.getMemberID(), item.getEmail());
+                        removeConnection(mCredential.getMemberID(), item.getEmail(), item.getChatID());
                     })
                     .setNegativeButton("Cancel", (dialog, id) -> {
                         //do nothing
@@ -158,11 +158,12 @@ public class ConnectionsNode {
         dialog.show();
     }
 
-    private void removeConnection(int memberID, String email) {
+    private void removeConnection(int memberID, String email, int ourChatID) {
         JSONObject removeJson = new JSONObject();
         try {
             removeJson.put("myMemberID", memberID);
             removeJson.put("theirEmail", email);
+            removeJson.put("ourChatID", ourChatID);
         } catch (JSONException e) {
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
         }
