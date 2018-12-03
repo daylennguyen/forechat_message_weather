@@ -37,7 +37,7 @@
         <item name="android:statusBarColor">@color/mintColorPrimary</item>
         <item name="navigationBarColor">@color/mintColorPrimary</item>
         <item name="statusBarColor">@color/mintColorPrimary</item>
-        <item name="primaryBorderColor">@color/mintColorPrimaryDark</item>
+        <item name="primaryBorderColor">@color/transparentDark</item>
         <item name="primaryDisabledColor">@color/mintColorPrimary</item>
         <item name="primaryEnabledColor">@color/colorWhite</item>
         <item name="primaryDarkTextColor">@color/mintDark</item>

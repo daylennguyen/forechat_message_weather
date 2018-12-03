@@ -22,5 +22,7 @@
 
 	<string name = "keys_intent_notification_msg">notification?</string>
 	<string name = "keys_intent_notification_chatID">notificationChatID</string>
+	<string name = "keys_credential_member_settings">updated credentials</string>
+
 
 </resources>
