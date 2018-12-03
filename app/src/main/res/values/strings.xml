@@ -40,7 +40,8 @@
 	<string name = "create_new_chat_select">Select your connection(s) for the new chat</string>
 	<string name = "remove_chat_members">Select the members of the chat you wish to remove.</string>
 	<string name = "remove_remove">Remove</string>
-
+    <string name = "reload_themes">reload theme fragment</string>
+    <string name = "reload_member_settings">reload member settings</string>
 	<!--ERROR NOTIFICATIONS-->
 	<string name = "loginRegister_missingField">empty field</string>
 	<string name = "loginRegister_invalidEmail">invalid email</string>
@@ -111,5 +112,12 @@
 	<string name = "weather_json_postal">postalcode</string>
 	<string name = "title_activity_maps">Map</string>
 	<string name = "sign_in">Sign in</string>
+
+    <!--___________Themes______________________-->
+    <string name = "theme_title">Change Theme</string>
+
+    <!--_____________Member Settings__________-->
+    <string name = "member_settings_title">Member Settings</string>
+    <string name = "member_settings_header">Change Personal Information</string>
 
 </resources>

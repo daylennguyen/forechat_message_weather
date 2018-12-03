@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Set;
 
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
@@ -21,14 +22,14 @@ public class MemberSettingsNode {
 
     private final String TAG = getClass().getSimpleName();
     private HomeActivity mMaster;
-    private Credentials mCredentials;
 
-    public MemberSettingsNode(HomeActivity master, Credentials credentials) {
+    public MemberSettingsNode(HomeActivity master) {
         mMaster = master;
-        mCredentials = credentials;
     }
 
-    public void onChangeMemberInfo(Map<String, String> updateMap) {
+
+
+    public void onChangeMemberInfo(Map<String, String> updateMap, int memberId) {
 
         Uri uri = new Uri.Builder()
                 .scheme("https")
@@ -40,14 +41,14 @@ public class MemberSettingsNode {
         boolean created = true;
         JSONObject json = new JSONObject();
         try {
-            json.put("memberid", mCredentials.getMemberID());
+            json.put("memberid", memberId);
             json.put("values", new JSONObject(updateMap));
             Log.d(TAG, json.toString());
         } catch (JSONException e) {
             Log.e(TAG, "JSON object cannot be created completely");
             created = false;
         }
-
+        Credentials newCredentials = null;
         if (created) {
             new SendPostAsyncTask.Builder(uri.toString(), json)
                     .onCancelled(error -> Log.e(TAG,"Error/Cancelled during SendPostASyncTask: " + error))
@@ -57,8 +58,8 @@ public class MemberSettingsNode {
 
         }
 
-    }
 
+    }
 
 
     private void handleOnPostExecute(String result) {
@@ -78,10 +79,6 @@ public class MemberSettingsNode {
                 Log.d(TAG, "Member Settings Update failed");
                 frag.unSuccessfulUpdateDialog();
             }
-            // a way to refresh the fragment
-            transaction.detach(frag)
-                    .attach(frag)
-                    .commit();
 
         } catch (JSONException e) {
             Log.e(TAG, "JSON on post execute failed");

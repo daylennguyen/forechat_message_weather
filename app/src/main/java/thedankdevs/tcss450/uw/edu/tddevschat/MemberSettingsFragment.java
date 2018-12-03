@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
+
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.MemberSettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 
 import java.util.HashMap;
@@ -43,14 +46,11 @@ public class MemberSettingsFragment extends Fragment {
     private static final String[] KEYS = {"firstname", "lastname", "username", "email", "password"};
     private static final String CHANGE_BTN_TEXT = "Change";
     private static final String UNDO_BTN_TEXT = "Undo";
-    private final int DISABLED_TEXT_COLOR = Color.WHITE;
-    private int ENABLED_TEXT_COLOR;
-    private Drawable ENABLED_ET_COLOR;
-    private Drawable DISABLED_ET_COLOR;
     private final String TAG = getClass().getSimpleName();
     private Credentials mCredentials;
     private OnFragmentInteractionListener mListener;
     private Map<Integer, UpdateValue> mCredentialsMap;
+    private Map<String, String> mUpdateMap;
     private GridLayout mGridLayout;
     private int mEnabledChangeButtons;
     private Button mApplyButton;
@@ -107,14 +107,6 @@ public class MemberSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        // create ContextThemeWrapper from the original Activity Context with the custom theme
-//        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), android.R.style.Theme_Material);
-//
-//        // clone the inflater using the ContextThemeWrapper
-//        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
-
-
-
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_member_settings, container, false);
 
@@ -124,9 +116,6 @@ public class MemberSettingsFragment extends Fragment {
         mConfirmPassword_tv = mView.findViewById(R.id.tv_member_settings_confirmpass);
         mApplyButton = mView.findViewById(R.id.btn_member_settings_apply);
 
-        ENABLED_TEXT_COLOR = getContext().getColor(R.color.colorPrimary);
-        ENABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_enabled);
-        DISABLED_ET_COLOR = getContext().getDrawable(R.drawable.member_settings_btn_disabled);
         Log.d("BRYAN", "my tag: "+ getTag());
         setDefault();
 
@@ -277,7 +266,7 @@ public class MemberSettingsFragment extends Fragment {
             String pass = mPassword_et.getText().toString();
             String confirm_pass = mConfirmPassword_et.getText().toString();
             if (!arePasswordsValid(pass, confirm_pass)) {
-                // do nothing
+                mPassword_et.setError("Passwords do not match!");
                 return;
             }
         }
@@ -415,7 +404,7 @@ public class MemberSettingsFragment extends Fragment {
     }
     private void attachListener() {
 
-        Map<String, String> updateMap = new HashMap<>();
+        mUpdateMap = new HashMap<>();
         for (int i = 0; i < mGridLayout.getChildCount(); i++) {
             View childView = mGridLayout.getChildAt(i);
             if (childView instanceof EditText) {
@@ -423,8 +412,8 @@ public class MemberSettingsFragment extends Fragment {
                 int id = et.getId();
                 if (et.isEnabled() && id != R.id.et_member_settings_confirm_password) {
                     UpdateValue obj = mCredentialsMap.get(id);
-                    updateMap.put(obj.getKey(), et.getText().toString());
-                    Log.d(TAG, "Added object to updateMap: " + obj.getKey() + "=" + et.getText().toString());
+                    mUpdateMap.put(obj.getKey(), et.getText().toString());
+                    Log.d(TAG, "Added object to mUpdateMap: " + obj.getKey() + "=" + et.getText().toString());
 
                 }
 
@@ -432,12 +421,13 @@ public class MemberSettingsFragment extends Fragment {
             }
         }
 
-        if (updateMap.isEmpty()) {
+        if (mUpdateMap.isEmpty()) {
             Log.d(TAG, "Why is my update map empty?");
         }
-        Log.d(TAG, "I'm sending this map: " + updateMap);
-        mListener.onChangeMemberInfo(updateMap);
-        Log.d(TAG, "mListener attached");
+
+        MemberSettingsNode node = new MemberSettingsNode((HomeActivity)getActivity());
+        node.onChangeMemberInfo(mUpdateMap, mCredentials.getMemberID());
+
     }
 
     // dialog boxes for when the update is successful and unsuccessful
@@ -449,15 +439,17 @@ public class MemberSettingsFragment extends Fragment {
         } else {
             builder = new AlertDialog.Builder(context);
         }
-
         builder.setTitle("Succesful Update")
                 .setMessage("Information has been successfully updated")
                 .setNeutralButton("OK",
-                        (DialogInterface dialog, int which) -> { dialog.dismiss(); })
+                        (DialogInterface dialog, int which) ->
+                        {
+                            dialog.dismiss();
+                            Credentials newCredentials = updateCredentials();
+                            mListener.onChangeMemberInfo(newCredentials);
+                        })
                 .setIcon(R.drawable.ic_check_black_24dp)
                 .show();
-
-
     }
     public void unSuccessfulUpdateDialog() {
         Context context = getContext();
@@ -476,6 +468,80 @@ public class MemberSettingsFragment extends Fragment {
                 .show();
 
         setDefault();
+    }
+
+    private Credentials updateCredentials() {
+
+
+        String email = mCredentials.getEmail();
+        String password = mCredentials.getPassword();
+        Set<String> keys = mUpdateMap.keySet();
+
+        Log.d(TAG, "Keys updated: " + keys);
+
+        if (mUpdateMap.containsKey("email")) {
+            email = mUpdateMap.get("email");
+            keys.remove("email");
+        }
+
+        // endpoint doesn't handle this properly yet
+        // server needs to apply hash before updating password in database
+        if (mUpdateMap.containsKey("password")) {
+            password = mUpdateMap.get("password");
+            keys.remove("password");
+        }
+
+
+        Credentials.Builder builder = new Credentials.Builder(email, password);
+        boolean firstnameAdded = false;
+        boolean lastnameAdded = false;
+        boolean usernameAdded = false;
+        for (String key : keys) {
+            String value = mUpdateMap.get(key);
+            switch (key) {
+                case "firstname":
+                    builder.addFirstName(value);
+                    firstnameAdded = true;
+                    break;
+                case "lastname":
+                    builder.addLastName(value);
+                    lastnameAdded = true;
+                    break;
+                case "username":
+                    builder.addUsername(value);
+                    usernameAdded = true;
+                    break;
+                default:
+                    Log.d(TAG, "The key should've been one of the 3. What is this?");
+            }
+        }
+
+        if (!firstnameAdded) {
+            builder.addFirstName(mCredentials.getFirstName());
+        }
+
+        if (!lastnameAdded) {
+            builder.addLastName(mCredentials.getLastName());
+        }
+
+        if (!usernameAdded) {
+            builder.addUsername(mCredentials.getUsername());
+        }
+
+        Credentials newCredentials = builder.build();
+        // credentials object should have a toString() method...
+        Log.d(TAG, "New Credentials");
+        Log.d(TAG, "firstname: " + newCredentials.getFirstName());
+        Log.d(TAG, "lastname: " + newCredentials.getLastName());
+        Log.d(TAG, "email: " + newCredentials.getEmail());
+        Log.d(TAG, "username:  " + newCredentials.getUsername());
+
+        // after all this work to update the Credentials object on the client side
+        // the app might be better off
+        // sending a new request to an endpoint (with the new email and/or password if changed)
+        // and get the new credentials object from that.
+
+        return newCredentials;
     }
 
 
@@ -509,7 +575,7 @@ public class MemberSettingsFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        void onChangeMemberInfo(Map<String, String> info);
+        void onChangeMemberInfo(Credentials credentials);
     }
 
     // helper class for storing the default values
