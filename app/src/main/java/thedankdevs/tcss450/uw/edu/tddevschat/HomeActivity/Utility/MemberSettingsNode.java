@@ -63,13 +63,13 @@ public class MemberSettingsNode {
 
 
     private void handleOnPostExecute(String result) {
+        FragmentManager fm = mMaster.getSupportFragmentManager();
+        MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentByTag("MemberSettingsFragment");
         try {
 
             JSONObject jsonObject = new JSONObject(result);
             boolean success = jsonObject.getBoolean("success");
-            FragmentManager fm = mMaster.getSupportFragmentManager();
-            MemberSettingsFragment frag = (MemberSettingsFragment) fm.findFragmentByTag("MemberSettingsFragment");
-            FragmentTransaction transaction = fm.beginTransaction();
+
 
             if (success) {
                 Log.d(TAG, "Member Settings Update successful");
@@ -82,6 +82,7 @@ public class MemberSettingsNode {
 
         } catch (JSONException e) {
             Log.e(TAG, "JSON on post execute failed");
+            frag.unSuccessfulUpdateDialog();
         }
     }
 

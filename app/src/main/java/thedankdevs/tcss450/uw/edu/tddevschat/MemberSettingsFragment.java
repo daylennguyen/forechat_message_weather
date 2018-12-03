@@ -527,7 +527,7 @@ public class MemberSettingsFragment extends Fragment {
         if (!usernameAdded) {
             builder.addUsername(mCredentials.getUsername());
         }
-
+        builder.addMemberID(mCredentials.getMemberID());
         Credentials newCredentials = builder.build();
         // credentials object should have a toString() method...
         Log.d(TAG, "New Credentials");
