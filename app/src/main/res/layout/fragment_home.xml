@@ -29,105 +29,79 @@
 		app:layout_constraintTop_toTopOf = "parent"
 		app:layout_constraintVertical_bias = "0.53" />
 
-	<android.support.v7.widget.CardView
+	<LinearLayout
 		android:id = "@+id/cardView2"
 		android:layout_width = "0dp"
 		android:layout_height = "wrap_content"
 		android:layout_marginBottom = "25dp"
 		android:padding = "8dp"
-		app:cardBackgroundColor = "@color/common_google_signin_btn_text_light_default"
-		app:contentPadding = "15dp"
+		android:Padding = "15dp"
+		android:background = "@color/common_google_signin_btn_text_light_default"
 		app:layout_constraintBottom_toBottomOf = "parent"
 		app:layout_constraintEnd_toEndOf = "parent"
 		app:layout_constraintHorizontal_bias = "0.5"
+		android:orientation = "vertical"
 		app:layout_constraintStart_toStartOf = "parent">
 
-		<LinearLayout
+		<TextView
+			android:id = "@+id/city_state_home"
 			android:layout_width = "match_parent"
-			android:layout_height = "match_parent"
-			android:orientation = "vertical">
+			android:layout_height = "wrap_content"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/in_tacoma_wa_you_can_expect"
+			android:textAlignment = "center"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "18sp" />
 
-			<LinearLayout
-				android:layout_width = "match_parent"
-				android:layout_height = "match_parent"
-				android:orientation = "horizontal">
+		<TextView
+			android:id = "@+id/forecast_home"
+			android:layout_width = "match_parent"
+			android:layout_height = "wrap_content"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/broken_clouds"
+			android:textAlignment = "center"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "30sp" />
 
-				<TextView
-					android:id = "@+id/city_state_home"
-					android:layout_width = "match_parent"
-					android:layout_height = "wrap_content"
-					android:fontFamily = "@font/roboto"
-					android:text = "@string/in_tacoma_wa_you_can_expect"
-					android:textAlignment = "center"
-					android:textColor = "@color/colorWhite"
-					android:textSize = "18sp" />
+		<TextView
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/with_a_high_of"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "18sp" />
 
-			</LinearLayout>
+		<TextView
+			android:id = "@+id/high_temp_home"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:layout_weight = "1"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/_69_f"
+			android:textAlignment = "center"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "30sp" />
 
-			<TextView
-				android:id = "@+id/forecast_home"
-				android:layout_width = "match_parent"
-				android:layout_height = "wrap_content"
-				android:fontFamily = "@font/roboto"
-				android:text = "@string/broken_clouds"
-				android:textAlignment = "center"
-				android:textColor = "@color/colorWhite"
-				android:textSize = "30sp" />
+		<TextView
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/and_a_low_of"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "18sp" />
 
-			<LinearLayout
-				android:layout_width = "match_parent"
-				android:layout_height = "match_parent"
-				android:orientation = "horizontal">
+		<TextView
+			android:id = "@+id/low_temp_home"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:layout_weight = "1"
+			android:fontFamily = "@font/roboto"
+			android:text = "@string/_69_f"
+			android:textAlignment = "center"
+			android:textColor = "@color/colorWhite"
+			android:textSize = "30sp" />
 
-				<TextView
-					android:layout_width = "wrap_content"
-					android:layout_height = "wrap_content"
-					android:fontFamily = "@font/roboto"
-					android:text = "@string/with_a_high_of"
-					android:textColor = "@color/colorWhite"
-					android:textSize = "18sp" />
+	</LinearLayout>
 
-				<TextView
-					android:id = "@+id/high_temp_home"
-					android:layout_width = "0dp"
-					android:layout_height = "wrap_content"
-					android:layout_weight = "1"
-					android:fontFamily = "@font/roboto"
-					android:text = "@string/_69_f"
-					android:textAlignment = "center"
-					android:textColor = "@color/colorWhite"
-					android:textSize = "30sp" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width = "match_parent"
-				android:layout_height = "match_parent"
-				android:orientation = "horizontal">
-
-				<TextView
-					android:layout_width = "wrap_content"
-					android:layout_height = "wrap_content"
-					android:fontFamily = "@font/roboto"
-					android:text = "@string/and_a_low_of"
-					android:textColor = "@color/colorWhite"
-					android:textSize = "18sp" />
-
-				<TextView
-					android:id = "@+id/low_temp_home"
-					android:layout_width = "0dp"
-					android:layout_height = "wrap_content"
-					android:layout_weight = "1"
-					android:fontFamily = "@font/roboto"
-					android:text = "@string/_69_f"
-					android:textAlignment = "center"
-					android:textColor = "@color/colorWhite"
-					android:textSize = "30sp" />
-
-			</LinearLayout>
-
-		</LinearLayout>
-
-	</android.support.v7.widget.CardView>
 
 </android.support.constraint.ConstraintLayout>
