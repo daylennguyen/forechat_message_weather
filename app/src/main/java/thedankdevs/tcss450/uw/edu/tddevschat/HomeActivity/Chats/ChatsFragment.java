@@ -29,7 +29,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_CHATS_LIST = "chats list";
     MyChatsRecyclerViewAdapter adapter;
     private ArrayList<Chat>                        mChats;
-    private int mColumnCount = 1;
+    private int                                    mColumnCount = 1;
     private OnChatsListFragmentInteractionListener mListener;
 
     /**
