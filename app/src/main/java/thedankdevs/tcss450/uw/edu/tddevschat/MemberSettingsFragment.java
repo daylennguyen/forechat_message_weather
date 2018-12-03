@@ -278,6 +278,7 @@ public class MemberSettingsFragment extends Fragment {
             String confirm_pass = mConfirmPassword_et.getText().toString();
             if (!arePasswordsValid(pass, confirm_pass)) {
                 // do nothing
+                mPassword_et.setError("Passwords do not match!");
                 return;
             }
         }

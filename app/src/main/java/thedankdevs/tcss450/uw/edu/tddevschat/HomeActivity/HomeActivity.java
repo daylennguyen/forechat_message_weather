@@ -169,6 +169,7 @@ public class HomeActivity extends AppCompatActivity
         mMemberSettingsNode = new MemberSettingsNode( this, mCredential );
     }
 
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -301,6 +302,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_member_settings:
+                setTitle( "Change Personal Information" );
                 fragment = new MemberSettingsFragment();
                 args.putSerializable( getString( R.string.nav_membersettings ), mCredential );
                 fragment.setArguments( args );
@@ -428,6 +430,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChatsListFragmentLongInteraction( Chat item ) {
         mChatNode.onChatsListFragmentLongInteraction( item );
+    }
+
+    public void onMemberUpdate( Credentials newCredentials ) {
+        mCredential = newCredentials;
+        initializeNodes();
     }
 
 
