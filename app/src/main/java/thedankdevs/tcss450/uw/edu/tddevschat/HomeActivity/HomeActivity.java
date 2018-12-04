@@ -119,29 +119,40 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
+        Log.d("Debug Bryan", "onCreate initialized");
         super.onCreate( savedInstanceState );
 
+        Log.d("Debug Bryan", "creating theme");
         ThemeUtils.onActivityCreateTheme( this );
 
+        Log.d("Debug Bryan", "theme created");
         setContentView( R.layout.activity_home );
+        Log.d("Debug Bryan", "content view set");
         setTitle( "Main Page" );
-        findViewById( R.id.nav_view );
+
         /*Check for saved-sign-in info*/
+        Log.d("Debug Bryan", "getting credentials");
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
+        Log.d("Debug Bryan", "Credentials: " + mCredential);
 
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
 
+        Log.d("Debug Bryan", "initializing Nodes");
         initializeNodes();
-
+        Log.d("Debug Bryan", "nodes initialized");
         /*insert option items into the tool bar and initialize the drawer*/
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
+
+        Log.d("Debug Bryan", "initializing drawer");
         initializeActionDrawerToggle( drawer, toolbar );
+        Log.d("Debug Bryan", "drawer initialized, starting location updates");
 
         mLocationNode.startLocationUpdates();
+        Log.d("Debug Bryan", "location updates successful");
 
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -154,6 +165,7 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
+
                 // add homeFragment to back stack
                 mHome = new HomeFragment();
                 fm.beginTransaction().add( R.id.frame_home_container, mHome ).addToBackStack( null ).commit();
@@ -161,6 +173,7 @@ public class HomeActivity extends AppCompatActivity
                 Log.d( "TESTING DAYLEN", String.format( "high = %s | low = %s | cs = %s", high, low, city_state ) );
             }
         }
+    }
 
 
         if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
@@ -177,7 +190,7 @@ public class HomeActivity extends AppCompatActivity
             frag.setArguments( args );
             loadFragmentWithoutBackStack( frag );
         }
-
+        Log.d("Debug Bryan", "onCreate done");
     }
 
     @Override
@@ -419,7 +432,7 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     /*Helper method to load an instance of the given fragment into the current activity*/
@@ -429,6 +442,7 @@ public class HomeActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
+                //.addToBackStack(null);
 
 
         if ( fm.getBackStackEntryCount() < 1 ) {
@@ -438,7 +452,7 @@ public class HomeActivity extends AppCompatActivity
 
         // Commit the transaction
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     @Override
@@ -449,12 +463,17 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChangeMemberInfo( Credentials credentials ) {
         mCredential = credentials;
+        Log.d("Debug Bryan", "creating new intent");
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
         intent.putExtra( getString( R.string.reload_member_settings ), true );
-        finish();
+        Log.d("Debug Bryan", "intent created");
+        Log.d("Debug Bryan", "starting new activity");
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+        Log.d("Debug Bryan", "started new home activity");
+        finish();
+        Log.d("Debug Bryan", "ended old home activity");
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
 
@@ -574,7 +593,7 @@ public class HomeActivity extends AppCompatActivity
         intent.putExtra( getString( R.string.reload_themes ), true );
         finish();
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
 
     }
 
@@ -766,6 +785,9 @@ public class HomeActivity extends AppCompatActivity
             SharedPreferences prefs = mMaster.getSharedPreferences( mMaster.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
+            prefs.edit().putBoolean(( getString( R.string.reload_member_settings )), false );
+            prefs.edit().putBoolean( getString( R.string.reload_themes ), false );
+//            prefs.edit().putBoolean()
             try {
                 //this call must be done asynchronously.
                 FirebaseInstanceId.getInstance().deleteInstanceId();
@@ -774,6 +796,9 @@ public class HomeActivity extends AppCompatActivity
                 Log.e( "FCM", "Delete error!" );
                 e.printStackTrace();
 
+            } catch (Exception e) {
+                Log.e("ERROR", "MAJOR ERROR");
+                e.printStackTrace();
             }
             return null;
         }

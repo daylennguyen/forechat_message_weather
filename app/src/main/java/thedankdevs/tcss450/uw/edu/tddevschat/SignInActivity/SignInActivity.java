@@ -142,7 +142,7 @@ public class SignInActivity extends AppCompatActivity
                 .beginTransaction()
                 .add( R.id.frame_signin_container, new WaitFragment(), "WAIT" )
                 .addToBackStack( null )
-                .commitAllowingStateLoss();
+                .commit();
     }
 
     /**
@@ -160,6 +160,7 @@ public class SignInActivity extends AppCompatActivity
         Intent intent = new Intent( this, HomeActivity.class );
         //Send credential to next activity
         intent.putExtra( getString( R.string.key_credential ), credentials );
+        Log.d("Debug Bryan", "SignInActivity credentials intent: " + credentials);
 
         //Send whether if we're opening from notification.
         intent.putExtra( getString( R.string.keys_intent_notification_msg ), mLoadFromChatNotification );
@@ -173,8 +174,10 @@ public class SignInActivity extends AppCompatActivity
                     getString( R.string.notification_accepted ));
         }
         startActivity( intent );
+        Log.d("Debug Bryan", "SignInActivity started HomeActivity");
         //End this Activity and remove it from the Activity back stack.
         finish();
+        Log.d("Debug Bryan", "SignIn activity is finished");
     }
 
     /**

@@ -3,6 +3,7 @@ package thedankdevs.tcss450.uw.edu.tddevschat;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -516,6 +517,11 @@ public class MemberSettingsFragment extends Fragment {
         Log.d(TAG, "lastname: " + newCredentials.getLastName());
         Log.d(TAG, "email: " + newCredentials.getEmail());
         Log.d(TAG, "username:  " + newCredentials.getUsername());
+
+        HomeActivity activity = (HomeActivity) getActivity();
+        SharedPreferences prefs = activity.getSharedPreferences( activity.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_password ), newCredentials.getPassword()).commit();
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_email ), newCredentials.getEmail() ).commit();
 
         // after all this work to update the Credentials object on the client side
         // the app might be better off
