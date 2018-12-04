@@ -42,7 +42,6 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -90,8 +89,8 @@ public class HomeActivity extends AppCompatActivity
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer>      notifiedChats = new ArrayList<>();
     private SharedPreferences       myLocationPref, myMetricPref;
-    /*Used to mToggle the opened/closed state of the nav drawer*/
-    private ActionBarDrawerToggle mToggle;
+    /*Used to toggle the opened/closed state of the nav drawer*/
+    private ActionBarDrawerToggle toggle;
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -111,21 +110,40 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
-
+        Log.d("Debug Bryan", "onCreate initialized");
         super.onCreate( savedInstanceState );
 
+        Log.d("Debug Bryan", "creating theme");
         ThemeUtils.onActivityCreateTheme( this );
 
+        Log.d("Debug Bryan", "theme created");
         setContentView( R.layout.activity_home );
+        Log.d("Debug Bryan", "content view set");
         setTitle( "Main Page" );
 
         /*Check for saved-sign-in info*/
+        Log.d("Debug Bryan", "getting credentials");
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
+        Log.d("Debug Bryan", "Credentials: " + mCredential);
 
-        /* Intent coming from when member settings are changed and HomeActivity is restarted. */
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
+
+        Log.d("Debug Bryan", "initializing Nodes");
+        initializeNodes();
+        Log.d("Debug Bryan", "nodes initialized");
+        /*insert option items into the tool bar and initialize the drawer*/
+        Toolbar toolbar = findViewById( R.id.toolbar );
+        setSupportActionBar( toolbar );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
+
+        Log.d("Debug Bryan", "initializing drawer");
+        initializeActionDrawerToggle( drawer, toolbar );
+        Log.d("Debug Bryan", "drawer initialized, starting location updates");
+
+        mLocationNode.startLocationUpdates();
+        Log.d("Debug Bryan", "location updates successful");
 
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -138,19 +156,11 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
-                // add homeFragment to back stack
-                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() )
-                        .addToBackStack( null ).commit();
-            }
+            // add homeFragment to back stack
+            fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
+
         }
-
-        /* initialize utility nodes */
-        initializeNodes();
-
-        /* initialize drawer and toolbar */
-        initializeActionDrawerToggle();
-
-        mLocationNode.startLocationUpdates();
+    }
 
         if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
             setTitle( getString( R.string.theme_title ) );
@@ -170,18 +180,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
-    private void initializeActionDrawerToggle( ) {
+    private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
 
         Log.d( "BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername() );
 
-        /*insert option items into the tool bar and initialize the drawer*/
-        Toolbar toolbar = findViewById( R.id.toolbar );
-        setSupportActionBar( toolbar );
-        DrawerLayout drawer = findViewById( R.id.drawer_layout );
-
-        mToggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
-        drawer.addDrawerListener(mToggle);
-        mToggle.syncState();
+        toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
+        drawer.addDrawerListener( toggle );
+        toggle.syncState();
         NavigationView navigationView = findViewById( R.id.nav_view );
         View           hView          = navigationView.getHeaderView( 0 );
         navigationView.setNavigationItemSelectedListener( this );
@@ -192,6 +197,13 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    private void reinitializeNavigationDrawer() {
+        NavigationView navigationView = findViewById( R.id.nav_view );
+        View           hView          = navigationView.getHeaderView( 0 );
+        navigationView.setNavigationItemSelectedListener( this );
+        TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
+        nav_user.setText( mCredential.getUsername() ); //Set the header username.
+    }
 
     /*Helper class to create node objects*/
     private void initializeNodes() {
@@ -220,7 +232,7 @@ public class HomeActivity extends AppCompatActivity
             if ( currentFragment instanceof ChatFragment ) {
                 mChatNode.loadAllChats();
             } else {
-                /* pop backstack except for one: HomeFragment should remain */
+
                 int i = 1;
                 while ( i < backstackCount ) {
                     getSupportFragmentManager().popBackStackImmediate();
@@ -344,7 +356,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_connectionRequests:
                 mConnectionsNode.loadRequests();
                 break;
-            case R.id.nav_switch_item:
+            case R.id.nav_theme:
                 setTitle( getString( R.string.theme_title ) );
                 fragment = new ThemesFragment();
                 break;
@@ -389,15 +401,13 @@ public class HomeActivity extends AppCompatActivity
         new DeleteTokenAsyncTask( this ).execute();
     }
 
-    /*Helper method to load an instance of the given fragment into the current activity
-    * that adds the Fragment Transaction onto the backstack
-    * */
+    /*Helper method to load an instance of the given fragment into the current activity*/
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() )
                 .addToBackStack( null );
-
+        // Commit the transaction
         transaction.commit();
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
@@ -409,13 +419,17 @@ public class HomeActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
+                //.addToBackStack(null);
 
-        /* ensures that HomeActivity doesn't exit unless it's displaying HomeFragment */
+
         if ( fm.getBackStackEntryCount() < 1 ) {
             transaction.addToBackStack( null );
         }
 
+
+        // Commit the transaction
         transaction.commit();
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     @Override
@@ -426,12 +440,16 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChangeMemberInfo( Credentials credentials ) {
         mCredential = credentials;
+        Log.d("Debug Bryan", "creating new intent");
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
         intent.putExtra( getString( R.string.reload_member_settings ), true );
+        Log.d("Debug Bryan", "intent created");
+        Log.d("Debug Bryan", "starting new activity");
         startActivity( intent );
+        Log.d("Debug Bryan", "started new home activity");
         finish();
-
+        Log.d("Debug Bryan", "ended old home activity");
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
@@ -521,8 +539,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     public void notifyUI( int colorOfText, int colorOfBurger ) {
-        mToggle.getDrawerArrowDrawable().setColor( colorOfBurger );
-        mToggle.syncState();
+        toggle.getDrawerArrowDrawable().setColor( colorOfBurger );
+        toggle.syncState();
         NavigationView  navigationView = findViewById( R.id.nav_view );
         Menu            m              = navigationView.getMenu();
         MenuItem        menuItem       = m.findItem( R.id.nav_chat );
@@ -717,11 +735,8 @@ public class HomeActivity extends AppCompatActivity
         @Override
         protected void onPostExecute( Void aVoid ) {
             super.onPostExecute( aVoid );
-
-            /* Start SignInActivity after user logs out gracefully */
-            Intent intent = new Intent(mMaster, SignInActivity.class);
-            mMaster.startActivity(intent);
-            mMaster.finish();
+            //close the app
+            mMaster.finishAndRemoveTask();
         }
     }
 

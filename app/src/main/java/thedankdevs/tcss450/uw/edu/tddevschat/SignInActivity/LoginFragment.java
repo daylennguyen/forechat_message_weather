@@ -518,9 +518,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mListener.onWaitFragmentInteractionHide();
             ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Verification couldn't be sent" );
-        } catch ( Exception e) {
-            Log.d(getClass().getSimpleName(), "Unknown exception: " + e);
-            e.printStackTrace();
         }
     }
 
