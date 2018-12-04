@@ -7,40 +7,40 @@
     android:theme = "@style/ThemeOverlay.AppCompat.Dark">
 
     <LinearLayout
-        android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
-        android:background = "@color/colorLightPurple"
-        android:gravity = "bottom"
-        android:orientation = "vertical"
-        android:paddingLeft = "25dp"
-        android:paddingRight = "25dp"
-        android:paddingBottom = "10dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorPrimaryDark"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:paddingBottom="10dp">
 
         <ImageView
-            android:id = "@+id/imageView"
-            android:layout_width = "70dp"
-            android:layout_height = "70dp"
-            android:background = "@drawable/circle"
-            android:contentDescription = "@string/nav_header_desc"
-            android:elevation = "14dp"
-            android:foreground = "@drawable/c02d"
-            android:foregroundGravity = "center|fill"
-            android:paddingTop = "@dimen/nav_header_vertical_spacing"
-            android:scaleType = "centerInside"
-            app:srcCompat = "@drawable/c02d" />
+            android:id="@+id/imageView"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/circle"
+            android:contentDescription="@string/nav_header_desc"
+            android:elevation="14dp"
+            android:foreground="@drawable/c02d"
+            android:foregroundGravity="center|fill"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/c02d" />
 
         <TextView
-            android:id = "@+id/tv_drawerheader_username"
-            android:layout_width = "match_parent"
-            android:layout_height = "wrap_content"
-            android:text = "@string/username"
-            android:textAlignment = "textStart"
-            android:textAllCaps = "false"
-            android:textAppearance = "@style/TextAppearance.AppCompat.Headline"
-            android:textColor = "@android:color/white"
-            android:textSize = "18sp"
-            android:textStyle = "bold"
-            android:typeface = "normal" />
+            android:id="@+id/tv_drawerheader_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/username"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="normal" />
     </LinearLayout>
 
 </FrameLayout>

@@ -33,13 +33,14 @@
 		android:id = "@+id/cardView2"
 		android:layout_width = "0dp"
 		android:layout_height = "wrap_content"
+		android:layout_marginStart = "24dp"
+		android:layout_marginEnd = "24dp"
 		android:layout_marginBottom = "25dp"
+		android:orientation = "vertical"
 		android:padding = "8dp"
-		android:background = "@color/common_google_signin_btn_text_light_default"
 		app:layout_constraintBottom_toBottomOf = "parent"
 		app:layout_constraintEnd_toEndOf = "parent"
 		app:layout_constraintHorizontal_bias = "0.5"
-		android:orientation = "vertical"
 		app:layout_constraintStart_toStartOf = "parent">
 		<!--android:Padding = "15dp"-->
 
@@ -48,10 +49,9 @@
 			android:layout_width = "match_parent"
 			android:layout_height = "wrap_content"
 			android:fontFamily = "@font/roboto"
-			android:text = "@string/in_tacoma_wa_you_can_expect"
 			android:textAlignment = "center"
-			android:textColor = "@color/colorWhite"
-			android:textSize = "18sp" />
+			android:textColor = "@color/colorDarkPurple"
+			android:textSize = "24sp" />
 
 		<TextView
 			android:id = "@+id/forecast_home"
@@ -60,7 +60,7 @@
 			android:fontFamily = "@font/roboto"
 			android:text = "@string/broken_clouds"
 			android:textAlignment = "center"
-			android:textColor = "@color/colorWhite"
+			android:textColor = "@color/colorDarkPurple"
 			android:textSize = "30sp" />
 
 		<TextView
@@ -68,18 +68,17 @@
 			android:layout_height = "wrap_content"
 			android:fontFamily = "@font/roboto"
 			android:text = "@string/with_a_high_of"
-			android:textColor = "@color/colorWhite"
+			android:textColor = "@color/colorDarkPurple"
 			android:textSize = "18sp" />
 
 		<TextView
 			android:id = "@+id/high_temp_home"
-			android:layout_width = "wrap_content"
+			android:layout_width = "match_parent"
 			android:layout_height = "wrap_content"
 			android:layout_weight = "1"
 			android:fontFamily = "@font/roboto"
-			android:text = "@string/_69_f"
 			android:textAlignment = "center"
-			android:textColor = "@color/colorWhite"
+			android:textColor = "@color/colorDarkPurple"
 			android:textSize = "30sp" />
 
 		<TextView
@@ -87,18 +86,17 @@
 			android:layout_height = "wrap_content"
 			android:fontFamily = "@font/roboto"
 			android:text = "@string/and_a_low_of"
-			android:textColor = "@color/colorWhite"
+			android:textColor = "@color/colorDarkPurple"
 			android:textSize = "18sp" />
 
 		<TextView
 			android:id = "@+id/low_temp_home"
-			android:layout_width = "wrap_content"
+			android:layout_width = "match_parent"
 			android:layout_height = "wrap_content"
 			android:layout_weight = "1"
 			android:fontFamily = "@font/roboto"
-			android:text = "@string/_69_f"
 			android:textAlignment = "center"
-			android:textColor = "@color/colorWhite"
+			android:textColor = "@color/colorDarkPurple"
 			android:textSize = "30sp" />
 
 	</LinearLayout>
