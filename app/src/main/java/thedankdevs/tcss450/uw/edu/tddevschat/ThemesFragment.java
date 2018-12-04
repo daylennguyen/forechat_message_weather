@@ -41,7 +41,7 @@ public class ThemesFragment extends Fragment {
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
         View   v          = inflater.inflate( R.layout.fragment_themes, container, false );
-        Switch switchView = v.findViewById( R.id.switch_theme );
+        Switch switchView = v.findViewById( R.id.switch_view_theme );
         switchView.setOnClickListener( view -> onSwitch( switchView ) );
         String theme = mSharedPref.getString( getString( R.string.current_theme ), ThemeUtils.THEME_CLASSIC );
         assert theme != null;
@@ -55,7 +55,7 @@ public class ThemesFragment extends Fragment {
     }
 
     public void onSwitch( View v ) {
-        Log.d( TAG, "I hit the switch" );
+
         Switch switchView = ( Switch ) v;
         String theme      = ThemeUtils.THEME_CLASSIC;
         if ( switchView.isChecked() ) {

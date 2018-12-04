@@ -6,7 +6,7 @@
     tools:context=".ThemesFragment">
 
     <Switch
-        android:id="@+id/switch_theme"
+        android:id="@+id/switch_view_theme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

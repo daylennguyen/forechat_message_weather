@@ -42,6 +42,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -89,8 +90,8 @@ public class HomeActivity extends AppCompatActivity
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer>      notifiedChats = new ArrayList<>();
     private SharedPreferences       myLocationPref, myMetricPref;
-    /*Used to toggle the opened/closed state of the nav drawer*/
-    private ActionBarDrawerToggle toggle;
+    /*Used to mToggle the opened/closed state of the nav drawer*/
+    private ActionBarDrawerToggle mToggle;
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -110,30 +111,21 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
+
         super.onCreate( savedInstanceState );
 
         ThemeUtils.onActivityCreateTheme( this );
 
         setContentView( R.layout.activity_home );
         setTitle( "Main Page" );
-        findViewById( R.id.nav_view );
 
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
 
+        /* Intent coming from when member settings are changed and HomeActivity is restarted. */
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
-
-        initializeNodes();
-
-        /*insert option items into the tool bar and initialize the drawer*/
-        Toolbar toolbar = findViewById( R.id.toolbar );
-        setSupportActionBar( toolbar );
-        DrawerLayout drawer = findViewById( R.id.drawer_layout );
-        initializeActionDrawerToggle( drawer, toolbar );
-
-        mLocationNode.startLocationUpdates();
 
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -147,10 +139,18 @@ public class HomeActivity extends AppCompatActivity
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
                 // add homeFragment to back stack
-                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
-
+                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() )
+                        .addToBackStack( null ).commit();
             }
         }
+
+        /* initialize utility nodes */
+        initializeNodes();
+
+        /* initialize drawer and toolbar */
+        initializeActionDrawerToggle();
+
+        mLocationNode.startLocationUpdates();
 
         if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
             setTitle( getString( R.string.theme_title ) );
@@ -166,17 +166,22 @@ public class HomeActivity extends AppCompatActivity
             frag.setArguments( args );
             loadFragmentWithoutBackStack( frag );
         }
-
+        Log.d("Debug Bryan", "onCreate done");
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
-    private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
+    private void initializeActionDrawerToggle( ) {
 
         Log.d( "BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername() );
 
-        toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
-        drawer.addDrawerListener( toggle );
-        toggle.syncState();
+        /*insert option items into the tool bar and initialize the drawer*/
+        Toolbar toolbar = findViewById( R.id.toolbar );
+        setSupportActionBar( toolbar );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
+
+        mToggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
+        drawer.addDrawerListener(mToggle);
+        mToggle.syncState();
         NavigationView navigationView = findViewById( R.id.nav_view );
         View           hView          = navigationView.getHeaderView( 0 );
         navigationView.setNavigationItemSelectedListener( this );
@@ -187,13 +192,6 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    private void reinitializeNavigationDrawer() {
-        NavigationView navigationView = findViewById( R.id.nav_view );
-        View           hView          = navigationView.getHeaderView( 0 );
-        navigationView.setNavigationItemSelectedListener( this );
-        TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
-        nav_user.setText( mCredential.getUsername() ); //Set the header username.
-    }
 
     /*Helper class to create node objects*/
     private void initializeNodes() {
@@ -222,7 +220,7 @@ public class HomeActivity extends AppCompatActivity
             if ( currentFragment instanceof ChatFragment ) {
                 mChatNode.loadAllChats();
             } else {
-
+                /* pop backstack except for one: HomeFragment should remain */
                 int i = 1;
                 while ( i < backstackCount ) {
                     getSupportFragmentManager().popBackStackImmediate();
@@ -346,7 +344,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_connectionRequests:
                 mConnectionsNode.loadRequests();
                 break;
-            case R.id.nav_theme:
+            case R.id.nav_switch_item:
                 setTitle( getString( R.string.theme_title ) );
                 fragment = new ThemesFragment();
                 break;
@@ -391,15 +389,17 @@ public class HomeActivity extends AppCompatActivity
         new DeleteTokenAsyncTask( this ).execute();
     }
 
-    /*Helper method to load an instance of the given fragment into the current activity*/
+    /*Helper method to load an instance of the given fragment into the current activity
+    * that adds the Fragment Transaction onto the backstack
+    * */
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() )
                 .addToBackStack( null );
-        // Commit the transaction
+
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     /*Helper method to load an instance of the given fragment into the current activity*/
@@ -410,15 +410,12 @@ public class HomeActivity extends AppCompatActivity
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
 
-
+        /* ensures that HomeActivity doesn't exit unless it's displaying HomeFragment */
         if ( fm.getBackStackEntryCount() < 1 ) {
             transaction.addToBackStack( null );
         }
 
-
-        // Commit the transaction
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     @Override
@@ -432,9 +429,10 @@ public class HomeActivity extends AppCompatActivity
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
         intent.putExtra( getString( R.string.reload_member_settings ), true );
-        finish();
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+        finish();
+
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
 
@@ -523,8 +521,8 @@ public class HomeActivity extends AppCompatActivity
 
 
     public void notifyUI( int colorOfText, int colorOfBurger ) {
-        toggle.getDrawerArrowDrawable().setColor( colorOfBurger );
-        toggle.syncState();
+        mToggle.getDrawerArrowDrawable().setColor( colorOfBurger );
+        mToggle.syncState();
         NavigationView  navigationView = findViewById( R.id.nav_view );
         Menu            m              = navigationView.getMenu();
         MenuItem        menuItem       = m.findItem( R.id.nav_chat );
@@ -554,7 +552,7 @@ public class HomeActivity extends AppCompatActivity
         intent.putExtra( getString( R.string.reload_themes ), true );
         finish();
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
 
     }
 
@@ -692,6 +690,9 @@ public class HomeActivity extends AppCompatActivity
             SharedPreferences prefs = mMaster.getSharedPreferences( mMaster.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
+            prefs.edit().putBoolean(( getString( R.string.reload_member_settings )), false );
+            prefs.edit().putBoolean( getString( R.string.reload_themes ), false );
+//            prefs.edit().putBoolean()
             try {
                 //this call must be done asynchronously.
                 FirebaseInstanceId.getInstance().deleteInstanceId();
@@ -700,6 +701,9 @@ public class HomeActivity extends AppCompatActivity
                 Log.e( "FCM", "Delete error!" );
                 e.printStackTrace();
 
+            } catch (Exception e) {
+                Log.e("ERROR", "MAJOR ERROR");
+                e.printStackTrace();
             }
             return null;
         }
@@ -713,8 +717,11 @@ public class HomeActivity extends AppCompatActivity
         @Override
         protected void onPostExecute( Void aVoid ) {
             super.onPostExecute( aVoid );
-            //close the app
-            mMaster.finishAndRemoveTask();
+
+            /* Start SignInActivity after user logs out gracefully */
+            Intent intent = new Intent(mMaster, SignInActivity.class);
+            mMaster.startActivity(intent);
+            mMaster.finish();
         }
     }
 

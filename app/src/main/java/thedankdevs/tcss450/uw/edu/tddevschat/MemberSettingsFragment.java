@@ -3,13 +3,12 @@ package thedankdevs.tcss450.uw.edu.tddevschat;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.text.method.HideReturnsTransformationMethod;
+
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,8 +38,8 @@ import java.util.Set;
  * create an instance of this fragment.
  */
 public class MemberSettingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+
     private static final String ARG_MEMBER_SETTINGS = "member_settings";
     private static final String[] KEYS = {"firstname", "lastname", "username", "email", "password"};
     private static final String CHANGE_BTN_TEXT = "Change";
@@ -115,7 +114,6 @@ public class MemberSettingsFragment extends Fragment {
         mConfirmPassword_tv = mView.findViewById(R.id.tv_member_settings_confirmpass);
         mApplyButton = mView.findViewById(R.id.btn_member_settings_apply);
 
-        Log.d("BRYAN", "my tag: "+ getTag());
         setDefault();
 
         return mView;
@@ -126,15 +124,12 @@ public class MemberSettingsFragment extends Fragment {
     private void setDefault() {
         Context context = getContext();
         mEnabledChangeButtons = 0;
-//        displayETIds();
         for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
             View childView = mGridLayout.getChildAt( i );
             int  id        = childView.getId();
             if ( childView instanceof EditText ) {
                 EditText et = ( EditText ) childView;
                 if ( id == R.id.et_member_settings_confirm_password ) {
-//                    et.setBackground(ENABLED_ET_COLOR);
-//                    et.setTextColor(ENABLED_TEXT_COLOR);
                     et.setVisibility( View.GONE );
                     mConfirmPassword_tv.setVisibility( View.GONE );
                     continue;
@@ -146,8 +141,6 @@ public class MemberSettingsFragment extends Fragment {
                     value = updateValue.getValue();
                 }
                 et.setText( value );
-//                et.setBackground(DISABLED_ET_COLOR);
-//                et.setTextColor(DISABLED_TEXT_COLOR);
                 et.setEnabled( false );
 
             } else if ( childView instanceof Button ) {
@@ -167,6 +160,7 @@ public class MemberSettingsFragment extends Fragment {
 
         }
         mPassword_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
+        mConfirmPassword_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
 
     }
 
@@ -189,7 +183,6 @@ public class MemberSettingsFragment extends Fragment {
 //                et = mView.findViewById(R.id.et_member_settings_email);
 //                break;
             case R.id.btn_member_settings_password:
-                Log.d( TAG, "I am password button" );
                 et = mView.findViewById( R.id.et_member_settings_password );
                 break;
             default:
@@ -234,10 +227,8 @@ public class MemberSettingsFragment extends Fragment {
         int id = et.getId();
         if ( id != R.id.et_member_settings_password ) {
             flipTextFields( et, btnClicked );
-            Log.d( TAG, "I flipped non-password fields" );
         } else {
             flipPasswordFields( mPassword_et, mConfirmPassword_et, btnClicked );
-            Log.d( TAG, "I flipped password fields" );
         }
 
         // check apply button state
@@ -286,15 +277,11 @@ public class MemberSettingsFragment extends Fragment {
         int key = et.getId();
         if ( !et.isEnabled() ) {
             et.setEnabled( true );
-//            et.setBackground(ENABLED_ET_COLOR);
-//            et.setTextColor(ENABLED_TEXT_COLOR);
             btn.setText( UNDO_BTN_TEXT );
             mEnabledChangeButtons += 1;
         } else {
             et.setEnabled( false );
             et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
-//            et.setBackground(DISABLED_ET_COLOR);
-//            et.setTextColor(DISABLED_TEXT_COLOR);
             btn.setText( CHANGE_BTN_TEXT );
             mEnabledChangeButtons -= 1;
         }
@@ -308,25 +295,21 @@ public class MemberSettingsFragment extends Fragment {
         if ( !pass_et.isEnabled() ) {
             Log.d( TAG, "I am enabling et" );
             pass_et.setEnabled( true );
-//            pass_et.setBackground(ENABLED_ET_COLOR);
-//            pass_et.setTextColor(ENABLED_TEXT_COLOR);
             confirmpass_et.setVisibility( View.VISIBLE );
             mConfirmPassword_tv.setVisibility( View.VISIBLE );
             btn.setText( UNDO_BTN_TEXT );
 
-            pass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
-            confirmpass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
+            //pass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
+            //confirmpass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
             mEnabledChangeButtons += 1;
         } else {
             Log.e( TAG, "I am disabling et" );
             pass_et.setEnabled( false );
             pass_et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
-//            pass_et.setBackground(DISABLED_ET_COLOR);
-//            pass_et.setTextColor(DISABLED_TEXT_COLOR);
             confirmpass_et.setVisibility( View.GONE );
             mConfirmPassword_tv.setVisibility( View.GONE );
             btn.setText( CHANGE_BTN_TEXT );
-            pass_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
+            //pass_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
             mEnabledChangeButtons -= 1;
         }
 
@@ -465,8 +448,6 @@ public class MemberSettingsFragment extends Fragment {
             keys.remove("email");
         }
 
-        // endpoint doesn't handle this properly yet
-        // server needs to apply hash before updating password in database
         if (mUpdateMap.containsKey("password")) {
             password = mUpdateMap.get("password");
             keys.remove("password");
@@ -510,17 +491,13 @@ public class MemberSettingsFragment extends Fragment {
         }
         builder.addMemberID(mCredentials.getMemberID());
         Credentials newCredentials = builder.build();
-        // credentials object should have a toString() method...
-        Log.d(TAG, "New Credentials");
-        Log.d(TAG, "firstname: " + newCredentials.getFirstName());
-        Log.d(TAG, "lastname: " + newCredentials.getLastName());
-        Log.d(TAG, "email: " + newCredentials.getEmail());
-        Log.d(TAG, "username:  " + newCredentials.getUsername());
 
-        // after all this work to update the Credentials object on the client side
-        // the app might be better off
-        // sending a new request to an endpoint (with the new email and/or password if changed)
-        // and get the new credentials object from that.
+        Log.d(TAG, "newCredentials: " + newCredentials);
+
+        HomeActivity activity = (HomeActivity) getActivity();
+        SharedPreferences prefs = activity.getSharedPreferences( activity.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_password ), newCredentials.getPassword()).commit();
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_email ), newCredentials.getEmail() ).commit();
 
         return newCredentials;
     }

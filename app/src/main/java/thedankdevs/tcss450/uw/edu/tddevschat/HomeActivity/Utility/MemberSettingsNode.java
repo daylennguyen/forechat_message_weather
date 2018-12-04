@@ -1,5 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -74,6 +76,7 @@ public class MemberSettingsNode {
             if (success) {
                 Log.d(TAG, "Member Settings Update successful");
                 frag.successfulUpdateDialog();
+
 
             } else {
                 Log.d(TAG, "Member Settings Update failed");
