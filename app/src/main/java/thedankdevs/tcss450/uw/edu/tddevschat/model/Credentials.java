@@ -40,8 +40,8 @@ public class Credentials implements Serializable {
 
     @Override
     public String toString() {
-        String o1 = String.format("memberId: %d | firstname: %s | lastname: %s | username: $s", mMemberID, mFirstName, mLastName, mUsername);
-        String o2 = String.format("%s | email: %s | password: %s", o1, mEmail, mPassword);
+        String o1 = String.format( "memberId: %d | firstname: %s | lastname: %s | username: $s", mMemberID, mFirstName, mLastName, mUsername );
+        String o2 = String.format( "%s | email: %s | password: %s", o1, mEmail, mPassword );
         return o2;
     }
 

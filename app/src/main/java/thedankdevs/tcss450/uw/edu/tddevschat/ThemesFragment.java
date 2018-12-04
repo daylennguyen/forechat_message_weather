@@ -20,14 +20,36 @@ import java.util.Objects;
  */
 public class ThemesFragment extends Fragment {
 
-    private final String TAG = getClass().getSimpleName();
-    private SharedPreferences mSharedPref;
-    private OnFragmentInteractionListener mListener;
+    private final String                        TAG = getClass().getSimpleName();
+    private       SharedPreferences             mSharedPref;
+    private       OnFragmentInteractionListener mListener;
 
     public ThemesFragment() {
         // Required empty public constructor
     }
 
+    public void onSwitch( View v ) {
+        Log.d( TAG, "I hit the switch" );
+        Switch switchView = ( Switch ) v;
+        String theme      = ThemeUtils.THEME_CLASSIC;
+        if ( switchView.isChecked() ) {
+            theme = ThemeUtils.THEME_MINT;
+        }
+
+        mSharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
+        mListener.onChangeTheme( theme );
+    }
+
+    @Override
+    public void onAttach( Context context ) {
+        super.onAttach( context );
+        if ( context instanceof OnFragmentInteractionListener ) {
+            mListener = ( OnFragmentInteractionListener ) context;
+        } else {
+            throw new RuntimeException( context.toString()
+                    + " must implement OnFragmentInteractionListener" );
+        }
+    }
 
     @Override
     public void onCreate( Bundle savedInstanceState ) {
@@ -54,29 +76,6 @@ public class ThemesFragment extends Fragment {
         return v;
     }
 
-    public void onSwitch( View v ) {
-        Log.d( TAG, "I hit the switch" );
-        Switch switchView = ( Switch ) v;
-        String theme      = ThemeUtils.THEME_CLASSIC;
-        if ( switchView.isChecked() ) {
-            theme = ThemeUtils.THEME_MINT;
-        }
-
-        mSharedPref.edit().putString(getString(R.string.current_theme), theme).apply();
-        mListener.onChangeTheme(theme);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -96,7 +95,7 @@ public class ThemesFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        void onChangeTheme(String theme);
+        void onChangeTheme( String theme );
 
     }
 }

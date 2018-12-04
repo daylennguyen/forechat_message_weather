@@ -166,7 +166,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      */
     private void handleIDOnPostExecute( String result ) {
 
-        Log.d("Debug Bryan" , "Handle Id on post execute");
+        Log.d( "Debug Bryan", "Handle Id on post execute" );
 
 
         try {
@@ -278,7 +278,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         //build the JSONObject
         JSONObject msg = mCredentials.asJSONObject();
-        Log.d("Debug Bryan", msg.toString());
+        Log.d( "Debug Bryan", msg.toString() );
 
         try {
             msg.put( "token", mFirebaseToken );
@@ -341,10 +341,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         //retrieve the stored credentials from SharedPrefs
         if ( prefs.contains( getString( R.string.keys_prefs_email ) ) &&
                 prefs.contains( getString( R.string.keys_prefs_password ) ) ) {
-            Log.d("DEBUG Bryan", "I have stored preferences");
+            Log.d( "DEBUG Bryan", "I have stored preferences" );
             mEmail = prefs.getString( getString( R.string.keys_prefs_email ), "" );
             mPassword = prefs.getString( getString( R.string.keys_prefs_password ), "" );
-            Log.d("DEBUG Bryan", "mEmail: "+ mEmail + " mPassword: "+ mPassword);
+            Log.d( "DEBUG Bryan", "mEmail: " + mEmail + " mPassword: " + mPassword );
 
             //Load the two login EditTexts with the credentials found in SharedPrefs
             EditText emailEdit = getActivity().findViewById( R.id.et_login_email );
@@ -358,7 +358,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         }
 
-        Log.d("DEBUG Bryan", "I dont have stored preferences; exiting onStart");
+        Log.d( "DEBUG Bryan", "I dont have stored preferences; exiting onStart" );
     }
 
     @Override
@@ -431,8 +431,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mListener.onWaitFragmentInteractionHide();
             ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Login Unsuccessful" );
-        } catch (Exception e) {
-            Log.d("Debug Bryan", "Not sure what this runtime exception is: " + e);
+        } catch ( Exception e ) {
+            Log.d( "Debug Bryan", "Not sure what this runtime exception is: " + e );
             e.printStackTrace();
         }
     }

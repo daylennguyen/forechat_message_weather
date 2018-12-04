@@ -3,7 +3,6 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,7 +26,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
@@ -45,17 +43,14 @@ import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
-import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
 
 /**
  *
@@ -78,28 +73,25 @@ public class HomeActivity extends AppCompatActivity
     /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public SettingsNode mSettingsNode;
     public String       date;
-    String myMetricValue;
-    int    myDeterminValue;
-    /*******************FIELD VARIABLES*******************/
+    /* ******************FIELD VARIABLES*******************/
     /*User saved credentials*/
     private Credentials     mCredential;
     private LocationNode    mLocationNode;
     private ConnectionsNode mConnectionsNode;
     private ChatNode        mChatNode;
-    private String          mState, mCity, mZip, weathDesc;
-    private double mLon, mLat;
-    private HomeFragment mHome;
-    private int          current_LocationDeterminant;
-    private String       current_WeatherMetric;
+
 
     /*Chat Field variables*/
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer>      notifiedChats = new ArrayList<>();
-    private SharedPreferences       myLocationPref, myMetricPref;
     /*Used to toggle the opened/closed state of the nav drawer*/
-    private ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle   toggle;
 
-    private TextView high, low, city_state, forecast;
+    /* ******** CONSTRUCTOR AND METHOD CALLS **************/
+
+
+    public HomeActivity() {
+    }
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -117,42 +109,35 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.startLocationUpdates();
     }
 
+    //  LIFE CYCLE METHODS///////////////////////////
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
-        Log.d("Debug Bryan", "onCreate initialized");
         super.onCreate( savedInstanceState );
-
-        Log.d("Debug Bryan", "creating theme");
         ThemeUtils.onActivityCreateTheme( this );
 
-        Log.d("Debug Bryan", "theme created");
         setContentView( R.layout.activity_home );
-        Log.d("Debug Bryan", "content view set");
-        setTitle( "Main Page" );
 
         /*Check for saved-sign-in info*/
-        Log.d("Debug Bryan", "getting credentials");
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
-        Log.d("Debug Bryan", "Credentials: " + mCredential);
 
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
-
-        Log.d("Debug Bryan", "initializing Nodes");
+        setTitle( "Hi there " + mCredential.getFirstName() + "" );
+        Log.d( "Debug Bryan", "initializing Nodes" );
         initializeNodes();
-        Log.d("Debug Bryan", "nodes initialized");
+        Log.d( "Debug Bryan", "nodes initialized" );
         /*insert option items into the tool bar and initialize the drawer*/
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
 
-        Log.d("Debug Bryan", "initializing drawer");
+        Log.d( "Debug Bryan", "initializing drawer" );
         initializeActionDrawerToggle( drawer, toolbar );
-        Log.d("Debug Bryan", "drawer initialized, starting location updates");
+        Log.d( "Debug Bryan", "drawer initialized, starting location updates" );
 
         mLocationNode.startLocationUpdates();
-        Log.d("Debug Bryan", "location updates successful");
+        Log.d( "Debug Bryan", "location updates successful" );
 
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -165,15 +150,9 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
-
-                // add homeFragment to back stack
-                mHome = new HomeFragment();
-                fm.beginTransaction().add( R.id.frame_home_container, mHome ).addToBackStack( null ).commit();
-
-                Log.d( "TESTING DAYLEN", String.format( "high = %s | low = %s | cs = %s", high, low, city_state ) );
+//                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
             }
         }
-    }
 
 
         if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
@@ -190,17 +169,14 @@ public class HomeActivity extends AppCompatActivity
             frag.setArguments( args );
             loadFragmentWithoutBackStack( frag );
         }
-        Log.d("Debug Bryan", "onCreate done");
+        Log.d( "Debug Bryan", "onCreate done" );
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-
-        Coordinates_getCurrentWeatherData();
-
     }
+
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
 
@@ -442,7 +418,7 @@ public class HomeActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
-                //.addToBackStack(null);
+        //.addToBackStack(null);
 
 
         if ( fm.getBackStackEntryCount() < 1 ) {
@@ -463,16 +439,16 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChangeMemberInfo( Credentials credentials ) {
         mCredential = credentials;
-        Log.d("Debug Bryan", "creating new intent");
+        Log.d( "Debug Bryan", "creating new intent" );
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
         intent.putExtra( getString( R.string.reload_member_settings ), true );
-        Log.d("Debug Bryan", "intent created");
-        Log.d("Debug Bryan", "starting new activity");
+        Log.d( "Debug Bryan", "intent created" );
+        Log.d( "Debug Bryan", "starting new activity" );
         startActivity( intent );
-        Log.d("Debug Bryan", "started new home activity");
+        Log.d( "Debug Bryan", "started new home activity" );
         finish();
-        Log.d("Debug Bryan", "ended old home activity");
+        Log.d( "Debug Bryan", "ended old home activity" );
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
@@ -611,165 +587,6 @@ public class HomeActivity extends AppCompatActivity
         dialog.show();
     }
 
-    public void getSharedPrefAndValue() {
-        SharedPreferences myLocationPref = getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE );
-        SharedPreferences myMetricPref   = getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-
-
-        myMetricValue = myMetricPref.getString( METRIC_PREF, "C" );
-        myDeterminValue = myLocationPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
-        Log.d( "DAYY", myMetricValue + myDeterminValue );
-    }
-
-    /*Generates a URI string. Changes the endpoint depending on location determinant*/
-    private String constructRequestLocation() {
-        SharedPreferences myDeterPref = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-
-        Uri.Builder uri_builder = new Uri.Builder()
-                .scheme( "https" )
-                .appendPath( getString( R.string.base_url ) )
-                .appendPath( getString( R.string.ep_weather ) );
-        switch ( myDeterPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
-            case SettingsNode.CITY_STATE:
-                uri_builder.appendPath( getString( R.string.ep_weather_citystate ) );
-                break;
-            case SettingsNode.GPS_DATA:
-                uri_builder.appendPath( getString( R.string.ep_weather_bycoordinate ) );
-                break;
-            case SettingsNode.SELECT_FROM_MAP:
-                uri_builder.appendPath( getString( R.string.ep_weather_bycoordinate ) );
-                break;
-            case SettingsNode.POSTAL_CODE:
-                uri_builder.appendPath( getString( R.string.ep_weather_postalcode ) );
-                break;
-        }
-        return uri_builder.build().toString();
-    }
-
-    /*returns a json object, dependent on the location determinant*/
-    private JSONObject constructRequestJSON() {
-        JSONObject        request      = new JSONObject();
-        SharedPreferences myDeterPref  = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-        SharedPreferences myLocatePref = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
-        myMetricPref = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( METRIC_PREF, 0 );
-
-        String mCity, mState, mZip;
-        double mLat, mLon;
-        try {
-            switch ( myDeterPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
-                case SettingsNode.CITY_STATE:
-                    mCity = myLocatePref.getString( CITY_KEY, "TACOMA" );
-                    mState = myLocatePref.getString( STATE_KEY, "WA" );
-                    Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mCity + mState );
-                    request.put( getString( R.string.weather_lcase_city ), mCity );
-                    request.put( getString( R.string.weather_lcase_state ), mState );
-                    break;
-                case SettingsNode.GPS_DATA:
-                    mLat = mLocationNode.getmCurrentLocation().getLatitude();
-                    mLon = mLocationNode.getmCurrentLocation().getLongitude();
-                    Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mLat + " mlatlon " + mLon );
-
-                    request.put( getString( R.string.weather_lon_json ), mLon );
-                    request.put( getString( R.string.weather_lat_json ), mLat );
-                    break;
-                case SettingsNode.SELECT_FROM_MAP:
-                    mLat = myLocatePref.getFloat( MAP_LAT_KEY, 0 );
-                    mLon = myLocatePref.getFloat( MAP_LON_KEY, 0 );
-                    Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mLat + " mlatlon " + mLon );
-                    request.put( getString( R.string.weather_lon_json ), mLon );
-                    request.put( getString( R.string.weather_lat_json ), mLat );
-                    break;
-                case SettingsNode.POSTAL_CODE:
-                    mZip = myLocatePref.getString( ZIP_KEY, "98422" );
-                    request.put( getString( R.string.weather_json_postal ), mZip );
-                    Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mZip + " MZIP " );
-
-
-                    break;
-            }
-            /*DEFAULT UNIT IS CELSIUS*/
-            if ( !Objects.requireNonNull( myMetricPref.getString( DETERMINANT_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
-                switch ( Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ) ) {
-                    case SettingsNode.FAHRENHEIT:
-                        request.put( "units", myMetricPref.getString( METRIC_PREF, "C" ) );
-                        break;
-                    case SettingsNode.KELVIN:
-                        request.put( "units", myMetricPref.getString( METRIC_PREF, "C" ) );
-                        break;
-                }
-            }
-        } catch ( Exception e ) {
-            Log.e( "WEATHER", String.valueOf( e ) );
-        }
-//        getMetricReqString( request );
-        return request;
-    }
-
-    private void Coordinates_getCurrentWeatherData() {
-        JSONObject request  = constructRequestJSON();
-        String     mSendUrl = constructRequestLocation();
-        Log.d( "daylen weather", mSendUrl );
-        if ( request != null ) {
-            Log.d( "daylen weather", request.toString() );
-        }
-        new SendPostAsyncTask.Builder( mSendUrl, request )
-                .onPreExecute( () -> {
-                    high = findViewById( R.id.high_temp_home );
-                    low = findViewById( R.id.low_temp_home );
-                    city_state = findViewById( R.id.city_state_home );
-                    current_LocationDeterminant = getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE ).getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
-                    current_WeatherMetric = getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.FAHRENHEIT );
-
-
-                } )
-                .onPostExecute( this::PostWeatherRequest )
-                .onCancelled( error -> Log.e( "daylen weather", error ) )
-                .build()
-                .execute();
-    }
-
-
-    private void PostWeatherRequest( String result ) {
-        //parse the post request
-        Log.i( "DAYLEN_WEATH_DATE_FRAG", "LOCATIONDETERMINANT = ".concat( String.valueOf( current_LocationDeterminant ) ) );
-        Log.i( "DAYLEN_WEATH_DATE_FRAG", "WEATHER METRIC = ".concat( String.valueOf( current_WeatherMetric ) ) );
-        Log.i( "json return", result );
-
-
-        try {
-
-
-            // This is the result from the web service
-            JSONObject res = new JSONObject( result );
-            Log.i( "Daylen", String.valueOf( res ) );
-
-            // retrieve the city and state of the current user from the
-            // latitude and longitude
-            mState = res.getString( "state_code" );
-            mCity = res.getString( "city_name" );
-            Log.i( "DAYLEN_WEATH_DATE_FRAG", mCity + mState );
-            // response will contain a json array containing 16 day forecast
-            JSONArray data = res.getJSONArray( "data" );
-            // data will be in the form of a json object
-            JSONObject currentDay = ( JSONObject ) data.get( 0 );
-            // extract json values from response
-            date = currentDay.getString( "datetime" );
-
-            double     avg       = currentDay.getDouble( "temp" );
-            double     min       = currentDay.getDouble( "min_temp" );
-            double     max       = currentDay.getDouble( "max_temp" );
-            JSONObject weather   = currentDay.getJSONObject( "weather" );
-            String     weathDesc = weather.getString( "description" );
-            Log.w( "WEATHER CURRENT", "\n[  ]\n\tDate: " + date + "\n\tAvg:" + avg + "\n\tMin:" + min + "\n\tMax" + max + "\n\tdesc:" + weathDesc );
-
-            ( ( TextView ) findViewById( R.id.city_state_home ) ).setText( String.format( "in %s, %s, you can expect", mCity, mState ) );
-            ( ( TextView ) findViewById( R.id.low_temp_home ) ).setText( MessageFormat.format( "{0}°{1}", String.valueOf( min ), current_WeatherMetric ) );
-            ( ( TextView ) findViewById( R.id.high_temp_home ) ).setText( MessageFormat.format( "{0}°{1}", String.valueOf( max ), current_WeatherMetric ) );
-        } catch ( JSONException e ) {
-            e.printStackTrace();
-        }
-    }
-
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private HomeActivity mMaster;
@@ -785,7 +602,7 @@ public class HomeActivity extends AppCompatActivity
             SharedPreferences prefs = mMaster.getSharedPreferences( mMaster.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
-            prefs.edit().putBoolean(( getString( R.string.reload_member_settings )), false );
+            prefs.edit().putBoolean( ( getString( R.string.reload_member_settings ) ), false );
             prefs.edit().putBoolean( getString( R.string.reload_themes ), false );
 //            prefs.edit().putBoolean()
             try {
@@ -796,8 +613,8 @@ public class HomeActivity extends AppCompatActivity
                 Log.e( "FCM", "Delete error!" );
                 e.printStackTrace();
 
-            } catch (Exception e) {
-                Log.e("ERROR", "MAJOR ERROR");
+            } catch ( Exception e ) {
+                Log.e( "ERROR", "MAJOR ERROR" );
                 e.printStackTrace();
             }
             return null;

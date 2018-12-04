@@ -322,11 +322,15 @@ public class ChatNode {
     public void onChatsListFragmentInteraction( Chat item ) {
         mChatID = item.getChatID();
         ArrayList<Integer> notifiedChats = mMaster.getNotifiedChats();
-        for ( int cid : notifiedChats ) {
-            if ( cid == mChatID ) {
-                mMaster.updateNotifiedChats( mChatID );
-                mMaster.notifyUI( Color.BLACK, Color.WHITE );
+        try {
+            for ( int cid : notifiedChats ) {
+                if ( cid == mChatID ) {
+                    mMaster.updateNotifiedChats( mChatID );
+                    mMaster.notifyUI( Color.BLACK, Color.WHITE );
+                }
             }
+        } catch ( Exception e ) {
+            Log.e( "ERROR IN CHAT LIST LISTENER", String.valueOf( e ) );
         }
         loadAllMessages();
     }

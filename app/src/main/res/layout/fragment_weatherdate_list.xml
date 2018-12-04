@@ -64,7 +64,7 @@
 		android:layout_height = "match_parent">
 
 		<android.support.design.widget.FloatingActionButton
-			android:id = "@+id/floatingActionButton2"
+			android:id = "@+id/weather_fab"
 			android:layout_width = "wrap_content"
 			android:layout_height = "wrap_content"
 			android:layout_gravity = "bottom|right"
@@ -73,7 +73,7 @@
 			app:backgroundTint = "?attr/primaryMediumBackground"
 			app:elevation = "16dp"
 			app:fabSize = "normal"
-			app:rippleColor = "?attr/primaryLightBackground"
+			app:rippleColor = "@color/colorAccent"
 			app:srcCompat = "@drawable/ic_location"
 			app:useCompatPadding = "true" />
 
