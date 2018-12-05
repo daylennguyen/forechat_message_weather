@@ -41,7 +41,7 @@
 	<string name = "remove_chat_members">Select the members of the chat you wish to remove.</string>
 	<string name = "remove_remove">Remove</string>
 
-	<string name = "reload_themes">reload theme fragment</string>
+	<string name = "reload_theme_switch">reload theme switch</string>
 	<string name = "reload_member_settings">reload member settings</string>
 
 	<string name = "notification_requested">requested</string>

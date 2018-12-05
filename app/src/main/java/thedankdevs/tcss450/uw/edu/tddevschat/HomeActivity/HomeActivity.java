@@ -21,8 +21,10 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -87,6 +89,8 @@ public class HomeActivity extends AppCompatActivity
     /*Used to toggle the opened/closed state of the nav drawer*/
     private ActionBarDrawerToggle   toggle;
 
+    private Switch mSwitch;
+
     /* ******** CONSTRUCTOR AND METHOD CALLS **************/
 
 
@@ -123,7 +127,7 @@ public class HomeActivity extends AppCompatActivity
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
-        setTitle( "Hi there " + mCredential.getFirstName() + "" );
+        setTitle( "Hi there, " + mCredential.getFirstName() + "" );
         Log.d( "Debug Bryan", "initializing Nodes" );
         initializeNodes();
         Log.d( "Debug Bryan", "nodes initialized" );
@@ -155,10 +159,6 @@ public class HomeActivity extends AppCompatActivity
         }
 
 
-        if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
-            setTitle( getString( R.string.theme_title ) );
-            loadFragmentWithoutBackStack( new ThemesFragment() );
-        }
 
         // reload member Settings fragment
         if ( getIntent().getBooleanExtra( getString( R.string.reload_member_settings ), false ) ) {
@@ -190,6 +190,39 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener( this );
         TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
         nav_user.setText( mCredential.getUsername() ); //Set the header username.
+
+        Menu mainMenu = navigationView.getMenu();
+        Menu settingsMenu = mainMenu.findItem(R.id.settings_menu_item).getSubMenu();
+        MenuItem switchItem = settingsMenu.findItem(R.id.nav_theme);
+        mSwitch = switchItem.getActionView().findViewById(R.id.view_switch_theme);
+        SharedPreferences sharedPref = getSharedPreferences( getString( R.string.current_theme ), Context.MODE_PRIVATE );
+
+        mSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d( "Paolo", "I hit the switch" );
+                Switch switchView = ( Switch ) v;
+                String theme      = ThemeUtils.THEME_CLASSIC;
+                if ( switchView.isChecked() ) {
+                    theme = ThemeUtils.THEME_MINT;
+                }
+
+                sharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
+                sharedPref.edit().putBoolean(getString(R.string.reload_theme_switch), switchView.isChecked()).commit();
+                onChangeTheme(theme);
+            }
+        });
+
+        String theme = sharedPref.getString( getString( R.string.current_theme ), ThemeUtils.THEME_CLASSIC );
+        assert theme != null;
+        switch ( theme ) {
+            case ThemeUtils.THEME_MINT:
+                mSwitch.setChecked( true );
+            default:
+
+        }
+
+
         mLocationNode.startLocationUpdates();
 
 
@@ -355,9 +388,7 @@ public class HomeActivity extends AppCompatActivity
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
-                setTitle( getString( R.string.theme_title ) );
-                fragment = new ThemesFragment();
-                break;
+                return false;
 
             default:
 
@@ -563,10 +594,11 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onChangeTheme( String theme ) {
-
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.key_credential ), mCredential );
-        intent.putExtra( getString( R.string.reload_themes ), true );
+
+
+        intent.putExtra( getString( R.string.reload_theme_switch ), mSwitch.isChecked() );
         finish();
         startActivity( intent );
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
@@ -603,7 +635,7 @@ public class HomeActivity extends AppCompatActivity
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
             prefs.edit().putBoolean( ( getString( R.string.reload_member_settings ) ), false );
-            prefs.edit().putBoolean( getString( R.string.reload_themes ), false );
+            prefs.edit().putBoolean( getString( R.string.reload_theme_switch ), false );
 //            prefs.edit().putBoolean()
             try {
                 //this call must be done asynchronously.
