@@ -43,6 +43,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 
@@ -563,7 +564,7 @@ public class HomeActivity extends AppCompatActivity
 
     public void updateNotifiedChats( int openedChatID ) {
         Log.w( "CRASH CHAT", String.valueOf( openedChatID ) );
-        notifiedChats.remove( openedChatID );
+        notifiedChats.remove( notifiedChats.indexOf(openedChatID) );
 
     }
 
@@ -662,7 +663,10 @@ public class HomeActivity extends AppCompatActivity
         protected void onPostExecute( Void aVoid ) {
             super.onPostExecute( aVoid );
             //close the app
-            mMaster.finishAndRemoveTask();
+
+            Intent intent = new Intent(mMaster, SignInActivity.class);
+            mMaster.startActivity(intent);
+            mMaster.finish();
         }
     }
 
