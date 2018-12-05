@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android = "http://schemas.android.com/apk/res/android"
-	xmlns:tools = "http://schemas.android.com/tools"
-	tools:showIn = "navigation_view">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:showIn="navigation_view">
 	<item
 		android:id = "@+id/nav_home"
 		android:icon = "@drawable/ic_menu_home"
@@ -32,9 +33,10 @@
 	</item>
 
 
-	<item android:title = "@string/settings">
-		<group>
-			<menu>
+	<item
+        android:id="@+id/settings_menu_item"
+        android:title = "@string/settings">
+        <menu>
 				<item
 					android:id = "@+id/nav_settings"
 					android:icon = "@drawable/weather_sett_ic"
@@ -45,10 +47,11 @@
 					android:title = "@string/nav_membersettings" />
 				<item
 					android:id = "@+id/nav_theme"
-					android:icon = "@drawable/ic_brush"
-					android:title = "@string/change_theme" />
-			</menu>
-		</group>
+					android:title = "Enable Mint Theme"
+                    android:icon="@drawable/ic_brush"
+                    app:showAsAction="always"
+                    app:actionLayout="@layout/switch_theme"/>
+        </menu>
 	</item>
 	<!--<item android:title="Communicate">-->
 	<!--<menu>-->
