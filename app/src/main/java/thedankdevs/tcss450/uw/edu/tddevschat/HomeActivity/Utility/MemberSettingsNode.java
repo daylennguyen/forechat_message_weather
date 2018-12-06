@@ -13,6 +13,15 @@ import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 import java.util.Map;
 
+
+/**
+ * Helper class to alleviate code from HomeActivity. Used in connection
+ * with the Fragment interaction with MemberSettingsFragment.
+ * Sends Post Request to an endpoint and sends the corresponding response.
+ *
+ * @author Bryan Santos
+ * @version 12/05/2018
+ */
 public class MemberSettingsNode {
 
     private final String       TAG = getClass().getSimpleName();
@@ -22,7 +31,14 @@ public class MemberSettingsNode {
         mMaster = master;
     }
 
-
+    /**
+     * Creates the URI string of the endpoint to update
+     * currently logged in user's personal information. Also creates
+     * the necessary JSON object to the endpoint. It sends the
+     * post request asynchronously.
+     * @param updateMap Storage that contains the information be updated
+     * @param memberId MemberId of the user whose information will be updated
+     */
     public void onChangeMemberInfo( Map<String, String> updateMap, int memberId ) {
 
         Uri uri = new Uri.Builder()
@@ -32,7 +48,7 @@ public class MemberSettingsNode {
                 .appendPath( mMaster.getString( R.string.ep_update_info ) )
                 .build();
         Log.d( TAG, "Uri: " + uri.toString() );
-        boolean    created = true;
+
         JSONObject json    = new JSONObject();
         try {
             json.put( "memberid", memberId );
@@ -40,22 +56,22 @@ public class MemberSettingsNode {
             Log.d( TAG, json.toString() );
         } catch ( JSONException e ) {
             Log.e( TAG, "JSON object cannot be created completely" );
-            created = false;
-        }
-        Credentials newCredentials = null;
-        if ( created ) {
-            new SendPostAsyncTask.Builder( uri.toString(), json )
-                    .onCancelled( error -> Log.e( TAG, "Error/Cancelled during SendPostASyncTask: " + error ) )
-                    .onPostExecute( this::handleOnPostExecute )
-                    .build()
-                    .execute();
-
+            return;
         }
 
+        new SendPostAsyncTask.Builder( uri.toString(), json )
+                .onCancelled( error -> Log.e( TAG, "Error/Cancelled during SendPostASyncTask: " + error ) )
+                .onPostExecute( this::handleOnPostExecute )
+                .build()
+                .execute();
 
     }
 
-
+    /**
+     * Method that handles the post request and
+     * parses the result from the endpoint.
+     * @param result JSON string of the post response
+     */
     private void handleOnPostExecute( String result ) {
         FragmentManager        fm   = mMaster.getSupportFragmentManager();
         MemberSettingsFragment frag = ( MemberSettingsFragment ) fm.findFragmentByTag( "MemberSettingsFragment" );

@@ -1,10 +1,10 @@
 package thedankdevs.tcss450.uw.edu.tddevschat;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -29,66 +29,142 @@ import java.util.Set;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MemberSettingsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MemberSettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This Fragment handles the actions when the user attempts
+ * to change their personal information. It also creates a
+ * new Credentials object with the updated information if
+ * change information transaction was successful. This new
+ * Credentials object is then stored in SharedPreferences.
+ *
+ * @author Bryan Santos
+ * @version 12/05/2018
  */
 public class MemberSettingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String                        ARG_MEMBER_SETTINGS = "member_settings";
-    private static final String[]                      KEYS                = { "firstname", "lastname", "username", "email", "password" };
+
+    /** Key constants that matches the keys needed to make post request to the endpoint. */
+    private static final String[]                      KEYS                =
+            { "firstname", "lastname", "username", "email", "password" };
+
+    /** Text to display when button can be changed. */
     private static final String                        CHANGE_BTN_TEXT     = "Change";
+
+    /** Text to display of button when reverting back the EditText Field's information to default value. */
     private static final String                        UNDO_BTN_TEXT       = "Undo";
+
+    /** Tag for Logcat. */
     private final        String                        TAG                 = getClass().getSimpleName();
+
+    /** Current credentials of user (Unchanged). */
     private              Credentials                   mCredentials;
+
     private              OnFragmentInteractionListener mListener;
+
+    /** Storage of default Credentials and a way to link key constants needed
+     * to make post request to endpoint with its appropriate EditTextFields
+     * and Credential Object's information.*/
     private              Map<Integer, UpdateValue>     mCredentialsMap;
+
+    /** Storage of the values updated, making of KEYS and its counterpart data. */
     private              Map<String, String>           mUpdateMap;
+
+    /** Layout that contains all EditTextFields and Buttons. */
     private              GridLayout                    mGridLayout;
+
+    /**
+     * A running counter of the Change/Undo Buttons pressed. Used for optimization
+     * in an attempt to remove the need to loop through the child elements of mGridLayout
+     * to check the state of the EditTextFields to check whether or not to enable the Apply Button.
+     */
     private              int                           mEnabledChangeButtons;
+
+    /** View being inflated by this class. */
+    private View mView;
+
     private              Button                        mApplyButton;
     private              EditText                      mPassword_et;
     private              EditText                      mConfirmPassword_et;
     private              TextView                      mConfirmPassword_tv;
 
-    private View mView;
+
 
     public MemberSettingsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment MemberSettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MemberSettingsFragment newInstance( Credentials credentials ) {
-        MemberSettingsFragment fragment = new MemberSettingsFragment();
-        Bundle                 args     = new Bundle();
-        args.putSerializable( ARG_MEMBER_SETTINGS, credentials );
-        fragment.setArguments( args );
-        return fragment;
+    @SuppressLint("UseSparseArrays")
+    @Override
+    public void onCreate( Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+        mCredentialsMap = new HashMap<>();
+        if ( getArguments() != null ) {
+            mCredentials = ( Credentials ) getArguments().getSerializable( getString( R.string.nav_membersettings ) );
+            UpdateValue firstname = new UpdateValue( KEYS[ 0 ], mCredentials.getFirstName() );
+            UpdateValue lastname  = new UpdateValue( KEYS[ 1 ], mCredentials.getLastName() );
+            UpdateValue username  = new UpdateValue( KEYS[ 2 ], mCredentials.getUsername() );
+            UpdateValue email     = new UpdateValue( KEYS[ 3 ], mCredentials.getEmail() );
+            UpdateValue password  = new UpdateValue( KEYS[ 4 ], mCredentials.getPassword() );
+
+            mCredentialsMap.put( R.id.et_member_settings_firstname, firstname );
+            mCredentialsMap.put( R.id.et_member_settings_lastname, lastname );
+            mCredentialsMap.put( R.id.et_member_settings_username, username );
+            mCredentialsMap.put( R.id.et_member_settings_email, email );
+            mCredentialsMap.put( R.id.et_member_settings_password, password );
+
+            Log.d( TAG, "Finished initializing mCredentialsMap: " + mCredentialsMap );
+
+
+        }
     }
 
-    // helper methods to setting the default values and state of the layout
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState ) {
+
+        // Inflate the layout for this fragment
+        mView = inflater.inflate( R.layout.fragment_member_settings, container, false );
+
+        mGridLayout = mView.findViewById( R.id.gl_member_settings );
+        mPassword_et = mView.findViewById( R.id.et_member_settings_password );
+        mConfirmPassword_et = mView.findViewById( R.id.et_member_settings_confirm_password );
+        mConfirmPassword_tv = mView.findViewById( R.id.tv_member_settings_confirmpass );
+        mApplyButton = mView.findViewById( R.id.btn_member_settings_apply );
+
+        setDefault();
+
+        return mView;
+    }
+
+    @Override
+    public void onAttach( Context context ) {
+        super.onAttach( context );
+        if ( context instanceof OnFragmentInteractionListener ) {
+            mListener = ( OnFragmentInteractionListener ) context;
+        } else {
+            throw new RuntimeException( context.toString()
+                    + " must implement OnFragmentInteractionListener" );
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * Helper method that sets default state of each
+     * View object along with the appropriate
+     * information from the mCredentials object; includes
+     * setting onClickListeners, visibility state, and default texts.
+     */
     private void setDefault() {
-        Context context = getContext();
+
         mEnabledChangeButtons = 0;
-//        displayETIds();
         for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
             View childView = mGridLayout.getChildAt( i );
             int  id        = childView.getId();
             if ( childView instanceof EditText ) {
                 EditText et = ( EditText ) childView;
                 if ( id == R.id.et_member_settings_confirm_password ) {
-//                    et.setBackground(ENABLED_ET_COLOR);
-//                    et.setTextColor(ENABLED_TEXT_COLOR);
                     et.setVisibility( View.GONE );
                     mConfirmPassword_tv.setVisibility( View.GONE );
                     continue;
@@ -100,8 +176,6 @@ public class MemberSettingsFragment extends Fragment {
                     value = updateValue.getValue();
                 }
                 et.setText( value );
-//                et.setBackground(DISABLED_ET_COLOR);
-//                et.setTextColor(DISABLED_TEXT_COLOR);
                 et.setEnabled( false );
 
             } else if ( childView instanceof Button ) {
@@ -121,9 +195,16 @@ public class MemberSettingsFragment extends Fragment {
 
         }
         mPassword_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
-
+        mConfirmPassword_et.setTransformationMethod( PasswordTransformationMethod.getInstance() );
     }
 
+
+    /**
+     * Helper method that links a button to its EditTextField. Makes
+     * use of the Tag attribute. Makes use of the actual EditTextField
+     * object as the tag.
+     * @param btn Button that the tag will be applied to
+     */
     private void setButtonTags( Button btn ) {
 
         EditText et;
@@ -138,12 +219,7 @@ public class MemberSettingsFragment extends Fragment {
             case R.id.btn_member_settings_username:
                 et = mView.findViewById( R.id.et_member_settings_username );
                 break;
-            // remove email actions until email endpoint is implemented
-//            case R.id.btn_member_settings_email:
-//                et = mView.findViewById(R.id.et_member_settings_email);
-//                break;
             case R.id.btn_member_settings_password:
-                Log.d( TAG, "I am password button" );
                 et = mView.findViewById( R.id.et_member_settings_password );
                 break;
             default:
@@ -154,8 +230,11 @@ public class MemberSettingsFragment extends Fragment {
         btn.setTag( et );
     }
 
-    // onClick Event handlers
+    /*******************************************************************************************
+     *                         onClickListeners for Buttons
+     *******************************************************************************************/
     public void onCancelButtonClick( View v ) {
+
         if ( mEnabledChangeButtons == 0 ) {
             return;
         } else if ( mEnabledChangeButtons < 0 ) {
@@ -177,6 +256,7 @@ public class MemberSettingsFragment extends Fragment {
     }
 
     public void onChangeButtonClick( View v ) {
+
         Button   btnClicked = ( Button ) v;
         EditText et;
         if ( v.getTag() instanceof EditText ) {
@@ -188,10 +268,8 @@ public class MemberSettingsFragment extends Fragment {
         int id = et.getId();
         if ( id != R.id.et_member_settings_password ) {
             flipTextFields( et, btnClicked );
-            Log.d( TAG, "I flipped non-password fields" );
         } else {
             flipPasswordFields( mPassword_et, mConfirmPassword_et, btnClicked );
-            Log.d( TAG, "I flipped password fields" );
         }
 
         // check apply button state
@@ -225,7 +303,7 @@ public class MemberSettingsFragment extends Fragment {
         builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
         builder.setTitle( "Update Information" )
                 .setMessage( "Are you sure you want to update the fields selected?" )
-                .setPositiveButton( android.R.string.yes, ( dialog, which ) -> attachListener() )
+                .setPositiveButton( android.R.string.yes, ( dialog, which ) -> attachFragmentListener() )
                 .setNegativeButton( android.R.string.no, ( dialog, which ) -> {
                     // do nothing
                 } )
@@ -234,49 +312,61 @@ public class MemberSettingsFragment extends Fragment {
 
     }
 
-    // helper methods for when the change button is clicked
+    /*****************************************************************************************/
+
+
+    /******************************************************************************************
+     *                                 Update View State
+     ******************************************************************************************/
+
+    /**
+     * Flips the state of the EditTextFields (From enabled to disabled and vice versa)
+     * depending on the button clicked. This method is used by all EditTextFields
+     * except for the password fields.
+     *
+     * @param et EditTextField that is interacted with
+     * @param btn Button that is interacted with.
+     */
     private void flipTextFields( EditText et, Button btn ) {
 
         int key = et.getId();
-        if ( !et.isEnabled() ) {
+        if ( !et.isEnabled() ) { // disabled to enabled
             et.setEnabled( true );
-//            et.setBackground(ENABLED_ET_COLOR);
-//            et.setTextColor(ENABLED_TEXT_COLOR);
             btn.setText( UNDO_BTN_TEXT );
             mEnabledChangeButtons += 1;
-        } else {
+        } else { // enabled to disabled
             et.setEnabled( false );
             et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
-//            et.setBackground(DISABLED_ET_COLOR);
-//            et.setTextColor(DISABLED_TEXT_COLOR);
             btn.setText( CHANGE_BTN_TEXT );
             mEnabledChangeButtons -= 1;
         }
 
+        // clears previous error if there is one
         et.setError( null );
     }
 
+
+    /**
+     * Flips the EditTextFields (enable to disabled and vice versa). Only used
+     * by the password fields.
+     *
+     * @param pass_et Password EditText
+     * @param confirmpass_et Confirm Password EditText
+     * @param btn Button interacted with
+     */
     private void flipPasswordFields( EditText pass_et, EditText confirmpass_et, Button btn ) {
         int key = pass_et.getId();
 
-        if ( !pass_et.isEnabled() ) {
-            Log.d( TAG, "I am enabling et" );
+        if ( !pass_et.isEnabled() ) { // disabled to enabled
             pass_et.setEnabled( true );
-//            pass_et.setBackground(ENABLED_ET_COLOR);
-//            pass_et.setTextColor(ENABLED_TEXT_COLOR);
             confirmpass_et.setVisibility( View.VISIBLE );
             mConfirmPassword_tv.setVisibility( View.VISIBLE );
             btn.setText( UNDO_BTN_TEXT );
-
             pass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
-            confirmpass_et.setTransformationMethod( HideReturnsTransformationMethod.getInstance() );
             mEnabledChangeButtons += 1;
-        } else {
-            Log.e( TAG, "I am disabling et" );
+        } else { // enabled to disabled
             pass_et.setEnabled( false );
             pass_et.setText( Objects.requireNonNull( mCredentialsMap.get( key ) ).getValue() );
-//            pass_et.setBackground(DISABLED_ET_COLOR);
-//            pass_et.setTextColor(DISABLED_TEXT_COLOR);
             confirmpass_et.setVisibility( View.GONE );
             mConfirmPassword_tv.setVisibility( View.GONE );
             btn.setText( CHANGE_BTN_TEXT );
@@ -284,13 +374,28 @@ public class MemberSettingsFragment extends Fragment {
             mEnabledChangeButtons -= 1;
         }
 
-        // clear error
+        // clear error if there is one previously set
         pass_et.setError( null );
 
     }
 
-    // helper methods to check the validity of the enabled fields before making post request
+    /********************************************************************************************/
+
+
+
+    /*****************************************************************************************
+     *                              Enabled Fields Validity Checker
+     *****************************************************************************************/
+
+    /**
+     * First check to see if the all enabled fields matches
+     * the minimum requirements: at least 3 characters and
+     * new value not matching the old value.
+     *
+     * @return validity of the enabled EditTextFields
+     */
     private boolean areFieldsValid() {
+
         boolean valid = true;
 
         for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
@@ -298,7 +403,6 @@ public class MemberSettingsFragment extends Fragment {
 
             if ( childView instanceof EditText ) {
                 EditText et   = ( EditText ) childView;
-                int      type = et.getInputType();
                 int      id   = et.getId();
                 if ( et.isEnabled() && id != R.id.et_member_settings_confirm_password ) {
                     String newValue = et.getText().toString();
@@ -318,6 +422,15 @@ public class MemberSettingsFragment extends Fragment {
         return valid;
     }
 
+    /**
+     * A check to see if the strings in the password field
+     * matches the string in the confirm password field. Sets error
+     * to password EditText if they don't match and returns false.
+     *
+     * @param pass String in Password EditText
+     * @param confirm_pass String in Confirm Password EditText
+     * @return validity of pass and confirm_pass matching
+     */
     private boolean arePasswordsValid( String pass, String confirm_pass ) {
         boolean valid = true;
 
@@ -340,18 +453,31 @@ public class MemberSettingsFragment extends Fragment {
         return valid;
     }
 
-    private void attachListener() {
+    /*****************************************************************************************/
+
+
+    /***************************************************************************************
+     *                          Attaching OnFragmentInteractionListener
+     ***************************************************************************************/
+
+
+    /**
+     * Stores the new information from the user into mUpdateMap.
+     * and attaches the OnFragmentInteractionListener.
+     */
+    private void attachFragmentListener() {
 
         mUpdateMap = new HashMap<>();
-        for ( int i = 0; i < mGridLayout.getChildCount(); i++ ) {
-            View childView = mGridLayout.getChildAt( i );
-            if ( childView instanceof EditText ) {
-                EditText et = ( EditText ) childView;
-                int      id = et.getId();
-                if ( et.isEnabled() && id != R.id.et_member_settings_confirm_password ) {
-                    UpdateValue obj = mCredentialsMap.get( id );
-                    mUpdateMap.put( obj.getKey(), et.getText().toString() );
-                    Log.d( TAG, "Added object to mUpdateMap: " + obj.getKey() + "=" + et.getText().toString() );
+        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
+            View childView = mGridLayout.getChildAt(i);
+            if (childView instanceof EditText) {
+                EditText et = (EditText) childView;
+                int id = et.getId();
+                if (et.isEnabled() && id != R.id.et_member_settings_confirm_password) {
+                    UpdateValue obj = mCredentialsMap.get(id);
+                    assert obj != null;
+                    mUpdateMap.put(obj.getKey(), et.getText().toString());
+                    Log.d(TAG, "Added object to mUpdateMap: " + obj.getKey() + "=" + et.getText().toString());
 
                 }
 
@@ -359,24 +485,27 @@ public class MemberSettingsFragment extends Fragment {
             }
         }
 
-        if ( mUpdateMap.isEmpty() ) {
-            Log.d( TAG, "Why is my update map empty?" );
+        if (mUpdateMap.isEmpty()) {
+            Log.d(TAG, "Why is my update map empty?");
         }
 
-        MemberSettingsNode node = new MemberSettingsNode( ( HomeActivity ) getActivity() );
-        node.onChangeMemberInfo( mUpdateMap, mCredentials.getMemberID() );
+        MemberSettingsNode node = new MemberSettingsNode((HomeActivity) getActivity());
+        node.onChangeMemberInfo(mUpdateMap, mCredentials.getMemberID());
 
     }
 
-    // dialog boxes for when the update is successful and unsuccessful
+    /**************************************************************************************/
+
+
+    /************************************************************************************
+     *                  Successful and Unsuccessful Dialog Boxes
+     ************************************************************************************/
+
     public void successfulUpdateDialog() {
+
         Context             context = getContext();
         AlertDialog.Builder builder;
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
-            builder = new AlertDialog.Builder( context, android.R.style.Theme_Material_Dialog_Alert );
-        } else {
-            builder = new AlertDialog.Builder( context );
-        }
+        builder = new AlertDialog.Builder( context );
         builder.setTitle( "Succesful Update" )
                 .setMessage( "Information has been successfully updated" )
                 .setNeutralButton( "OK",
@@ -405,6 +534,16 @@ public class MemberSettingsFragment extends Fragment {
         setDefault();
     }
 
+    /****************************************************************************************/
+
+
+    /**
+     * Helper method that creates a new Credential object based
+     * on the data in mUpdateMap. Uses this object to update
+     * the SharedPreferences.
+     *
+     * @return new Credential object with updated information of user
+     */
     private Credentials updateCredentials() {
 
 
@@ -419,8 +558,6 @@ public class MemberSettingsFragment extends Fragment {
             keys.remove( "email" );
         }
 
-        // endpoint doesn't handle this properly yet
-        // server needs to apply hash before updating password in database
         if ( mUpdateMap.containsKey( "password" ) ) {
             password = mUpdateMap.get( "password" );
             keys.remove( "password" );
@@ -447,7 +584,7 @@ public class MemberSettingsFragment extends Fragment {
                     usernameAdded = true;
                     break;
                 default:
-                    Log.d( TAG, "The key should've been one of the 3. What is this?" );
+                    Log.d( TAG, "The key should've been one of the 3. What is this?: "+ key );
             }
         }
 
@@ -464,84 +601,15 @@ public class MemberSettingsFragment extends Fragment {
         }
         builder.addMemberID( mCredentials.getMemberID() );
         Credentials newCredentials = builder.build();
-        // credentials object should have a toString() method...
-        Log.d( TAG, "New Credentials" );
-        Log.d( TAG, "firstname: " + newCredentials.getFirstName() );
-        Log.d( TAG, "lastname: " + newCredentials.getLastName() );
-        Log.d( TAG, "email: " + newCredentials.getEmail() );
-        Log.d( TAG, "username:  " + newCredentials.getUsername() );
 
         HomeActivity      activity = ( HomeActivity ) getActivity();
         SharedPreferences prefs    = activity.getSharedPreferences( activity.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
-        prefs.edit().putString( activity.getString( R.string.keys_prefs_password ), newCredentials.getPassword() ).commit();
-        prefs.edit().putString( activity.getString( R.string.keys_prefs_email ), newCredentials.getEmail() ).commit();
+        assert(prefs != null);
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_password ), newCredentials.getPassword() ).apply();
+        prefs.edit().putString( activity.getString( R.string.keys_prefs_email ), newCredentials.getEmail() ).apply();
 
-        // after all this work to update the Credentials object on the client side
-        // the app might be better off
-        // sending a new request to an endpoint (with the new email and/or password if changed)
-        // and get the new credentials object from that.
 
         return newCredentials;
-    }
-
-    @Override
-    public void onAttach( Context context ) {
-        super.onAttach( context );
-        if ( context instanceof OnFragmentInteractionListener ) {
-            mListener = ( OnFragmentInteractionListener ) context;
-        } else {
-            throw new RuntimeException( context.toString()
-                    + " must implement OnFragmentInteractionListener" );
-        }
-    }
-
-    @Override
-    public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-        mCredentialsMap = new HashMap<>();
-        if ( getArguments() != null ) {
-            mCredentials = ( Credentials ) getArguments().getSerializable( getString( R.string.nav_membersettings ) );
-            UpdateValue firstname = new UpdateValue( KEYS[ 0 ], mCredentials.getFirstName() );
-            UpdateValue lastname  = new UpdateValue( KEYS[ 1 ], mCredentials.getLastName() );
-            UpdateValue username  = new UpdateValue( KEYS[ 2 ], mCredentials.getUsername() );
-            UpdateValue email     = new UpdateValue( KEYS[ 3 ], mCredentials.getEmail() );
-            UpdateValue password  = new UpdateValue( KEYS[ 4 ], mCredentials.getPassword() );
-
-            mCredentialsMap.put( R.id.et_member_settings_firstname, firstname );
-            mCredentialsMap.put( R.id.et_member_settings_lastname, lastname );
-            mCredentialsMap.put( R.id.et_member_settings_username, username );
-            mCredentialsMap.put( R.id.et_member_settings_email, email );
-            mCredentialsMap.put( R.id.et_member_settings_password, password );
-
-            Log.d( TAG, "Finished initializing mCredentialsMap: " + mCredentialsMap );
-
-
-        }
-    }
-
-    @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState ) {
-
-        // Inflate the layout for this fragment
-        mView = inflater.inflate( R.layout.fragment_member_settings, container, false );
-
-        mGridLayout = mView.findViewById( R.id.gl_member_settings );
-        mPassword_et = mView.findViewById( R.id.et_member_settings_password );
-        mConfirmPassword_et = mView.findViewById( R.id.et_member_settings_confirm_password );
-        mConfirmPassword_tv = mView.findViewById( R.id.tv_member_settings_confirmpass );
-        mApplyButton = mView.findViewById( R.id.btn_member_settings_apply );
-
-        Log.d( "BRYAN", "my tag: " + getTag() );
-        setDefault();
-
-        return mView;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
 
@@ -560,8 +628,11 @@ public class MemberSettingsFragment extends Fragment {
         void onChangeMemberInfo( Credentials credentials );
     }
 
-    // helper class for storing the default values
-    // of each EditText field (excluding confirm_password)
+    /**
+     * Helper object that stores the KEYS needed for the endpoint
+     * with its appropriate data (e.g. firstname, lastname, email, etc.).
+     * This object will store the default credentials of user.
+     */
     private class UpdateValue {
 
         private String mKey;
