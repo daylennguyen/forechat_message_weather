@@ -35,15 +35,14 @@ import java.util.Objects;
  */
 public class ChatFragment extends Fragment {
 
-    private static final String                  TAG = "CHAT_FRAG";
+    private static final String TAG = "CHAT_FRAG";
     @SuppressLint("StaticFieldLeak")
-    static               View                    rootLayout;
-    private              FirebaseMessageReciever mFirebaseMessageReciever;
+    static View rootLayout;
+    private FirebaseMessageReciever mFirebaseMessageReciever;
     /**
-     * Views that will show message recieved and sending
-     **/
-
-    private              EditText                mMessageInputEditText;
+     * input edit text to send message.
+     */
+    private EditText mMessageInputEditText;
 
     /**
      * User information.
@@ -74,8 +73,11 @@ public class ChatFragment extends Fragment {
         //Setting the UI for the fragment.
         String title = getArguments().getString( getString( R.string.key_chat_Title ) );
         Objects.requireNonNull( getActivity() ).setTitle( title );
+        //Grab the root layout.
         rootLayout = inflater.inflate( R.layout.fragment_chat, container, false );
         mMessageInputEditText = rootLayout.findViewById( R.id.et_chat_message );
+
+        //Grab the view of scrollview.
         ScrollView scrollview = rootLayout.findViewById( R.id.Scroller );
         scrollview.post( () -> scrollview.fullScroll( ScrollView.FOCUS_DOWN ) );
 
