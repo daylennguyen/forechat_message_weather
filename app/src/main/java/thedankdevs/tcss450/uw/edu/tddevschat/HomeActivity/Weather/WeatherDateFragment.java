@@ -30,10 +30,8 @@ import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragmen
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * A weather date fragment contains much of the client functionality corresponding to weather.
+ * Interacts with a list fragment containing all of the weather data
  */
 public class WeatherDateFragment extends Fragment {
     /*  UNITS OF MEASUREMENT  */
