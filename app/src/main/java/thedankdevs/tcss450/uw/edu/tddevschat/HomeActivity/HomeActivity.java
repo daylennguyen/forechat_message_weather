@@ -21,7 +21,6 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.Switch;
@@ -41,9 +40,11 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Co
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
-import thedankdevs.tcss450.uw.edu.tddevschat.*;
+import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
 
@@ -72,16 +73,17 @@ public class HomeActivity extends AppCompatActivity
         RemoveChatMembers.OnRemoveMemberListener,
         MemberSettingsFragment.OnFragmentInteractionListener {
 
-    /*NODES are helper classes meant to encapsulate various functionality of the application*/
-    public SettingsNode mSettingsNode;
-    public String       date;
     /* ******************FIELD VARIABLES*******************/
-    /*User saved credentials*/
-    private Credentials     mCredential;
+
+    /*NODES are helper classes meant to encapsulate various functionality of the application*/
+    public  SettingsNode    mSettingsNode;
+    public  String          date;
     private LocationNode    mLocationNode;
     private ConnectionsNode mConnectionsNode;
     private ChatNode        mChatNode;
 
+    /*User saved credentials*/
+    private Credentials     mCredential;
 
     /*Chat Field variables*/
     private FirebaseMessageReciever mFirebaseMessageReciever;
@@ -92,8 +94,6 @@ public class HomeActivity extends AppCompatActivity
     private Switch mSwitch;
 
     /* ******** CONSTRUCTOR AND METHOD CALLS **************/
-
-
     public HomeActivity() {
     }
 
@@ -118,12 +118,9 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         ThemeUtils.onActivityCreateTheme( this );
-
         setContentView( R.layout.activity_home );
-
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
-
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
@@ -135,14 +132,11 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
-
         Log.d( "Debug Bryan", "initializing drawer" );
         initializeActionDrawerToggle( drawer, toolbar );
         Log.d( "Debug Bryan", "drawer initialized, starting location updates" );
-
         mLocationNode.startLocationUpdates();
         Log.d( "Debug Bryan", "location updates successful" );
-
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
             String          connectionNotification = getIntent().getStringExtra( getString( R.string.keys_intent_notification_connections ) );
@@ -154,10 +148,13 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
-//                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
+                HomeFragment home = new HomeFragment();
+                fm.beginTransaction().add( R.id.frame_home_container, home ).addToBackStack( null ).commit();
+//                this.setContentView( home.getView() );
+                loadFragment( home );
             }
-        }
 
+        }
 
 
         // reload member Settings fragment
@@ -179,9 +176,7 @@ public class HomeActivity extends AppCompatActivity
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
-
         Log.d( "BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername() );
-
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
@@ -190,16 +185,14 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener( this );
         TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
         nav_user.setText( mCredential.getUsername() ); //Set the header username.
-
-        Menu mainMenu = navigationView.getMenu();
-        Menu settingsMenu = mainMenu.findItem(R.id.settings_menu_item).getSubMenu();
-        MenuItem switchItem = settingsMenu.findItem(R.id.nav_theme);
-        mSwitch = switchItem.getActionView().findViewById(R.id.view_switch_theme);
+        Menu     mainMenu     = navigationView.getMenu();
+        Menu     settingsMenu = mainMenu.findItem( R.id.settings_menu_item ).getSubMenu();
+        MenuItem switchItem   = settingsMenu.findItem( R.id.nav_theme );
+        mSwitch = switchItem.getActionView().findViewById( R.id.view_switch_theme );
         SharedPreferences sharedPref = getSharedPreferences( getString( R.string.current_theme ), Context.MODE_PRIVATE );
-
-        mSwitch.setOnClickListener(new View.OnClickListener() {
+        mSwitch.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick( View v ) {
                 Log.d( "Paolo", "I hit the switch" );
                 Switch switchView = ( Switch ) v;
                 String theme      = ThemeUtils.THEME_CLASSIC;
@@ -208,10 +201,10 @@ public class HomeActivity extends AppCompatActivity
                 }
 
                 sharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
-                sharedPref.edit().putBoolean(getString(R.string.reload_theme_switch), switchView.isChecked()).commit();
-                onChangeTheme(theme);
+                sharedPref.edit().putBoolean( getString( R.string.reload_theme_switch ), switchView.isChecked() ).commit();
+                onChangeTheme( theme );
             }
-        });
+        } );
 
         String theme = sharedPref.getString( getString( R.string.current_theme ), ThemeUtils.THEME_CLASSIC );
         assert theme != null;
@@ -246,8 +239,6 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode = new LocationNode( this );
         /*     Chat      */
         mChatNode = new ChatNode( this, mCredential );
-        /*   Weather     */
-//        mWeatherNode = new WeatherNode(this, mLocationNode);
     }
 
 
@@ -263,7 +254,6 @@ public class HomeActivity extends AppCompatActivity
             if ( currentFragment instanceof ChatFragment ) {
                 mChatNode.loadAllChats();
             } else {
-
                 int i = 1;
                 while ( i < backstackCount ) {
                     getSupportFragmentManager().popBackStackImmediate();
@@ -276,11 +266,7 @@ public class HomeActivity extends AppCompatActivity
                 loadFragmentWithoutBackStack( new HomeFragment() );
             }
             super.onBackPressed();
-
-
         }
-
-
     }
 
     @Override
@@ -323,7 +309,6 @@ public class HomeActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if ( id == R.id.action_settings ) {
             loadFragment( new SettingsFragment() );
@@ -344,7 +329,6 @@ public class HomeActivity extends AppCompatActivity
         /*depending on the ID of the nav_item, route them to the appropriate fragment*/
         boolean loadingFromDifferentMethods = false;
         switch ( item.getItemId() ) {
-
             case R.id.nav_home:
                 setTitle( "Main Page" );
                 fragment = new HomeFragment();
@@ -444,6 +428,7 @@ public class HomeActivity extends AppCompatActivity
 
     /**
      * Helper method to load an instance of the given fragment into the current activity
+     *
      * @param frag fragment to be loaded
      * @author Emmett Kang, Bryan Santos
      * @version 30 November 2018
@@ -507,6 +492,7 @@ public class HomeActivity extends AppCompatActivity
     /**
      * When chat option is pressed, through connections, handle
      * the interaction from chatnode.
+     *
      * @author Emmett Kang, Daylen Nguyen
      * @version 20 November 2018
      */
@@ -518,6 +504,7 @@ public class HomeActivity extends AppCompatActivity
     /**
      * When chat is pressed, use the method fro chat node to handle
      * the interaction.
+     *
      * @param item Chat Object
      * @author Emmett Kang, Daylen Nguyen
      * @version 20
@@ -526,10 +513,12 @@ public class HomeActivity extends AppCompatActivity
     public void onChatsListFragmentInteraction( Chat item ) {
         mChatNode.onChatsListFragmentInteraction( item );
     }
+
     /**
      * Load the connections in order to display the connections
      * that the user has, so the user gets to select their connection
      * and load the CreateNewChat Fragment.
+     *
      * @author Emmett Kang
      * @version 26 November 2018
      */
@@ -539,9 +528,11 @@ public class HomeActivity extends AppCompatActivity
         mConnectionsNode.loadConnections( fragment );
 
     }
+
     /**
      * When chat is long-pressed, handle the interaction
      * in mChatNode.
+     *
      * @param item Chat object
      * @author Emmett Kang
      * @version 27 November 2018
@@ -555,9 +546,10 @@ public class HomeActivity extends AppCompatActivity
      * When user have selected the users to add into the new chat
      * Check if the user have checked at least one user, and if they
      * haven't, warn them with toast.
-     * @param cbList Checkbox list of connection's usernames.
+     *
+     * @param cbList         Checkbox list of connection's usernames.
      * @param connectionList connections that user has.
-     * @param chatTitle chat room title.
+     * @param chatTitle      chat room title.
      * @author Emmett Kang
      * @version 25 November 2018
      */
@@ -589,6 +581,7 @@ public class HomeActivity extends AppCompatActivity
 
     /**
      * Helper method to generate string of usernames that are checked.
+     *
      * @param list list of usernames that are checked
      * @return appended string of usernames.
      * @author Emmett Kang
@@ -608,6 +601,7 @@ public class HomeActivity extends AppCompatActivity
 
     /**
      * This is a getter method to return the notified chats
+     *
      * @return list of notified chats
      * @author Emmett Kang
      * @version 27 November 2018
@@ -617,16 +611,16 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
-
     /**
      * Update the notified chat list when user has read that chat.
+     *
      * @param openedChatID chat room that was opened.
      * @author Emmett Kang
      * @version 27 November 2018
      */
     public void updateNotifiedChats( int openedChatID ) {
         //User read, so remove the chatroom that was notified from the list.
-        notifiedChats.remove( notifiedChats.indexOf(openedChatID) );
+        notifiedChats.remove( openedChatID );
 
     }
 
@@ -635,7 +629,8 @@ public class HomeActivity extends AppCompatActivity
      * When notification is received through firebase, notify the
      * hamburger button and color it so the user knows they've received a
      * message.
-     * @param colorOfText color of menu item's text.
+     *
+     * @param colorOfText   color of menu item's text.
      * @param colorOfBurger color of burger button
      * @author Emmett Kang
      * @version 25 November 2018
@@ -646,7 +641,7 @@ public class HomeActivity extends AppCompatActivity
         NavigationView  navigationView = findViewById( R.id.nav_view );
         Menu            m              = navigationView.getMenu();
         MenuItem        menuItem       = m.findItem( R.id.nav_chat );
-        SpannableString span              = new SpannableString( menuItem.getTitle() );
+        SpannableString span           = new SpannableString( menuItem.getTitle() );
 
         span.setSpan( new ForegroundColorSpan( colorOfText ),
                 0, span.length(), 0 );
@@ -656,7 +651,8 @@ public class HomeActivity extends AppCompatActivity
     /**
      * Use chatnode's remove members from chat method in order to
      * remove members from the chat.
-     * @param users users to be removed.
+     *
+     * @param users     users to be removed.
      * @param theChatID chat that will remove the users.
      * @author Emmett Kang
      * @version 21 November 2018
@@ -691,10 +687,12 @@ public class HomeActivity extends AppCompatActivity
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     /**
      * This class was given by Charles Bryan, when the user logs out,
      * we would like to delete the token from the database,
      * so we can grant another token when the user logs in.
+     *
      * @author Charles Bryan
      */
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -741,8 +739,8 @@ public class HomeActivity extends AppCompatActivity
             super.onPostExecute( aVoid );
             //close the app
 
-            Intent intent = new Intent(mMaster, SignInActivity.class);
-            mMaster.startActivity(intent);
+            Intent intent = new Intent( mMaster, SignInActivity.class );
+            mMaster.startActivity( intent );
             mMaster.finish();
         }
     }
@@ -751,6 +749,7 @@ public class HomeActivity extends AppCompatActivity
      * A BroadcastReceiver setup to listen for messages sent from
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
+     *
      * @author Charles Bryan, Emmett kang, Michelle Brown
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {

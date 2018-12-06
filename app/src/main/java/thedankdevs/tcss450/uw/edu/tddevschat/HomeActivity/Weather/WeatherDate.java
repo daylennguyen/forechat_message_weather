@@ -1,6 +1,15 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather;
 
+
+/**
+ * Helper class meant to encapsulate
+ * the ui components corresponding
+ * to the weather data on a specific day.
+ * This class is passed to the { @MyWeatherDateRecyclerViewAdapter }
+ * To which is passed to the { @WeatherDateFragment }
+ */
 public class WeatherDate {
+    /**/
     public final int    id;
     public final String icon;
     final        String mDateTxtView;
