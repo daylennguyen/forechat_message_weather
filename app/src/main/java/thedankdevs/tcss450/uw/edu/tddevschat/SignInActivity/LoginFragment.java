@@ -39,7 +39,7 @@ import java.util.Objects;
  * {@link LoginFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  *
- * @author Michelle Brown, Bryan Santos
+ * @author Michelle Brown, Bryan Santos, Emmett Kang
  * @version 11/05/2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
@@ -367,6 +367,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
+    /**
+     * Get firebase token and insert to the database, then do login operations.
+     * @param email user's email
+     * @param password user's pasword
+     * @author Charles Bryan, Emmett Kang
+     */
     private void getFirebaseToken( final String email, final String password ) {
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic( "all" );
