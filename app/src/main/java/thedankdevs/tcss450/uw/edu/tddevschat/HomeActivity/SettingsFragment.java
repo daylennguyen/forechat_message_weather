@@ -34,16 +34,15 @@ import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.Locatio
 
 
 /**
- *
  * The settings fragment in which users may choose their preferred weather settings
- * @author Daylen Nguyen
  *
+ * @author Daylen Nguyen
  */
 public class SettingsFragment extends Fragment {
 
     /* Bundle Keys */
-    public static final  String METRIC_PREF        = "WEATHER_METRIC";
-    public static final  String DETERMINANT_PREF   = "LOCATION_DETERMINANT";
+    public static final String METRIC_PREF      = "WEATHER_METRIC";
+    public static final String DETERMINANT_PREF = "LOCATION_DETERMINANT";
 
     /*Static values of the center of USA*/
     private static final double AMERICA_CENTER_LON = 39.8283;
@@ -332,8 +331,8 @@ public class SettingsFragment extends Fragment {
             this.googleMap = googleMap;
             SharedPreferences sp = Objects.requireNonNull( getActivity() )
                     .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
-            float  lat             = sp.getFloat( MAP_LAT_KEY, 0f ); // val 0 if none
-            float  lon             = sp.getFloat( MAP_LON_KEY, 0f );
+            float  lat = sp.getFloat( MAP_LAT_KEY, 0f ); // val 0 if none
+            float  lon = sp.getFloat( MAP_LON_KEY, 0f );
             LatLng CurrentLocation;
 
             try {

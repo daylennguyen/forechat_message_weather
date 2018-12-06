@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +27,19 @@ import java.util.ArrayList;
  * @Version 27 November 2018
  */
 public class CreateNewChatFragment extends Fragment implements View.OnClickListener {
-    /**Checkbox list for connection's usernames*/
+    /**
+     * Checkbox list for connection's usernames
+     */
     ArrayList<CheckBox>   checkBoxList;
-    /**List of connections*/
+    /**
+     * List of connections
+     */
     ArrayList<Connection> connectionList;
     private OnCreateNewChatButtonListener mListener;
-    /**Chat room title*/
-    private EditText mChatTitleEditText;
+    /**
+     * Chat room title
+     */
+    private EditText                      mChatTitleEditText;
 
     public CreateNewChatFragment() {
         // Required empty public constructor
@@ -65,8 +70,9 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
 
     /**
      * Set the view of the fragment.
-     * @param inflater view to be inflated
-     * @param container container of the contents
+     *
+     * @param inflater           view to be inflated
+     * @param container          container of the contents
      * @param savedInstanceState any saved information
      * @return inflated view.
      */

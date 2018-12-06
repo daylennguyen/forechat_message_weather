@@ -83,7 +83,7 @@ public class HomeActivity extends AppCompatActivity
     private ChatNode        mChatNode;
 
     /*User saved credentials*/
-    private Credentials     mCredential;
+    private Credentials mCredential;
 
     /*Chat Field variables*/
     private FirebaseMessageReciever mFirebaseMessageReciever;
@@ -216,8 +216,6 @@ public class HomeActivity extends AppCompatActivity
             default:
 
         }
-
-
 
 
     }

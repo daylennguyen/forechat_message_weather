@@ -17,7 +17,9 @@ public class ThemeUtils {
     public static final String THEME_CLASSIC = "theme_classic";
     public static final String THEME_MINT    = "theme_mint";
 
-    /** Field used to check which theme to switch to. THEME_CLASSIC is the default value. */
+    /**
+     * Field used to check which theme to switch to. THEME_CLASSIC is the default value.
+     */
     private static String sTheme = THEME_CLASSIC;
 
     private ThemeUtils() {

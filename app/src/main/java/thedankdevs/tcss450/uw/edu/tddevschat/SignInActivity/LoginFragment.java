@@ -369,7 +369,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Get firebase token and insert to the database, then do login operations.
-     * @param email user's email
+     *
+     * @param email    user's email
      * @param password user's pasword
      * @author Charles Bryan, Emmett Kang
      */

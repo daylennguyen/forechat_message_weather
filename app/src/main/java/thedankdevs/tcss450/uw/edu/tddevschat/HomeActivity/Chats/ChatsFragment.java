@@ -23,16 +23,23 @@ import java.util.Objects;
  * <p/>
  * Activities containing this fragment MUST implement the {@link }
  * interface.
+ *
  * @author Emmett Kang
  */
 public class ChatsFragment extends Fragment implements View.OnClickListener {
-    /**Key to find the array list*/
+    /**
+     * Key to find the array list
+     */
     public static final String ARG_CHATS_LIST = "chats list";
-    /** Adapter that sets the conent*/
+    /**
+     * Adapter that sets the conent
+     */
     MyChatsRecyclerViewAdapter adapter;
-    /** Array list that contains all chats */
-    private ArrayList<Chat> mChats;
-    private int mColumnCount = 1;
+    /**
+     * Array list that contains all chats
+     */
+    private ArrayList<Chat>                        mChats;
+    private int                                    mColumnCount = 1;
     private OnChatsListFragmentInteractionListener mListener;
 
     /**
@@ -44,6 +51,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     /**
      * new instance of the chats fragment.
+     *
      * @param columnCount setting arguments with column count
      * @return chats list fragment
      */
@@ -79,8 +87,9 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Create the view of the fragment itself.
-     * @param inflater view to be inflated
-     * @param container content container
+     *
+     * @param inflater           view to be inflated
+     * @param container          content container
      * @param savedInstanceState any saved information.
      * @return inflated view
      */
@@ -133,6 +142,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     /**
      * onclick listener
+     *
      * @param v button to be set
      */
     @Override

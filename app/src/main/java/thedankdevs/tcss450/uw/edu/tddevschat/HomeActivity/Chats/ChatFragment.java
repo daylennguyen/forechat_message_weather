@@ -35,14 +35,14 @@ import java.util.Objects;
  */
 public class ChatFragment extends Fragment {
 
-    private static final String TAG = "CHAT_FRAG";
+    private static final String                  TAG = "CHAT_FRAG";
     @SuppressLint("StaticFieldLeak")
-    static View rootLayout;
-    private FirebaseMessageReciever mFirebaseMessageReciever;
+    static               View                    rootLayout;
+    private              FirebaseMessageReciever mFirebaseMessageReciever;
     /**
      * input edit text to send message.
      */
-    private EditText mMessageInputEditText;
+    private              EditText                mMessageInputEditText;
 
     /**
      * User information.
@@ -151,6 +151,7 @@ public class ChatFragment extends Fragment {
 
     /**
      * When send button is clicked, invoke endpoint to send messages.
+     *
      * @param theButton sendbutton.
      */
     private void handleSendClick( final View theButton ) {
@@ -177,6 +178,7 @@ public class ChatFragment extends Fragment {
 
     /**
      * after sending message, clear out the input edit text.
+     *
      * @param result if message was sent or not.
      */
     private void endOfSendMsgTask( final String result ) {
@@ -195,12 +197,13 @@ public class ChatFragment extends Fragment {
 
     /**
      * This method creates the bubble UI by intaking the sender and the message that the sender sent
+     *
      * @param sender Person who sent the message
-     * @param msg content of the message
+     * @param msg    content of the message
      */
     public void createBubbleUI( String sender, String msg ) {
         //Grab the linear layout (container for chats) that is vertical.
-        LinearLayout ll     = rootLayout.findViewById( R.id.LinLay );
+        LinearLayout ll = rootLayout.findViewById( R.id.LinLay );
 
         //Create a horizontal layout for each edit text.
         LinearLayout holder = new LinearLayout( getContext() );
@@ -247,6 +250,7 @@ public class ChatFragment extends Fragment {
 
     /**
      * Get the current chatID for this chat.
+     *
      * @return the current chatID
      */
     public int getmChatID() {
@@ -257,6 +261,7 @@ public class ChatFragment extends Fragment {
      * A BroadcastReceiver setup to listen for messages sent from
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
+     *
      * @author Charles Bryan, Emmett Kang
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {

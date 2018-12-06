@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.ChatsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Chats.content.Chat;
-import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.ConnectionFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeFragment;
@@ -52,13 +51,14 @@ public class ChatNode {
     /**
      * Current user information
      **/
-    private Credentials  mCredential;
+    private Credentials mCredential;
 
     private HomeActivity mMaster;
 
     /**
      * When this node is instantiated, pass around the information.
-     * @param Master HomeActivity Node.
+     *
+     * @param Master      HomeActivity Node.
      * @param mCredential User information.
      */
     public ChatNode( HomeActivity Master, Credentials mCredential ) {
@@ -86,6 +86,7 @@ public class ChatNode {
 
     /**
      * Retrieves the previous messages that chat session contains.
+     *
      * @author Emmett Kang
      * @version 16 November 2018
      */
@@ -117,6 +118,7 @@ public class ChatNode {
     /**
      * If there aren't any ongoing chat happening, create new chat, else
      * load al messages and open existing chat.
+     *
      * @param chatID Chat session identifier.
      * @author Emmett Kang
      * @version 1 December 2018
@@ -134,6 +136,7 @@ public class ChatNode {
 
     /**
      * Receive and process the result from the endpoint and send to chat fragment.
+     *
      * @param result JSON file from endpoint.
      * @Author Emmett Kang
      * @Version 16 November 2018
@@ -163,6 +166,7 @@ public class ChatNode {
 
     /**
      * This method creates new chat sessions.
+     *
      * @Author Emmett Kang
      * @Version 15 November 2018
      */
@@ -212,6 +216,7 @@ public class ChatNode {
     /**
      * Receive and process the result from the endpoint and send to chat fragment while
      * adding users to the new chat room.
+     *
      * @param result JSON file from endpoint.
      * @Author Emmett Kang
      * @Version 15 November 2018
@@ -241,6 +246,7 @@ public class ChatNode {
 
     /**
      * Add the users to a certain chatroom through chatID.
+     *
      * @param chatID    chatroom identifier.
      * @param usernames user's email to be added.
      * @Author Emmett Kang
@@ -272,6 +278,7 @@ public class ChatNode {
 
     /**
      * Receive and show if succeeded through logcat.
+     *
      * @param result JSON file
      * @Author Emmett Kang
      * @Version 15 November 2018
@@ -297,6 +304,7 @@ public class ChatNode {
     /**
      * Receive bundle from other methods, send necessary information, and
      * load the chat fragment.
+     *
      * @param bundle Information chat fragment to open.
      * @Author Emmett Kang
      * @Version 16 November 2018
@@ -312,6 +320,7 @@ public class ChatNode {
     /**
      * If chat is selected, check if chatID is notified, then unnotify the
      * chat, else just open normal.
+     *
      * @param item chat object itself.
      */
     public void onChatsListFragmentInteraction( Chat item ) {
@@ -332,6 +341,7 @@ public class ChatNode {
 
     /**
      * Load all chats that user associates with.
+     *
      * @Author Emmett Kang
      * @Version 16 November 2018
      */
@@ -358,6 +368,7 @@ public class ChatNode {
 
     /**
      * Receive and process the result from the endpoint and send to chat fragment.
+     *
      * @param result JSON file from endpoint.
      * @Author Emmett Kang
      * @Version 16 November 2018
@@ -384,6 +395,7 @@ public class ChatNode {
 
     /**
      * Get all of the members who are part of group chats
+     *
      * @author Emmett Kang
      * @version 23 November 2018
      */
@@ -405,6 +417,7 @@ public class ChatNode {
     /**
      * Receiving the result from the post request. Add to existing chats list so that
      * we can use that to show the list of chats.
+     *
      * @param result JSON array of group members.
      * @author Emmett Kang
      * @version 23 November 2018
@@ -472,9 +485,10 @@ public class ChatNode {
      * When button for create new chat is pressed, this method is called. It will contain
      * the connections that are checked and create new chats or open new chats if
      * user already has an ongoing chat.
-     * @param cbList checkboxes that uses connection's username,
+     *
+     * @param cbList         checkboxes that uses connection's username,
      * @param connectionList list of connections the user have.
-     * @param chatTitle chatroom title.
+     * @param chatTitle      chatroom title.
      * @author Emmett Kang
      * @version 1 December 2018
      */
@@ -509,6 +523,7 @@ public class ChatNode {
     /**
      * When the user long-presses one of the chats, this method will create the a up
      * to provide users some options regarding to the chatrooms.
+     *
      * @param item the chat object.
      * @author Emmett Kang
      * @version 27 November 2018
@@ -541,6 +556,7 @@ public class ChatNode {
     /**
      * When user presses end chat, this method gets called to set the status of the
      * chat to ended.
+     *
      * @param theChatID chat session identifier being ended.
      * @author Emmett Kang
      * @version 22 November 2018
@@ -568,6 +584,7 @@ public class ChatNode {
 
     /**
      * After ending te chats, reload the list of chats that user is in.
+     *
      * @param result
      * @author Emmett Kang
      * @version 22 November 2018
@@ -580,6 +597,7 @@ public class ChatNode {
     /**
      * This method is called when user wishes to remove the chat member.
      * Send the group chatID so we can retrive who's in the group chat.
+     *
      * @param groupChatID Chatroom identifier
      * @author Emmett Kang
      * @version 21 November 2018
@@ -610,6 +628,7 @@ public class ChatNode {
     /**
      * Get all of the members who are in the chat, and create a new fragment
      * so that user can choose who they would like to remove.
+     *
      * @param result others in the group chat.
      * @author Emmett Kang
      * @version 21 November 2018
@@ -659,7 +678,8 @@ public class ChatNode {
     /**
      * Receive the members to be removed from the chat and the chatID and call
      * a post request to remove members from the chat through server side.
-     * @param members Members to be removed.
+     *
+     * @param members   Members to be removed.
      * @param theChatID Chats that is going to remove members
      * @author Emmett Kang
      * @version 21 November 2018
@@ -691,6 +711,7 @@ public class ChatNode {
 
     /**
      * After removing the members, reload the chats list.
+     *
      * @param result result from post request.
      * @author Emmett Kang
      * @version 21 Novebmer 2018

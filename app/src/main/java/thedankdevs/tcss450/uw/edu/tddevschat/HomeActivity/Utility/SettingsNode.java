@@ -14,6 +14,7 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
 
+/*Contains much of the functionality regarding weather preferences. Usually initialized by home activity*/
 public class SettingsNode {
 
     /******************[CONSTANTS]******************/
@@ -32,6 +33,7 @@ public class SettingsNode {
 
     /************************************************/
 
+    /*Home activity passes a a self reference*/
     public SettingsNode( HomeActivity master ) {
         this.master = master;
     }
@@ -61,6 +63,7 @@ public class SettingsNode {
         editor.apply();
     }
 
+    /*STATIC listener assigned to the dropdown for location determinant*/
     public static class LocationDeterminantDropdownListener implements AdapterView.OnItemSelectedListener {
         View view;
 

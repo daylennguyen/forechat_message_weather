@@ -159,7 +159,6 @@ public class LocationNode implements Serializable {
     }
 
     /**
-     *
      * @return
      */
     private AppCompatActivity getMyNodeMaster() {

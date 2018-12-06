@@ -14,7 +14,6 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import java.util.List;
 
 /**
- *
  * {@link RecyclerView.Adapter} that can display a {@link WeatherDate} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
