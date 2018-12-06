@@ -400,8 +400,8 @@ public class SettingsFragment extends Fragment {
             if ( cLocate != null ) {
                 curLat = ( float ) cLocate.latitude;
                 curLon = ( float ) cLocate.longitude;
-                e.putFloat( MAP_LAT_KEY, curLat );
-                e.putFloat( MAP_LON_KEY, curLon );
+                e.putString( MAP_LAT_KEY, String.valueOf( curLat ) );
+                e.putString( MAP_LON_KEY, String.valueOf( curLon ) );
                 Toast.makeText( mMaster, "Latitude: "
                                 .concat( String.valueOf( curLat ) )
                                 .concat( " and Longitude: " )

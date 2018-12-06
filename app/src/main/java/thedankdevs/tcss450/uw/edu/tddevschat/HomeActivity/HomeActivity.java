@@ -126,7 +126,6 @@ public class HomeActivity extends AppCompatActivity
         }
         setTitle( "Hi there, " + mCredential.getFirstName() + "" );
         Log.d( "Debug Bryan", "initializing Nodes" );
-        initializeNodes();
         Log.d( "Debug Bryan", "nodes initialized" );
         /*insert option items into the tool bar and initialize the drawer*/
         Toolbar toolbar = findViewById( R.id.toolbar );
@@ -135,7 +134,7 @@ public class HomeActivity extends AppCompatActivity
         Log.d( "Debug Bryan", "initializing drawer" );
         initializeActionDrawerToggle( drawer, toolbar );
         Log.d( "Debug Bryan", "drawer initialized, starting location updates" );
-        mLocationNode.startLocationUpdates();
+
         Log.d( "Debug Bryan", "location updates successful" );
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -149,12 +148,15 @@ public class HomeActivity extends AppCompatActivity
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
                 HomeFragment home = new HomeFragment();
-                fm.beginTransaction().add( R.id.frame_home_container, home ).addToBackStack( null ).commit();
+                fm.beginTransaction().add( R.id.frame_home_container, home, HomeFragment.class.getSimpleName() ).addToBackStack( null ).commit();
 //                this.setContentView( home.getView() );
                 loadFragment( home );
             }
 
         }
+        initializeNodes();
+
+        mLocationNode.startLocationUpdates();
 
 
         // reload member Settings fragment
@@ -216,7 +218,6 @@ public class HomeActivity extends AppCompatActivity
         }
 
 
-        mLocationNode.startLocationUpdates();
 
 
     }
