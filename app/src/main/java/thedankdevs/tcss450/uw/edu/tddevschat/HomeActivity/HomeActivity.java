@@ -70,8 +70,7 @@ public class HomeActivity extends AppCompatActivity
         WaitFragment.OnFragmentInteractionListener,
         RequestFragment.OnListFragmentInteractionListener,
         RemoveChatMembers.OnRemoveMemberListener,
-        MemberSettingsFragment.OnFragmentInteractionListener,
-        ThemesFragment.OnFragmentInteractionListener {
+        MemberSettingsFragment.OnFragmentInteractionListener {
 
     /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public SettingsNode mSettingsNode;
@@ -593,7 +592,6 @@ public class HomeActivity extends AppCompatActivity
         mChatNode.RemoveMembersFromChat( users, theChatID );
     }
 
-    @Override
     public void onChangeTheme( String theme ) {
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.key_credential ), mCredential );
