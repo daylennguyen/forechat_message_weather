@@ -132,7 +132,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                     if ( !mIsMine ) {
                         requestConnection();
                     } else {
-                        mListener.onOpenChatInteraction( mOurChatID, mTheirEmail, mTheirUsername );
+                        mListener.onOpenChatInteraction( mOurChatID, mTheirUsername );
                     }
                     break;
             }
@@ -193,6 +193,6 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
      * activity.
      */
     public interface OnConnectionFragmentInteractionListener {
-        void onOpenChatInteraction( int chatID, String email, String username );
+        void onOpenChatInteraction( int chatID, String username );
     }
 }

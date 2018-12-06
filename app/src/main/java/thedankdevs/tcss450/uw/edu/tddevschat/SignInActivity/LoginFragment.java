@@ -39,7 +39,7 @@ import java.util.Objects;
  * {@link LoginFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  *
- * @author Michelle Brown, Bryan Santos
+ * @author Michelle Brown, Bryan Santos, Emmett Kang
  * @version 11/05/2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
@@ -165,6 +165,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * @param result
      */
     private void handleIDOnPostExecute( String result ) {
+
+        Log.d( "Debug Bryan", "Handle Id on post execute" );
+
+
         try {
             JSONObject resultsJSON  = new JSONObject( result );
             JSONObject jsonMemberID = resultsJSON.getJSONObject( "memberID" );
@@ -261,8 +265,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private void buildLoginServerCredentials( String email, String password ) {
 
         //build the web service URL
-        //getMemberID(email);
-        Log.d( "MEMBERID", String.valueOf( mMemberID ) );
+        //getMemberID();
+        //Log.d( "MEMBERID", String.valueOf( mMemberID ) );
         mCredentials = new Credentials.Builder( email, password )
                 .build();
         Uri uri = new Uri.Builder()
@@ -274,6 +278,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         //build the JSONObject
         JSONObject msg = mCredentials.asJSONObject();
+        Log.d( "Debug Bryan", msg.toString() );
 
         try {
             msg.put( "token", mFirebaseToken );
@@ -336,8 +341,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         //retrieve the stored credentials from SharedPrefs
         if ( prefs.contains( getString( R.string.keys_prefs_email ) ) &&
                 prefs.contains( getString( R.string.keys_prefs_password ) ) ) {
+            Log.d( "DEBUG Bryan", "I have stored preferences" );
             mEmail = prefs.getString( getString( R.string.keys_prefs_email ), "" );
             mPassword = prefs.getString( getString( R.string.keys_prefs_password ), "" );
+            Log.d( "DEBUG Bryan", "mEmail: " + mEmail + " mPassword: " + mPassword );
+
             //Load the two login EditTexts with the credentials found in SharedPrefs
             EditText emailEdit = getActivity().findViewById( R.id.et_login_email );
             emailEdit.setText( mEmail );
@@ -349,6 +357,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             //buildLoginServerCredentials(email, password);
 
         }
+
+        Log.d( "DEBUG Bryan", "I dont have stored preferences; exiting onStart" );
     }
 
     @Override
@@ -357,6 +367,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
+    /**
+     * Get firebase token and insert to the database, then do login operations.
+     * @param email user's email
+     * @param password user's pasword
+     * @author Charles Bryan, Emmett Kang
+     */
     private void getFirebaseToken( final String email, final String password ) {
         //add this app on this device to listen for the topic all
         FirebaseMessaging.getInstance().subscribeToTopic( "all" );
@@ -382,6 +398,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * Handle the setup of the UI before the HTTP call to the webservice.
      */
     private void handleLoginOnPre() {
+        mListener.onWaitFragmentInteractionShow();
     }
 
     /**
@@ -420,6 +437,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             mListener.onWaitFragmentInteractionHide();
             ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Login Unsuccessful" );
+        } catch ( Exception e ) {
+            Log.d( "Debug Bryan", "Not sure what this runtime exception is: " + e );
+            e.printStackTrace();
         }
     }
 

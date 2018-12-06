@@ -31,7 +31,7 @@ import java.util.Objects;
  * Fragment that deals with Receiving and Sending a chat between users.
  *
  * @Author Emmett Kang
- * @Version 15 November 2018
+ * @Version 19 November 2018
  */
 public class ChatFragment extends Fragment {
 
@@ -64,35 +64,36 @@ public class ChatFragment extends Fragment {
                               Bundle savedInstanceState ) {
 
         assert getArguments() != null;
+        //Get the Chat information such as the user and the ChatID.
         mChatID = getArguments().getInt( getString( R.string.key_connection_chatID ) );
         mCredentials = ( Credentials ) getArguments().getSerializable( getString( R.string.key_credential ) );
         assert mCredentials != null;
         mEmail = mCredentials.getEmail();
         mUsername = mCredentials.getUsername();
+
+        //Setting the UI for the fragment.
         String title = getArguments().getString( getString( R.string.key_chat_Title ) );
         Objects.requireNonNull( getActivity() ).setTitle( title );
         rootLayout = inflater.inflate( R.layout.fragment_chat, container, false );
         mMessageInputEditText = rootLayout.findViewById( R.id.et_chat_message );
-
         ScrollView scrollview = rootLayout.findViewById( R.id.Scroller );
         scrollview.post( () -> scrollview.fullScroll( ScrollView.FOCUS_DOWN ) );
 
+        //grab all of old chats and reverse them in order.
         JSONArray pastChat;
         String    pastChatString = getArguments().getString( getString( R.string.key_json_array ) );
         if ( pastChatString != null ) {
             try {
                 pastChat = new JSONArray( pastChatString );
 
+                //Dynamically create the bubble UI while grabbing the old messages information.
                 for ( int i = pastChat.length() - 1; i >= 0; i-- ) {
                     LinearLayout holder = new LinearLayout( getContext() );
                     holder.setOrientation( LinearLayout.HORIZONTAL );
                     JSONObject message = pastChat.getJSONObject( i );
                     String     sender  = message.getString( "username" );
                     String     msg     = message.getString( "message" );
-
-                    Log.w( "sender", sender );
-                    Log.w( "sender", mCredentials.getUsername() );
-                    createBubbleUI( sender, msg );
+                    createBubbleUI( sender, msg ); //Create the bubble UI
                 }
             } catch ( JSONException e ) {
                 Log.w( "cant make it", "DARN IT" );
@@ -148,7 +149,6 @@ public class ChatFragment extends Fragment {
 
     /**
      * When send button is clicked, invoke endpoint to send messages.
-     *
      * @param theButton sendbutton.
      */
     private void handleSendClick( final View theButton ) {
@@ -173,6 +173,10 @@ public class ChatFragment extends Fragment {
                 .build().execute();
     }
 
+    /**
+     * after sending message, clear out the input edit text.
+     * @param result if message was sent or not.
+     */
     private void endOfSendMsgTask( final String result ) {
         try {
             //This is the result from the web service
@@ -187,11 +191,19 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    @SuppressLint("RtlHardcoded")
+    /**
+     * This method creates the bubble UI by intaking the sender and the message that the sender sent
+     * @param sender Person who sent the message
+     * @param msg content of the message
+     */
     public void createBubbleUI( String sender, String msg ) {
+        //Grab the linear layout (container for chats) that is vertical.
         LinearLayout ll     = rootLayout.findViewById( R.id.LinLay );
+
+        //Create a horizontal layout for each edit text.
         LinearLayout holder = new LinearLayout( getContext() );
         holder.setOrientation( LinearLayout.HORIZONTAL );
+        //If the sender is the user, then create a purple bubble.
         if ( sender.equals( mCredentials.getUsername() ) ) {
             TextView messageBubble = new TextView( getContext() );
             messageBubble.setText( msg );
@@ -206,8 +218,8 @@ public class ChatFragment extends Fragment {
             holder.addView( messageBubble, layoutParams );
 
             holder.setGravity( Gravity.END );
-            ll.addView( holder );
-        } else {
+            ll.addView( holder ); //Add to the chat container.
+        } else { //If sender is other people, create a blue bubble.
             holder.setOrientation( LinearLayout.VERTICAL );
             TextView messageBubble = new TextView( getContext() );
             TextView send          = new TextView( getContext() );
@@ -231,6 +243,10 @@ public class ChatFragment extends Fragment {
 
     }
 
+    /**
+     * Get the current chatID for this chat.
+     * @return the current chatID
+     */
     public int getmChatID() {
         return mChatID;
     }
@@ -239,6 +255,7 @@ public class ChatFragment extends Fragment {
      * A BroadcastReceiver setup to listen for messages sent from
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
+     * @author Charles Bryan, Emmett Kang
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {
         @Override
@@ -255,11 +272,12 @@ public class ChatFragment extends Fragment {
                         String msg    = jObj.getString( "message" );
                         String chatID = jObj.getString( "chatID" );
                         int    cid    = Integer.parseInt( chatID );
-                        if ( cid == mChatID ) {
+                        if ( cid == mChatID ) { //If the chat ID is correct,
                             Log.i( "FCM Chat Frag", sender + " " + msg );
-                            createBubbleUI( sender, msg );
+                            createBubbleUI( sender, msg ); //Create the bubble UI accordingly.
                         }
                     }
+                    //Make the focus on the scroll view to go down, so user can easily see it.
                     ScrollView scrollview = rootLayout.findViewById( R.id.Scroller );
                     scrollview.post( () -> scrollview.fullScroll( ScrollView.FOCUS_DOWN ) );
                 } catch ( JSONException e ) {

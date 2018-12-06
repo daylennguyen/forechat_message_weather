@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -33,21 +34,30 @@ import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.Locatio
 
 
 /**
- * A simple {@link Fragment} subclass.
+ *
+ * The settings fragment in which users may choose their preferred weather settings
+ * @author Daylen Nguyen
+ *
  */
 public class SettingsFragment extends Fragment {
+
     /* Bundle Keys */
     public static final  String METRIC_PREF        = "WEATHER_METRIC";
     public static final  String DETERMINANT_PREF   = "LOCATION_DETERMINANT";
+
+    /*Static values of the center of USA*/
     private static final double AMERICA_CENTER_LON = 39.8283;
     private static final double AMERICA_CENTER_LAT = 98.5795;
+
+    /*UI Elements to display weather data*/
     EditText mStateView, mCityView, mZipView;
-    RadioGroup         mWeatherMetricRGroup;
-    HomeActivity       home;
-    MapView            mMap;
-    boolean            gpsIsActive;
-    MapIsReadyCallback mCallback;
-    Spinner            locate_spinner;
+    RadioGroup           mWeatherMetricRGroup;
+    HomeActivity         home;
+    MapView              mMap;
+    boolean              gpsIsActive;
+    MapIsReadyCallback   mCallback;
+    Spinner              locate_spinner;
+    FloatingActionButton mFAB;
 
     public SettingsFragment() {/*Required empty public constructor*/
         home = ( HomeActivity ) getActivity();
@@ -62,6 +72,9 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_settings, container, false );
+
+
+
         /*Spinner is the Dropdown for how we will be retrieving the location.
                   - GPS Data
                   - Select Location on Map
@@ -79,7 +92,12 @@ public class SettingsFragment extends Fragment {
         mCityView = view.findViewById( R.id.city_txtvjew );
         mStateView = view.findViewById( R.id.state_txtentry );
         mZipView = view.findViewById( R.id.zipcode_txtvjew );
-
+        mFAB = view.findViewById( R.id.weather_fab );
+        mFAB.setOnClickListener( ( View v ) -> {
+            if ( getFragmentManager() != null ) {
+                getFragmentManager().beginTransaction().add( R.id.frame_home_container, new SettingsFragment() ).addToBackStack( null ).commit();
+            }
+        } );
 
 
         /*Check if permissions were granted yet*/
@@ -88,7 +106,12 @@ public class SettingsFragment extends Fragment {
                 && ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             gpsIsActive = false;
             /*if not, then ask for them again*/
-            ActivityCompat.requestPermissions( this.getActivity(), new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
+            ActivityCompat.requestPermissions( Objects
+                            .requireNonNull( this.getActivity() ), new String[] {
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION },
+                    MY_PERMISSIONS_LOCATIONS );
+
             if ( ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_FINE_LOCATION )
                     != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission( home, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
@@ -125,7 +148,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        SharedPreferences determin_sp   = getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+        SharedPreferences determin_sp   = Objects.requireNonNull( getContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
         int               determin_pref = determin_sp.getInt( DETERMINANT_PREF, -1 );
         SharedPreferences sp = Objects.requireNonNull( getActivity() )
                 .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
@@ -181,14 +204,10 @@ public class SettingsFragment extends Fragment {
     public void onStop() {
         super.onStop();
         // Get from the SharedPreferences
-        SharedPreferences        metSet           = Objects.requireNonNull( this.getContext() ).getSharedPreferences( METRIC_PREF, 0 );
-        SharedPreferences        locSet           = Objects.requireNonNull( this.getContext() ).getSharedPreferences( DETERMINANT_PREF, 0 );
-        SharedPreferences.Editor determin_pref    = getActivity().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE ).edit();
+        SharedPreferences.Editor determin_pref    = Objects.requireNonNull( getActivity() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE ).edit();
         int                      DeterminantState = locate_spinner.getSelectedItemPosition();
         determin_pref.putInt( DETERMINANT_PREF, DeterminantState );
-        determin_pref.commit();
-        String METRICPREF = metSet.getString( METRIC_PREF, "C" );
-//        int    DeterminantState = locSet.getInt( DETERMINANT_PREF, 1 );
+        determin_pref.apply();
         /*if the gps setting is not active, disable the gps*/
         switch ( DeterminantState ) {
             case SettingsNode.SELECT_FROM_MAP:
@@ -245,14 +264,13 @@ public class SettingsFragment extends Fragment {
         } else {
             mZipView.setError( "Enter a Zip Code" );
         }
-        e.commit();
+        e.apply();
     }
 
     private void cityStateActionListener( View v ) {
         /*Retrieve shared preferences for editing*/
         SharedPreferences        sp = Objects.requireNonNull( this.getContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
         SharedPreferences.Editor e  = sp.edit();
-        // TODO : Add city state check and tables within database
         /*Retrieve the city and state text from the views*/
         String state = mStateView.getText().toString();
         String city  = mCityView.getText().toString();
@@ -262,7 +280,7 @@ public class SettingsFragment extends Fragment {
             /*Insert City and State into the shared preferences*/
             e.putString( CITY_KEY, city );
             e.putString( STATE_KEY, state );
-            e.commit();
+            e.apply();
 
             /*Turn off the GPS*/
             Toast.makeText( getActivity(), state + "," + city + " applied to Location", Toast.LENGTH_LONG ).show();
@@ -316,7 +334,7 @@ public class SettingsFragment extends Fragment {
                     .getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
             float  lat             = sp.getFloat( MAP_LAT_KEY, 0f ); // val 0 if none
             float  lon             = sp.getFloat( MAP_LON_KEY, 0f );
-            LatLng CurrentLocation = new LatLng( 0f, 0f );
+            LatLng CurrentLocation;
 
             try {
                 /*Attempt to retrieve shared preferences*/
@@ -353,7 +371,7 @@ public class SettingsFragment extends Fragment {
                 googleMap.setOnMapClickListener( this );
                 googleMap.addMarker( currentMarker );
             }
-            googleMap.setOnMapClickListener( this::onMapClick );
+            googleMap.setOnMapClickListener( this );
         }
 
         @Override
@@ -396,7 +414,8 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText( mMaster, "Error setting the location; tap a location to drop a pin", Toast.LENGTH_LONG ).show();
             }
 
-            e.commit();
+
+            e.apply();
         }
     }
 }

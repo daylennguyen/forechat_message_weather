@@ -44,10 +44,10 @@ public class VerifyFragment extends Fragment implements View.OnClickListener {
     public void onClick( View v ) {
         if ( mListener != null ) {
             switch ( v.getId() ) {
-                case R.id.btn_verify_verify:
+                case R.id.btn_verify_verify: //If verify button was clicked.
                     attemptVerify(); //Try to verify
                     break;
-                case R.id.btn_verify_resend:
+                case R.id.btn_verify_resend: //If resend button was clicked.
                     resendVerificationCode();
                     break;
 

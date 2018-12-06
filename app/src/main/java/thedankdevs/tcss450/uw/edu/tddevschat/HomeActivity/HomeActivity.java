@@ -3,7 +3,6 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,8 +21,10 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -42,20 +43,17 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.*;
 import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
+import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.MyFirebaseMessagingService;
-import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment.MURICA;
-import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment.SCIENTIFIC;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
 
 /**
  *
@@ -72,25 +70,32 @@ public class HomeActivity extends AppCompatActivity
         WaitFragment.OnFragmentInteractionListener,
         RequestFragment.OnListFragmentInteractionListener,
         RemoveChatMembers.OnRemoveMemberListener,
-        MemberSettingsFragment.OnFragmentInteractionListener,
-        ThemesFragment.OnFragmentInteractionListener {
+        MemberSettingsFragment.OnFragmentInteractionListener {
 
     /*NODES are helper classes meant to encapsulate various functionality of the application*/
     public SettingsNode mSettingsNode;
-    String myMetricValue;
-    int    myDeterminValue;
-    /*******************FIELD VARIABLES*******************/
+    public String       date;
+    /* ******************FIELD VARIABLES*******************/
     /*User saved credentials*/
-    private Credentials             mCredential;
-    private LocationNode            mLocationNode;
-    private ConnectionsNode         mConnectionsNode;
-    private ChatNode                mChatNode;
+    private Credentials     mCredential;
+    private LocationNode    mLocationNode;
+    private ConnectionsNode mConnectionsNode;
+    private ChatNode        mChatNode;
+
+
     /*Chat Field variables*/
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer>      notifiedChats = new ArrayList<>();
-    private SharedPreferences       myLocationPref, myMetricPref;
     /*Used to toggle the opened/closed state of the nav drawer*/
-    private ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle   toggle;
+
+    private Switch mSwitch;
+
+    /* ******** CONSTRUCTOR AND METHOD CALLS **************/
+
+
+    public HomeActivity() {
+    }
 
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
@@ -108,15 +113,13 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.startLocationUpdates();
     }
 
+    //  LIFE CYCLE METHODS///////////////////////////
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-
         ThemeUtils.onActivityCreateTheme( this );
 
         setContentView( R.layout.activity_home );
-        setTitle( "Main Page" );
-        findViewById( R.id.nav_view );
 
         /*Check for saved-sign-in info*/
         mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.key_credential ) );
@@ -124,16 +127,21 @@ public class HomeActivity extends AppCompatActivity
         if ( mCredential == null ) {
             mCredential = ( Credentials ) getIntent().getSerializableExtra( getString( R.string.keys_credential_member_settings ) );
         }
-
+        setTitle( "Hi there, " + mCredential.getFirstName() + "" );
+        Log.d( "Debug Bryan", "initializing Nodes" );
         initializeNodes();
-
+        Log.d( "Debug Bryan", "nodes initialized" );
         /*insert option items into the tool bar and initialize the drawer*/
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
+
+        Log.d( "Debug Bryan", "initializing drawer" );
         initializeActionDrawerToggle( drawer, toolbar );
+        Log.d( "Debug Bryan", "drawer initialized, starting location updates" );
 
         mLocationNode.startLocationUpdates();
+        Log.d( "Debug Bryan", "location updates successful" );
 
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
@@ -146,16 +154,11 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
             if ( findViewById( R.id.frame_home_container ) != null ) {
-                // add homeFragment to back stack
-                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
-
+//                fm.beginTransaction().add( R.id.frame_home_container, new HomeFragment() ).addToBackStack( null ).commit();
             }
         }
 
-        if ( getIntent().getBooleanExtra( getString( R.string.reload_themes ), false ) ) {
-            setTitle( getString( R.string.theme_title ) );
-            loadFragmentWithoutBackStack( new ThemesFragment() );
-        }
+
 
         // reload member Settings fragment
         if ( getIntent().getBooleanExtra( getString( R.string.reload_member_settings ), false ) ) {
@@ -166,7 +169,12 @@ public class HomeActivity extends AppCompatActivity
             frag.setArguments( args );
             loadFragmentWithoutBackStack( frag );
         }
+        Log.d( "Debug Bryan", "onCreate done" );
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
@@ -182,6 +190,39 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener( this );
         TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
         nav_user.setText( mCredential.getUsername() ); //Set the header username.
+
+        Menu mainMenu = navigationView.getMenu();
+        Menu settingsMenu = mainMenu.findItem(R.id.settings_menu_item).getSubMenu();
+        MenuItem switchItem = settingsMenu.findItem(R.id.nav_theme);
+        mSwitch = switchItem.getActionView().findViewById(R.id.view_switch_theme);
+        SharedPreferences sharedPref = getSharedPreferences( getString( R.string.current_theme ), Context.MODE_PRIVATE );
+
+        mSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d( "Paolo", "I hit the switch" );
+                Switch switchView = ( Switch ) v;
+                String theme      = ThemeUtils.THEME_CLASSIC;
+                if ( switchView.isChecked() ) {
+                    theme = ThemeUtils.THEME_MINT;
+                }
+
+                sharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
+                sharedPref.edit().putBoolean(getString(R.string.reload_theme_switch), switchView.isChecked()).commit();
+                onChangeTheme(theme);
+            }
+        });
+
+        String theme = sharedPref.getString( getString( R.string.current_theme ), ThemeUtils.THEME_CLASSIC );
+        assert theme != null;
+        switch ( theme ) {
+            case ThemeUtils.THEME_MINT:
+                mSwitch.setChecked( true );
+            default:
+
+        }
+
+
         mLocationNode.startLocationUpdates();
 
 
@@ -347,9 +388,7 @@ public class HomeActivity extends AppCompatActivity
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
-                setTitle( getString( R.string.theme_title ) );
-                fragment = new ThemesFragment();
-                break;
+                return false;
 
             default:
 
@@ -384,6 +423,7 @@ public class HomeActivity extends AppCompatActivity
                 .beginTransaction()
                 .remove( Objects.requireNonNull( getSupportFragmentManager().findFragmentByTag( "WAIT" ) ) )
                 .commit();
+
     }
 
     /*Signs the user out of the current account*/
@@ -399,16 +439,22 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
-    /*Helper method to load an instance of the given fragment into the current activity*/
+    /**
+     * Helper method to load an instance of the given fragment into the current activity
+     * @param frag fragment to be loaded
+     * @author Emmett Kang, Bryan Santos
+     * @version 30 November 2018
+     */
     public void loadFragmentWithoutBackStack( Fragment frag ) {
         int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
         Log.d( "BRYAN", "backstack before loading: " + backstackCount );
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
+        //.addToBackStack(null);
 
 
         if ( fm.getBackStackEntryCount() < 1 ) {
@@ -418,7 +464,7 @@ public class HomeActivity extends AppCompatActivity
 
         // Commit the transaction
         transaction.commit();
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     @Override
@@ -429,12 +475,17 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onChangeMemberInfo( Credentials credentials ) {
         mCredential = credentials;
+        Log.d( "Debug Bryan", "creating new intent" );
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
         intent.putExtra( getString( R.string.reload_member_settings ), true );
-        finish();
+        Log.d( "Debug Bryan", "intent created" );
+        Log.d( "Debug Bryan", "starting new activity" );
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+        Log.d( "Debug Bryan", "started new home activity" );
+        finish();
+        Log.d( "Debug Bryan", "ended old home activity" );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
 
@@ -453,45 +504,81 @@ public class HomeActivity extends AppCompatActivity
         mConnectionsNode.onRequestListFragmentInteraction( theirUsername );
     }
 
+    /**
+     * When chat option is pressed, through connections, handle
+     * the interaction from chatnode.
+     * @author Emmett Kang, Daylen Nguyen
+     * @version 20 November 2018
+     */
     @Override
-    public void onOpenChatInteraction( int chatID, String email, String username ) {
-        mChatNode.onOpenChatInteraction( chatID, email, username );
+    public void onOpenChatInteraction( int chatID, String username ) {
+        mChatNode.onOpenChatInteraction( chatID, username );
     }
 
+    /**
+     * When chat is pressed, use the method fro chat node to handle
+     * the interaction.
+     * @param item Chat Object
+     * @author Emmett Kang, Daylen Nguyen
+     * @version 20
+     */
     @Override
     public void onChatsListFragmentInteraction( Chat item ) {
         mChatNode.onChatsListFragmentInteraction( item );
     }
-
+    /**
+     * Load the connections in order to display the connections
+     * that the user has, and load the CreateNewChat Fragment.
+     * @author Emmett Kang
+     * @version 26 November 2018
+     */
     @Override
     public void onCreateNewChatButtonPressed() {
         Fragment fragment = new CreateNewChatFragment();
         mConnectionsNode.loadConnections( fragment );
 
     }
-
+    /**
+     * When chat is long-pressed, handle the interaction
+     * in mChatNode.
+     * @param item Chat object
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     @Override
     public void onChatsListFragmentLongInteraction( Chat item ) {
         mChatNode.onChatsListFragmentLongInteraction( item );
     }
 
+    /**
+     * When user have selected the users to add into the new chat
+     * Check if the user have checked at least one user, and if they
+     * haven't, warn them with toast.
+     * @param cbList Checkbox list of connection's usernames.
+     * @param connectionList connections that user has.
+     * @param chatTitle chat room title.
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     @Override
     public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,
                                           String chatTitle ) {
         StringBuilder checkedBoxesSB = checkedBoxes( cbList );
         boolean       flag           = false;
+
+        //Check if the user has checked any of the check box.
         for ( CheckBox checkBox : cbList ) {
             if ( checkBox.isChecked() ) {
                 flag = true;
                 break;
             }
         }
-        if ( flag ) {
+        if ( flag ) {//If they have checked at least one, create new chat.
             mChatNode.CreateNewChatInteraction( cbList, connectionList, chatTitle );
             int   duration = Toast.LENGTH_SHORT;
             Toast toast    = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
             toast.show();
-        } else {
+        } else {//If not, warn them and do nothing.
             int   duration = Toast.LENGTH_SHORT;
             Toast toast    = Toast.makeText( this, "You have not selected anyone!", duration );
             toast.show();
@@ -499,9 +586,17 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Helper method to generate string of usernames that are checked.
+     * @param list list of usernames that are checked
+     * @return appended string of usernames.
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     private StringBuilder checkedBoxes( List<CheckBox> list ) {
         StringBuilder sb = new StringBuilder();
 
+        //Check if the box is checked, then append to string builder to display name
         for ( int i = 0; i < list.size(); i++ ) {
             if ( list.get( i ).isChecked() ) {
                 sb.append( list.get( i ).getText().toString() );
@@ -510,51 +605,75 @@ public class HomeActivity extends AppCompatActivity
         return sb;
     }
 
+    /**
+     * This is a getter method to return the notified chats
+     * @return list of notified chats
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     public ArrayList<Integer> getNotifiedChats() {
         return ( ArrayList<Integer> ) notifiedChats.clone();
     }
 
 
+
+    /**
+     * Update the notified chat list when user has read that chat.
+     * @param openedChatID chat room that was opened.
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     public void updateNotifiedChats( int openedChatID ) {
-        Log.w( "CRASH CHAT", String.valueOf( openedChatID ) );
-        notifiedChats.remove( openedChatID );
+        //User read, so remove the chatroom that was notified from the list.
+        notifiedChats.remove( notifiedChats.indexOf(openedChatID) );
 
     }
 
 
+    /**
+     * When notification is received through firebase, notify the
+     * hamburger button and color it so the user knows they've received a
+     * message.
+     * @param colorOfText color of menu item's text.
+     * @param colorOfBurger color of burger button
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     public void notifyUI( int colorOfText, int colorOfBurger ) {
         toggle.getDrawerArrowDrawable().setColor( colorOfBurger );
         toggle.syncState();
         NavigationView  navigationView = findViewById( R.id.nav_view );
         Menu            m              = navigationView.getMenu();
         MenuItem        menuItem       = m.findItem( R.id.nav_chat );
-        SpannableString s              = new SpannableString( menuItem.getTitle() );
+        SpannableString span              = new SpannableString( menuItem.getTitle() );
 
-        s.setSpan( new ForegroundColorSpan( colorOfText ),
-                0, s.length(), 0 );
-        menuItem.setTitle( s );
+        span.setSpan( new ForegroundColorSpan( colorOfText ),
+                0, span.length(), 0 );
+        menuItem.setTitle( span );
     }
 
     /**
-     *
+     * Use chatnode's remove members from chat method in order to
+     * remove members from the chat.
+     * @param users users to be removed.
+     * @param theChatID chat that will remove the users.
+     * @author Emmett Kang
+     * @version 21 November 2018
      */
-//    private void SuccessOrFailToast() {
-//
-//    }
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
         mChatNode.RemoveMembersFromChat( users, theChatID );
     }
 
-    @Override
     public void onChangeTheme( String theme ) {
-
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.key_credential ), mCredential );
-        intent.putExtra( getString( R.string.reload_themes ), true );
+
+
+        intent.putExtra( getString( R.string.reload_theme_switch ), mSwitch.isChecked() );
         finish();
         startActivity( intent );
-        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
+//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
 
     }
 
@@ -571,112 +690,12 @@ public class HomeActivity extends AppCompatActivity
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-    public void getSharedPrefAndValue() {
-        SharedPreferences myLocationPref = Objects.requireNonNull( getApplicationContext() ).getApplicationContext().getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE );
-        SharedPreferences myMetricPref   = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-        myMetricValue = myMetricPref.getString( METRIC_PREF, "C" );
-        myDeterminValue = myLocationPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
-    }
-
-    /*Generates a URI string. Changes the endpoint depending on location determinant*/
-    private String constructRequestLocation() {
-
-        Uri.Builder uri_builder = new Uri.Builder()
-                .scheme( "https" )
-                .appendPath( getString( R.string.base_url ) )
-                .appendPath( getString( R.string.ep_weather ) );
-        switch ( myDeterminValue ) {
-            case SettingsNode.CITY_STATE:
-                uri_builder.appendPath( getString( R.string.ep_weather_citystate ) );
-                break;
-            case SettingsNode.GPS_DATA:
-                uri_builder.appendPath( getString( R.string.ep_weather_bycoordinate ) );
-                break;
-            case SettingsNode.SELECT_FROM_MAP:
-                uri_builder.appendPath( getString( R.string.ep_weather_bycoordinate ) );
-                break;
-            case SettingsNode.POSTAL_CODE:
-                uri_builder.appendPath( getString( R.string.ep_weather_postalcode ) );
-                break;
-        }
-        return uri_builder.build().toString();
-    }
-
-    /*returns a json object, dependent on the location determinant*/
-    private JSONObject constructRequestJSON() {
-        JSONObject        request      = new JSONObject();
-        SharedPreferences myDeterPref  = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-        SharedPreferences myLocatePref = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
-        myMetricPref = Objects.requireNonNull( getApplicationContext() ).getSharedPreferences( METRIC_PREF, 0 );
-
-        String mCity, mState, mZip;
-        double mLat, mLon;
-        try {
-            switch ( myDeterPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
-                case SettingsNode.CITY_STATE:
-                    mCity = myLocatePref.getString( CITY_KEY, "TACOMA" );
-                    mState = myLocatePref.getString( STATE_KEY, "WA" );
-                    Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mCity + mState );
-                    request.put( getString( R.string.weather_lcase_city ), mCity );
-                    request.put( getString( R.string.weather_lcase_state ), mState );
-                    break;
-                case SettingsNode.GPS_DATA:
-                    mLat = mLocationNode.getmCurrentLocation().getLatitude();
-                    mLon = mLocationNode.getmCurrentLocation().getLongitude();
-                    request.put( getString( R.string.weather_lon_json ), mLon );
-                    request.put( getString( R.string.weather_lat_json ), mLat );
-                    break;
-                case SettingsNode.SELECT_FROM_MAP:
-                    mLat = myLocatePref.getFloat( MAP_LAT_KEY, 0 );
-                    mLon = myLocatePref.getFloat( MAP_LON_KEY, 0 );
-                    request.put( getString( R.string.weather_lon_json ), mLon );
-                    request.put( getString( R.string.weather_lat_json ), mLat );
-                    break;
-                case SettingsNode.POSTAL_CODE:
-                    mZip = myLocatePref.getString( ZIP_KEY, "98422" );
-                    request.put( getString( R.string.weather_json_postal ), mZip );
-
-                    break;
-            }
-            /*DEFAULT UNIT IS CELSIUS*/
-            if ( !Objects.requireNonNull( myMetricPref.getString( DETERMINANT_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
-                switch ( Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ) ) {
-                    case SettingsNode.FAHRENHEIT:
-                        request.put( "units", MURICA );
-                        break;
-                    case SettingsNode.KELVIN:
-                        request.put( "units", SCIENTIFIC );
-                        break;
-                }
-            }
-        } catch ( Exception e ) {
-            Log.e( "WEATHER", String.valueOf( e ) );
-        }
-//        getMetricReqString( request );
-        return request;
-    }
-
-    private void Coordinates_getCurrentWeatherData() {
-        String     mSendUrl = constructRequestLocation();
-        JSONObject request  = constructRequestJSON();
-        Log.d( "daylen weather", mSendUrl );
-        if ( request != null ) {
-            Log.d( "daylen weather", request.toString() );
-        }
-        new SendPostAsyncTask.Builder( mSendUrl, request )
-                .onPostExecute( e -> Log.d( "daylen weather", request.toString() ) )
-                .onCancelled( error -> Log.e( "daylen weather", error ) )
-                .build()
-                .execute();
-    }
-
-
-    private void PostWeatherRequest( String s ) {
-        //parse the post request
-
-    }
-
+    /**
+     * This class was given by Charles Bryan, when the user logs out,
+     * we would like to delete the token from the database,
+     * so we can grant another token when the user logs in.
+     * @author Charles Bryan
+     */
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private HomeActivity mMaster;
@@ -692,6 +711,9 @@ public class HomeActivity extends AppCompatActivity
             SharedPreferences prefs = mMaster.getSharedPreferences( mMaster.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
+            prefs.edit().putBoolean( ( getString( R.string.reload_member_settings ) ), false );
+            prefs.edit().putBoolean( getString( R.string.reload_theme_switch ), false );
+//            prefs.edit().putBoolean()
             try {
                 //this call must be done asynchronously.
                 FirebaseInstanceId.getInstance().deleteInstanceId();
@@ -700,6 +722,9 @@ public class HomeActivity extends AppCompatActivity
                 Log.e( "FCM", "Delete error!" );
                 e.printStackTrace();
 
+            } catch ( Exception e ) {
+                Log.e( "ERROR", "MAJOR ERROR" );
+                e.printStackTrace();
             }
             return null;
         }
@@ -714,7 +739,10 @@ public class HomeActivity extends AppCompatActivity
         protected void onPostExecute( Void aVoid ) {
             super.onPostExecute( aVoid );
             //close the app
-            mMaster.finishAndRemoveTask();
+
+            Intent intent = new Intent(mMaster, SignInActivity.class);
+            mMaster.startActivity(intent);
+            mMaster.finish();
         }
     }
 
@@ -722,6 +750,7 @@ public class HomeActivity extends AppCompatActivity
      * A BroadcastReceiver setup to listen for messages sent from
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
+     * @author Charles Bryan, Emmett kang, Michelle Brown
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {
         @Override
@@ -739,18 +768,20 @@ public class HomeActivity extends AppCompatActivity
                         Log.wtf( "sender", sender );
                         Log.wtf( "username", mCredential.getUsername() );
                         int chatID = Integer.valueOf( jObj.getString( "chatID" ) );
-                        if ( currentFragment instanceof ChatFragment ) {
-                            if ( !sender.equals( mCredential.getUsername() ) ) {
+                        if ( currentFragment instanceof ChatFragment ) {  //If user is in a chat fragment
+                            if ( !sender.equals( mCredential.getUsername() ) ) {  //and message isn't from the user,
                                 int currentChatID = ( ( ChatFragment ) currentFragment ).getmChatID();
-                                Log.wtf( "currChatID: ", String.valueOf( currentChatID ) );
-                                if ( currentChatID != chatID ) {
-                                    notifiedChats.add( chatID );
-                                    notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ),
-                                            ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ) );
+                                if ( currentChatID != chatID ) { //check if notification is from other chats.
+                                    notifiedChats.add( chatID ); //Put this chat as notified.
+
+                                    //change the hamburger UI and menu item for chat so user gets notified.
+                                    notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorAccent ),
+                                            ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorAccent ) );
                                 }
                             }
-                        } else {
-                            notifiedChats.add( chatID );
+                        } else { //If user somewhere in homeactivity,
+                            notifiedChats.add( chatID ); //put this chat as notified
+                            //Notify the UI so user knows they've gotten a mesage.
                             notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ),
                                     ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ) );
                         }

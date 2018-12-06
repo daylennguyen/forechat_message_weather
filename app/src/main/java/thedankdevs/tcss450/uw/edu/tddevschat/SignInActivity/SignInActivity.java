@@ -29,8 +29,8 @@ public class SignInActivity extends AppCompatActivity
      **/
     private              String  mChatIDfromNotification;
     private              boolean mLoadFromChatNotification = false;
-    private              boolean mLoadConnections = false;
-    private              boolean mLoadRequests = false;
+    private              boolean mLoadConnections          = false;
+    private              boolean mLoadRequests             = false;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -40,21 +40,21 @@ public class SignInActivity extends AppCompatActivity
             //If there is message notification, grab all of the information.
             if ( getIntent().getExtras().containsKey( "type" ) ) {
 
-                if (getIntent().getExtras().get( "type" ).equals( "contact" )) {
-                    Log.d(TAG, "type of message: " + getIntent().getExtras().getString("type"));
-                    Log.d(TAG, "chatID from notification: " + getIntent().getExtras().getString("chatID"));
+                if ( getIntent().getExtras().get( "type" ).equals( "contact" ) ) {
+                    Log.d( TAG, "type of message: " + getIntent().getExtras().getString( "type" ) );
+                    Log.d( TAG, "chatID from notification: " + getIntent().getExtras().getString( "chatID" ) );
 
                     //Grab all of message information.
-                    mLoadFromChatNotification = getIntent().getExtras().getString("type").equals("contact");
-                    mChatIDfromNotification = getIntent().getExtras().getString("chatID");
+                    mLoadFromChatNotification = getIntent().getExtras().getString( "type" ).equals( "contact" );
+                    mChatIDfromNotification = getIntent().getExtras().getString( "chatID" );
 
-                } else if (getIntent().getExtras().getString("type").contains("sent")) {
-                    Log.d(TAG, "type of message: " + getIntent().getExtras().getString("type"));
+                } else if ( getIntent().getExtras().getString( "type" ).contains( "sent" ) ) {
+                    Log.d( TAG, "type of message: " + getIntent().getExtras().getString( "type" ) );
                     //we got a request
                     mLoadRequests = true;
 
-                } else if (getIntent().getExtras().getString("type").contains("accepted")) {
-                    Log.d(TAG, "type of message: " + getIntent().getExtras().getString("type"));
+                } else if ( getIntent().getExtras().getString( "type" ).contains( "accepted" ) ) {
+                    Log.d( TAG, "type of message: " + getIntent().getExtras().getString( "type" ) );
                     //we have a new connection
                     mLoadConnections = true;
                 }
@@ -142,7 +142,7 @@ public class SignInActivity extends AppCompatActivity
                 .beginTransaction()
                 .add( R.id.frame_signin_container, new WaitFragment(), "WAIT" )
                 .addToBackStack( null )
-                .commitAllowingStateLoss();
+                .commit();
     }
 
     /**
@@ -160,6 +160,7 @@ public class SignInActivity extends AppCompatActivity
         Intent intent = new Intent( this, HomeActivity.class );
         //Send credential to next activity
         intent.putExtra( getString( R.string.key_credential ), credentials );
+        Log.d( "Debug Bryan", "SignInActivity credentials intent: " + credentials );
 
         //Send whether if we're opening from notification.
         intent.putExtra( getString( R.string.keys_intent_notification_msg ), mLoadFromChatNotification );
@@ -167,14 +168,16 @@ public class SignInActivity extends AppCompatActivity
             intent.putExtra( getString( R.string.keys_intent_notification_chatID ), Integer.parseInt( mChatIDfromNotification ) );
         } else if ( mLoadRequests ) {
             intent.putExtra( getString( R.string.keys_intent_notification_connections ),
-                    getString( R.string.notification_requested ));
+                    getString( R.string.notification_requested ) );
         } else if ( mLoadConnections ) {
             intent.putExtra( getString( R.string.keys_intent_notification_connections ),
-                    getString( R.string.notification_accepted ));
+                    getString( R.string.notification_accepted ) );
         }
         startActivity( intent );
+        Log.d( "Debug Bryan", "SignInActivity started HomeActivity" );
         //End this Activity and remove it from the Activity back stack.
         finish();
+        Log.d( "Debug Bryan", "SignIn activity is finished" );
     }
 
     /**

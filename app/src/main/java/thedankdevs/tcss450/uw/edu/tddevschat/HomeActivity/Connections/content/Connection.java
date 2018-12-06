@@ -20,6 +20,7 @@ public class Connection implements Serializable {
     private final String  mLastName;
     private       int     mChatID;
     private       boolean mIsMine;
+    private       boolean mIsEmpty;
 
 
     private Connection( final Builder builder ) {
@@ -29,6 +30,7 @@ public class Connection implements Serializable {
         this.mLastName = builder.mLastName;
         this.mChatID = builder.mChatID;
         this.mIsMine = builder.mIsMine;
+        this.mIsEmpty = builder.mIsEmpty;
     }
 
     public String getEmail() {
@@ -59,6 +61,10 @@ public class Connection implements Serializable {
         return mIsMine;
     }
 
+    public boolean isEmpty() {
+        return mIsEmpty;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -71,6 +77,8 @@ public class Connection implements Serializable {
      * Helper class for building Connection.
      *
      * @author Michelle Brown
+     * @author Bryan Santos (added mIsEmptyField)
+     * @version 12/05/2018
      */
     public static class Builder {
 
@@ -80,6 +88,7 @@ public class Connection implements Serializable {
         private       String  mLastName  = "";
         private       int     mChatID    = -1;
         private       boolean mIsMine    = false;
+        private       boolean mIsEmpty = false;
 
 
         /**
@@ -134,6 +143,18 @@ public class Connection implements Serializable {
          */
         public Builder isMine() {
             mIsMine = true;
+            return this;
+        }
+
+        /**
+         * Signifies that the current connection is
+         * an empty one. Used by the Search Functionality
+         * to display "No Connections Found"
+         *
+         * @return the Builder of this Connection
+         */
+        public Builder isEmpty() {
+            mIsEmpty = true;
             return this;
         }
 
