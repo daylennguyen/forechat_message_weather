@@ -442,7 +442,12 @@ public class HomeActivity extends AppCompatActivity
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
-    /*Helper method to load an instance of the given fragment into the current activity*/
+    /**
+     * Helper method to load an instance of the given fragment into the current activity
+     * @param frag fragment to be loaded
+     * @author Emmett Kang, Bryan Santos
+     * @version 30 November 2018
+     */
     public void loadFragmentWithoutBackStack( Fragment frag ) {
         int backstackCount = getSupportFragmentManager().getBackStackEntryCount();
         Log.d( "BRYAN", "backstack before loading: " + backstackCount );
@@ -499,45 +504,81 @@ public class HomeActivity extends AppCompatActivity
         mConnectionsNode.onRequestListFragmentInteraction( theirUsername );
     }
 
+    /**
+     * When chat option is pressed, through connections, handle
+     * the interaction from chatnode.
+     * @author Emmett Kang, Daylen Nguyen
+     * @version 20 November 2018
+     */
     @Override
-    public void onOpenChatInteraction( int chatID, String email, String username ) {
-        mChatNode.onOpenChatInteraction( chatID, email, username );
+    public void onOpenChatInteraction( int chatID, String username ) {
+        mChatNode.onOpenChatInteraction( chatID, username );
     }
 
+    /**
+     * When chat is pressed, use the method fro chat node to handle
+     * the interaction.
+     * @param item Chat Object
+     * @author Emmett Kang, Daylen Nguyen
+     * @version 20
+     */
     @Override
     public void onChatsListFragmentInteraction( Chat item ) {
         mChatNode.onChatsListFragmentInteraction( item );
     }
-
+    /**
+     * Load the connections in order to display the connections
+     * that the user has, and load the CreateNewChat Fragment.
+     * @author Emmett Kang
+     * @version 26 November 2018
+     */
     @Override
     public void onCreateNewChatButtonPressed() {
         Fragment fragment = new CreateNewChatFragment();
         mConnectionsNode.loadConnections( fragment );
 
     }
-
+    /**
+     * When chat is long-pressed, handle the interaction
+     * in mChatNode.
+     * @param item Chat object
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     @Override
     public void onChatsListFragmentLongInteraction( Chat item ) {
         mChatNode.onChatsListFragmentLongInteraction( item );
     }
 
+    /**
+     * When user have selected the users to add into the new chat
+     * Check if the user have checked at least one user, and if they
+     * haven't, warn them with toast.
+     * @param cbList Checkbox list of connection's usernames.
+     * @param connectionList connections that user has.
+     * @param chatTitle chat room title.
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     @Override
     public void CreateNewChatInteraction( ArrayList<CheckBox> cbList, ArrayList<Connection> connectionList,
                                           String chatTitle ) {
         StringBuilder checkedBoxesSB = checkedBoxes( cbList );
         boolean       flag           = false;
+
+        //Check if the user has checked any of the check box.
         for ( CheckBox checkBox : cbList ) {
             if ( checkBox.isChecked() ) {
                 flag = true;
                 break;
             }
         }
-        if ( flag ) {
+        if ( flag ) {//If they have checked at least one, create new chat.
             mChatNode.CreateNewChatInteraction( cbList, connectionList, chatTitle );
             int   duration = Toast.LENGTH_SHORT;
             Toast toast    = Toast.makeText( this, checkedBoxesSB.toString() + "  selected", duration );
             toast.show();
-        } else {
+        } else {//If not, warn them and do nothing.
             int   duration = Toast.LENGTH_SHORT;
             Toast toast    = Toast.makeText( this, "You have not selected anyone!", duration );
             toast.show();
@@ -545,9 +586,17 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Helper method to generate string of usernames that are checked.
+     * @param list list of usernames that are checked
+     * @return appended string of usernames.
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     private StringBuilder checkedBoxes( List<CheckBox> list ) {
         StringBuilder sb = new StringBuilder();
 
+        //Check if the box is checked, then append to string builder to display name
         for ( int i = 0; i < list.size(); i++ ) {
             if ( list.get( i ).isChecked() ) {
                 sb.append( list.get( i ).getText().toString() );
@@ -556,37 +605,61 @@ public class HomeActivity extends AppCompatActivity
         return sb;
     }
 
+    /**
+     * This is a getter method to return the notified chats
+     * @return list of notified chats
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     public ArrayList<Integer> getNotifiedChats() {
         return ( ArrayList<Integer> ) notifiedChats.clone();
     }
 
 
+
+    /**
+     * Update the notified chat list when user has read that chat.
+     * @param openedChatID chat room that was opened.
+     * @author Emmett Kang
+     * @version 27 November 2018
+     */
     public void updateNotifiedChats( int openedChatID ) {
-        Log.w( "CRASH CHAT", String.valueOf( openedChatID ) );
+        //User read, so remove the chatroom that was notified from the list.
         notifiedChats.remove( notifiedChats.indexOf(openedChatID) );
 
     }
 
 
+    /**
+     * When notification is received through firebase, notify the
+     * hamburger button and color it so the user knows they've received a
+     * message.
+     * @param colorOfText color of menu item's text.
+     * @param colorOfBurger color of burger button
+     * @author Emmett Kang
+     * @version 25 November 2018
+     */
     public void notifyUI( int colorOfText, int colorOfBurger ) {
         toggle.getDrawerArrowDrawable().setColor( colorOfBurger );
         toggle.syncState();
         NavigationView  navigationView = findViewById( R.id.nav_view );
         Menu            m              = navigationView.getMenu();
         MenuItem        menuItem       = m.findItem( R.id.nav_chat );
-        SpannableString s              = new SpannableString( menuItem.getTitle() );
+        SpannableString span              = new SpannableString( menuItem.getTitle() );
 
-        s.setSpan( new ForegroundColorSpan( colorOfText ),
-                0, s.length(), 0 );
-        menuItem.setTitle( s );
+        span.setSpan( new ForegroundColorSpan( colorOfText ),
+                0, span.length(), 0 );
+        menuItem.setTitle( span );
     }
 
     /**
-     *
+     * Use chatnode's remove members from chat method in order to
+     * remove members from the chat.
+     * @param users users to be removed.
+     * @param theChatID chat that will remove the users.
+     * @author Emmett Kang
+     * @version 21 November 2018
      */
-//    private void SuccessOrFailToast() {
-//
-//    }
     @Override
     public void RemoveMemberInteraction( ArrayList<String> users, int theChatID ) {
         mChatNode.RemoveMembersFromChat( users, theChatID );
@@ -617,7 +690,12 @@ public class HomeActivity extends AppCompatActivity
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
+    /**
+     * This class was given by Charles Bryan, when the user logs out,
+     * we would like to delete the token from the database,
+     * so we can grant another token when the user logs in.
+     * @author Charles Bryan
+     */
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private HomeActivity mMaster;
@@ -672,6 +750,7 @@ public class HomeActivity extends AppCompatActivity
      * A BroadcastReceiver setup to listen for messages sent from
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
+     * @author Charles Bryan, Emmett kang, Michelle Brown
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {
         @Override
@@ -689,18 +768,20 @@ public class HomeActivity extends AppCompatActivity
                         Log.wtf( "sender", sender );
                         Log.wtf( "username", mCredential.getUsername() );
                         int chatID = Integer.valueOf( jObj.getString( "chatID" ) );
-                        if ( currentFragment instanceof ChatFragment ) {
-                            if ( !sender.equals( mCredential.getUsername() ) ) {
+                        if ( currentFragment instanceof ChatFragment ) {  //If user is in a chat fragment
+                            if ( !sender.equals( mCredential.getUsername() ) ) {  //and message isn't from the user,
                                 int currentChatID = ( ( ChatFragment ) currentFragment ).getmChatID();
-                                Log.wtf( "currChatID: ", String.valueOf( currentChatID ) );
-                                if ( currentChatID != chatID ) {
-                                    notifiedChats.add( chatID );
-                                    notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ),
-                                            ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightPurple ) );
+                                if ( currentChatID != chatID ) { //check if notification is from other chats.
+                                    notifiedChats.add( chatID ); //Put this chat as notified.
+
+                                    //change the hamburger UI and menu item for chat so user gets notified.
+                                    notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorAccent ),
+                                            ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorAccent ) );
                                 }
                             }
-                        } else {
-                            notifiedChats.add( chatID );
+                        } else { //If user somewhere in homeactivity,
+                            notifiedChats.add( chatID ); //put this chat as notified
+                            //Notify the UI so user knows they've gotten a mesage.
                             notifyUI( ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ),
                                     ContextCompat.getColor( Objects.requireNonNull( getApplicationContext() ), R.color.colorLightBluePurple ) );
                         }
