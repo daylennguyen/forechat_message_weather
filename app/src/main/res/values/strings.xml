@@ -33,7 +33,10 @@
 	<string name = "connection_requestconnection">Request Connection</string>
 	<string name = "connection_requestsent">request sent</string>
 	<string name = "connection_requestfailed">request failed</string>
+	<string name = "connection_requestfailedpending">failed: connection request is already pending</string>
 	<string name = "connection_acceptrequest">Accept</string>
+	<string name = "connection_acceptedrequest">Accepted!</string>
+	<string name = "connection_pendingrequest">Pending</string>
 	<string name = "connection_removesent">connection removed</string>
 	<string name = "connection_removefailed">remove failed</string>
 	<string name = "chats_list_newChat">Create New Chat</string>

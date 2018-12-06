@@ -174,7 +174,13 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
             if ( res.has( "success" ) && res.getBoolean( "success" ) ) {
                 toastMsg = getString( R.string.connection_requestsent );
             } else {
-                toastMsg = getString( R.string.connection_requestfailed );
+                JSONObject row = res.getJSONObject("row");
+                if ( row.has( "verified" ) ) {
+                    mChatButton.setText(R.string.connection_pendingrequest);
+                    toastMsg = getString(R.string.connection_requestfailedpending);
+                } else {
+                    toastMsg = getString(R.string.connection_requestfailed);
+                }
             }
             Toast toast = Toast.makeText( Objects.requireNonNull( getActivity() ).getApplicationContext(),
                     toastMsg, Toast.LENGTH_SHORT );

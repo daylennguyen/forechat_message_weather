@@ -43,7 +43,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
             if ( !( holder.mItem.getIReceived() ) ) {
                 holder.mAcceptButton.setEnabled( false );
                 holder.mAcceptButton.setBackgroundColor( Color.WHITE );
-                holder.mAcceptButton.setText( "Pending" );
+                holder.mAcceptButton.setText( R.string.connection_pendingrequest );
                 holder.mUsernameView.setTextColor( Color.GRAY );
             }
         } catch ( Exception e ) {
@@ -81,7 +81,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
         @Override
         public void onClick( View v ) {
             mAcceptButton.setEnabled( false );
-            mAcceptButton.setText( "Accepted!" );
+            mAcceptButton.setText( R.string.connection_acceptedrequest );
             //mAcceptButton.setBackgroundColor(mMaster.getResources().getColor(R.color.colorBluePurple));
             mAcceptButton.setTextColor( Color.BLUE );
             mListener.onRequestListFragmentInteraction( mItem.getUsername() );
