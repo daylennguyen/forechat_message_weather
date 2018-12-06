@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         mListener = listener;
         mCopyConnections = new ArrayList<>();
         mCopyConnections.addAll( mConnections );
+
     }
 
 
@@ -42,6 +44,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
     public ViewHolder onCreateViewHolder( @NonNull ViewGroup parent, int viewType ) {
         View view = LayoutInflater.from( parent.getContext() )
                 .inflate( R.layout.fragment_connections, parent, false );
+
         return new ViewHolder( view );
     }
 
@@ -49,13 +52,23 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
     public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
         holder.mItem = ( mConnections ).get( position );
         holder.mUsername.setText( mConnections.get( position ).getUsername() );
-
+        Log.d(getClass().getSimpleName(), "I am in onBindViewHolder");
         try {
             if ( !( holder.mItem.getIsMine() ) ) {
                 holder.mUsername.setTextColor( Color.GRAY );
+
             }
         } catch ( Exception e ) {
             Log.e( "CONNECTION VIEW HOLDER", "my isMine value is weird!! " + e );
+        }
+
+        /*
+            A Card View for when no connections are found during search.
+            Early return call so that onClickListener won't be set.
+         */
+        if (holder.mItem.isEmpty()) {
+            holder.mUsername.setText("No Connections Found");
+            return;
         }
 
         holder.mView.setOnClickListener( v -> {
@@ -78,6 +91,14 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         return mConnections.size();
     }
 
+    public void setEmptyConnections() {
+        List<Connection> emptyConnections = new ArrayList<>();
+        Connection connection = new Connection.Builder("", "").isEmpty().build();
+        emptyConnections.add(connection);
+        mConnections = emptyConnections;
+        notifyDataSetChanged();
+    }
+
     /**
      * Initially clears the list currently being displayed and
      * rebuilds the list based on the text query passed in matched up with
@@ -88,7 +109,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
      * sequence of the text passed in
      */
 
-    boolean filter( String text ) {
+    public boolean filter( String text ) {
 
         /*
             Clearing the list each time is needed because of the way that the logic
@@ -116,6 +137,9 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
             Returning false meant that mCopyConnections (which was the list
             initially passed in does not contain the character sequence of text).
          */
+
+
+
 
         return !mConnections.isEmpty();
     }

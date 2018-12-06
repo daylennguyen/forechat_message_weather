@@ -12,9 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.*;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
+
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -24,13 +29,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * A Fragment that utilizes a RecyclerView to display local connections
+ * of the currently logged in user. This Fragment is also used
+ * by the Search Connections functionality of the app that
+ * searches through both local and the database of connections
+ * that matches the search query typed in by the user.
  *
- * @author Michelle Brown, Bryan Santos
- * @version 11/17/2018
+ * @author Michelle Brown
+ * @author Bryan Santos
+ * @version 12/05/2018
  */
 public class ConnectionListFragment extends Fragment implements SearchView.OnQueryTextListener {
 
@@ -59,8 +66,11 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     private SearchView                        mSearchView;
 
     private MenuItem mSearch;
+    private       String                      mPreviousQuery;
 
     private int mMemberId;
+
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,13 +79,6 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     public ConnectionListFragment() {
     }
 
-//    public static ConnectionListFragment newInstance(int connectionsList) { //TODO: fix
-//        ConnectionListFragment fragment = new ConnectionListFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_CONNECTIONS_LIST, connectionsList);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onAttach( Context context ) {
@@ -96,6 +99,8 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         if ( getArguments() != null ) {
             mConnections = ( ArrayList ) getArguments().getSerializable( ARG_CONNECTIONS_LIST );
             mMemberId = getArguments().getInt( ARG_CREDENTIALS );
+            mPreviousQuery = "";
+
         }
     }
 
@@ -119,6 +124,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
             mLocalAdapter = new ConnectionListRecyclerViewAdapter( mConnections, mListener );
             mGlobalAdapter = null;
             mRecyclerView.setAdapter( mLocalAdapter );
+
         }
         if ( mConnections.size() == 0 ) {
             //Alert the user that they don't have any connections and give them the option to search
@@ -157,7 +163,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         super.onCreateOptionsMenu( menu, inflater );
         mSearch = menu.findItem( R.id.action_search_contacts );
         mSearch.setVisible( true );
-        //SearchView searchView = (SearchView) search.getActionView();
+
         mSearchView = ( SearchView ) mSearch.getActionView();
         mSearchView.setVisibility( View.VISIBLE );
         mSearchView.setOnQueryTextListener( this );
@@ -174,19 +180,33 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
         mExistsLocally = mLocalAdapter.filter( text );
         if ( !mExistsLocally ) {
 
+
+            boolean sendRequest = true;
             /*
                 since global adapter was previously initialized and that list
-                contains the text query, just set adapter to this
+                contains the text query, check if it can be reused.
              */
-            if ( mGlobalAdapter != null && mGlobalAdapter.filter( text ) ) {
-                Log.d( getClass().getSimpleName(), "I am setting mGlobalAdapter to be my adapter" );
-                mRecyclerView.setAdapter( mGlobalAdapter );
+            if ( mGlobalAdapter != null) {
+                if (mGlobalAdapter.filter( text )) { // reuse old global adapter
+                    Log.d( getClass().getSimpleName(), "I am setting mGlobalAdapter to be my adapter" );
+                    mRecyclerView.setAdapter( mGlobalAdapter );
+                    sendRequest = false;
+                }
+                // display no connections found and don't send new post request
+                else if(mPreviousQuery.contains(text) || text.contains(mPreviousQuery)) {
+                    mGlobalAdapter.setEmptyConnections();
+                    mRecyclerView.setAdapter(mGlobalAdapter);
+                    sendRequest = false;
+                    Log.d(getClass().getSimpleName(), "Not making Requests");
+                }
+
             }
+
             /*
                 otherwise, make post request to search through database
                 that current user is not connected with
              */
-            else {
+           if (sendRequest) {
 
                 Log.d( getClass().getSimpleName(), "I'm sending a post request" );
                 requestForAllContacts( text );
@@ -201,6 +221,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
 
             mRecyclerView.setAdapter( mLocalAdapter );
         }
+        mPreviousQuery = text;
 
         Log.d( getClass().getSimpleName(), "current Adapter: " + mRecyclerView.getAdapter() );
         Log.d( getClass().getSimpleName(), "is my equals method working:" +
