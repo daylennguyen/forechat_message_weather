@@ -40,7 +40,7 @@ import java.util.Objects;
  * to handle interaction events.
  *
  * @author Michelle Brown, Bryan Santos, Emmett Kang
- * @version 11/05/2018
+ * @version 1 December 2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 

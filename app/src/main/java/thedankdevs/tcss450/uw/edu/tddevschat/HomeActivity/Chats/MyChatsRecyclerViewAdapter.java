@@ -13,14 +13,19 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Chat} and makes a call to the
- * TODO: Replace the implementation with code for your data type.
+ * This recyclerview adapter sets the content of the chats list fragment.
+ * @author Emmett Kang
  */
 public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Chat>                             mValues;
+    private final List<Chat> mValues;
     private final OnChatsListFragmentInteractionListener mListener;
 
+    /**
+     * constructor for the view adapter.
+     * @param items chats list.
+     * @param listener interaction listener between the activity.
+     */
     MyChatsRecyclerViewAdapter( List<Chat> items, ChatsFragment.OnChatsListFragmentInteractionListener listener ) {
         mValues = items;
         mListener = listener;
@@ -34,6 +39,11 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
         return new ViewHolder( view );
     }
 
+    /**
+     * biding the view holder, setting the contents accordingly with the layout
+     * @param holder content holder
+     * @param position where the content will be placed.
+     */
     @Override
     public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
         holder.mItem = mValues.get( position );

@@ -528,7 +528,8 @@ public class HomeActivity extends AppCompatActivity
     }
     /**
      * Load the connections in order to display the connections
-     * that the user has, and load the CreateNewChat Fragment.
+     * that the user has, so the user gets to select their connection
+     * and load the CreateNewChat Fragment.
      * @author Emmett Kang
      * @version 26 November 2018
      */
