@@ -19,15 +19,25 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * A fragment representing a list of Items.
+ * A fragment representing a list of chats.
  * <p/>
  * Activities containing this fragment MUST implement the {@link }
  * interface.
+ *
+ * @author Emmett Kang
  */
 public class ChatsFragment extends Fragment implements View.OnClickListener {
-
+    /**
+     * Key to find the array list
+     */
     public static final String ARG_CHATS_LIST = "chats list";
+    /**
+     * Adapter that sets the conent
+     */
     MyChatsRecyclerViewAdapter adapter;
+    /**
+     * Array list that contains all chats
+     */
     private ArrayList<Chat>                        mChats;
     private int                                    mColumnCount = 1;
     private OnChatsListFragmentInteractionListener mListener;
@@ -39,8 +49,13 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
     public ChatsFragment() {
     }
 
-
-    public static ChatsFragment newInstance( int columnCount ) { //TODO: fix
+    /**
+     * new instance of the chats fragment.
+     *
+     * @param columnCount setting arguments with column count
+     * @return chats list fragment
+     */
+    public static ChatsFragment newInstance( int columnCount ) {
         ChatsFragment fragment = new ChatsFragment();
         Bundle        args     = new Bundle();
         args.putInt( ARG_CHATS_LIST, columnCount );
@@ -70,6 +85,14 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    /**
+     * Create the view of the fragment itself.
+     *
+     * @param inflater           view to be inflated
+     * @param container          content container
+     * @param savedInstanceState any saved information.
+     * @return inflated view
+     */
     @Override
     public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
@@ -80,7 +103,6 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
         if ( view instanceof LinearLayout ) {
             Context      context      = view.getContext();
             RecyclerView recyclerView = view.findViewById( R.id.list );
-
             if ( mColumnCount <= 1 ) {
                 recyclerView.setLayoutManager( new LinearLayoutManager( context ) );
             } else {
@@ -88,14 +110,19 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
             }
             recyclerView.setAdapter( adapter );
         }
+        //set on click listener.
         Button b = view.findViewById( R.id.btn_newChat_chats );
         b.setOnClickListener( this );
         return view;
     }
 
+    /**
+     * When this fragment resumes, set the title of the activity to Chat.
+     */
     @Override
     public void onResume() {
         super.onResume();
+        //Set the title to chat.
         Objects.requireNonNull( getActivity() ).setTitle( "Chat" );
 
 
@@ -104,16 +131,24 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    /**
+     * Detach the fragment from activity.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
+    /**
+     * onclick listener
+     *
+     * @param v button to be set
+     */
     @Override
     public void onClick( View v ) {
         switch ( v.getId() ) {
-            case R.id.btn_newChat_chats:
+            case R.id.btn_newChat_chats: //new chat button
                 mListener.onCreateNewChatButtonPressed();
         }
     }

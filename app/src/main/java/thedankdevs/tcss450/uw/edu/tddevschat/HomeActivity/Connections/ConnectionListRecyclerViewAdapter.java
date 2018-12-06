@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +51,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
     public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
         holder.mItem = ( mConnections ).get( position );
         holder.mUsername.setText( mConnections.get( position ).getUsername() );
-        Log.d(getClass().getSimpleName(), "I am in onBindViewHolder");
+        Log.d( getClass().getSimpleName(), "I am in onBindViewHolder" );
         try {
             if ( !( holder.mItem.getIsMine() ) ) {
                 holder.mUsername.setTextColor( Color.GRAY );
@@ -66,8 +65,8 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
             A Card View for when no connections are found during search.
             Early return call so that onClickListener won't be set.
          */
-        if (holder.mItem.isEmpty()) {
-            holder.mUsername.setText("No Connections Found");
+        if ( holder.mItem.isEmpty() ) {
+            holder.mUsername.setText( "No Connections Found" );
             return;
         }
 
@@ -93,8 +92,8 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
 
     public void setEmptyConnections() {
         List<Connection> emptyConnections = new ArrayList<>();
-        Connection connection = new Connection.Builder("", "").isEmpty().build();
-        emptyConnections.add(connection);
+        Connection       connection       = new Connection.Builder( "", "" ).isEmpty().build();
+        emptyConnections.add( connection );
         mConnections = emptyConnections;
         notifyDataSetChanged();
     }
@@ -137,8 +136,6 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
             Returning false meant that mCopyConnections (which was the list
             initially passed in does not contain the character sequence of text).
          */
-
-
 
 
         return !mConnections.isEmpty();

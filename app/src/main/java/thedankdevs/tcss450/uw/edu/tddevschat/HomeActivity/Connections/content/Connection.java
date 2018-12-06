@@ -88,7 +88,7 @@ public class Connection implements Serializable {
         private       String  mLastName  = "";
         private       int     mChatID    = -1;
         private       boolean mIsMine    = false;
-        private       boolean mIsEmpty = false;
+        private       boolean mIsEmpty   = false;
 
 
         /**

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +20,25 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import java.util.ArrayList;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that gives the users to select from their connections and
+ * create a new chat. The connection list is loaded from homeactivity.
+ *
+ * @Author Emmett Kang
+ * @Version 27 November 2018
  */
 public class CreateNewChatFragment extends Fragment implements View.OnClickListener {
+    /**
+     * Checkbox list for connection's usernames
+     */
     ArrayList<CheckBox>   checkBoxList;
+    /**
+     * List of connections
+     */
     ArrayList<Connection> connectionList;
     private OnCreateNewChatButtonListener mListener;
+    /**
+     * Chat room title
+     */
     private EditText                      mChatTitleEditText;
 
     public CreateNewChatFragment() {
@@ -37,7 +49,7 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
     public void onClick( View v ) {
         if ( mListener != null ) {
             switch ( v.getId() ) {
-                case R.id.btn_create_new_chat:
+                case R.id.btn_create_new_chat: //When button create new chat is clicked
                     String ChatTitle = mChatTitleEditText.getText().toString();
                     mListener.CreateNewChatInteraction( checkBoxList, connectionList, ChatTitle );
                     break;
@@ -56,6 +68,14 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * Set the view of the fragment.
+     *
+     * @param inflater           view to be inflated
+     * @param container          container of the contents
+     * @param savedInstanceState any saved information
+     * @return inflated view.
+     */
     @Override
     public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
@@ -63,10 +83,12 @@ public class CreateNewChatFragment extends Fragment implements View.OnClickListe
         View v = inflater.inflate( R.layout.fragment_create_new_chat, container, false );
 
         if ( getArguments() != null ) {
+
             LinearLayout cbContainter = v.findViewById( R.id.CheckBoxContainer );
             checkBoxList = new ArrayList<>();
             connectionList = ( ArrayList<Connection> ) getArguments().getSerializable( ConnectionListFragment.ARG_CONNECTIONS_LIST );
-            Log.wtf( "EMMETT", "connetions list is loaded" );
+
+            //For each connections the user have, make a checkbox for each connection.
             for ( int i = 0; i < connectionList.size(); i++ ) {
                 CheckBox checkBox = new CheckBox( getContext() );
                 checkBox.setTextSize( 20 );

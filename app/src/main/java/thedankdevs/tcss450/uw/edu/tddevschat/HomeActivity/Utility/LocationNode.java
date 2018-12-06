@@ -1,6 +1,7 @@
 package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
@@ -61,6 +62,11 @@ public class LocationNode implements Serializable {
                 if ( locationResult != null ) {
                     for ( Location location : locationResult.getLocations() ) {
                         // Update UI with location data
+
+                        SharedPreferences sp = myNodeMaster.getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
+                        sp.edit().putLong( LATITUDE_KEY, ( long ) location.getLatitude() ).putLong( LATITUDE_KEY, ( long ) location.getLongitude() ).apply();
+
+
                         Log.d( "LOCATION", "LATITUDE: " + String.valueOf( location.getLatitude() ) );
                         Log.d( "LOCATION", "LONG: " + String.valueOf( location.getLongitude() ) );
 

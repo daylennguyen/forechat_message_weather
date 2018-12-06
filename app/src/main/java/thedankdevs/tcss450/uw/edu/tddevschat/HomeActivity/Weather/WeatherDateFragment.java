@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,30 +30,31 @@ import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragmen
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * A weather date fragment contains much of the client functionality corresponding to weather.
+ * Interacts with a list fragment containing all of the weather data
  */
 public class WeatherDateFragment extends Fragment {
     /*  UNITS OF MEASUREMENT  */
     public static final String            METRIC     = "M";       // - [DEFAULT] Metric (Celcius, m/s, mm)
-    public static final String            SCIENTIFIC = "S";   // - Scientific (Kelvin, m/s, mm)
+    public static final String            SCIENTIFIC = "S";       // - Scientific (Kelvin, m/s, mm)
     public static final String            MURICA     = "I";       // - Fahrenheit (F, mph, in)
-    static final        String            TAG        = "WEATHER";
+    static final        String            TAG        = "WEATHER"; // for logcat
     /*  Response from server will push content to list  */
     private             List<WeatherDate> currentWeatherData;
 
     /*
-    Weather Variables; data output is dependant on valid variables
-    NOTE: State is the state abbreviation.*/
+        Weather Variables; data output is dependant on valid variables
+        NOTE: State is the state abbreviation.
+    */
 
     private String mState, mCity, mZip;
     private double mLon, mLat;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView                      myRV;
-    private int                               current_LocationDeterminant;
-    private String                            current_WeatherMetric;
+
+    /*pulled from shared preferences*/
+    private int    current_LocationDeterminant;
+    private String current_WeatherMetric;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,7 +63,9 @@ public class WeatherDateFragment extends Fragment {
     public WeatherDateFragment() {
     }
 
-    /*** Retrieves the user's location data based on preference settings*/
+    /**
+     * Retrieves the user's location data based on preference settings
+     */
     private void getLocationDataBasedOnPreference( Bundle bundle ) {
         SharedPreferences sp = Objects.requireNonNull( this.getContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
 //        SharedPreferences.Editor e = sp.edit();
@@ -207,7 +209,7 @@ public class WeatherDateFragment extends Fragment {
                 case "K":
                     j.put( "units", "S" );
                     break;
-                case "C":
+                case "C": /*default weather api field*/
                     break;
             }
         } catch ( JSONException e ) {
@@ -254,6 +256,9 @@ public class WeatherDateFragment extends Fragment {
         return request;
     }
 
+    /**
+     * Creates a weather request
+     */
     private void Coordinates_getCurrentWeatherData() {
         String     mSendUrl = constructRequestLocation();
         JSONObject request  = constructRequestJSON();
@@ -277,29 +282,28 @@ public class WeatherDateFragment extends Fragment {
         super.onAttach( context );
         if ( context instanceof OnListFragmentInteractionListener ) {
             mListener = ( OnListFragmentInteractionListener ) context;
+
+            /*initialize the weather data before display of the fragment*/
+            getAndUpdateLocationDeterminantPref();
+            getAndUpdateMetricPreferences();
+            // Send request for weather data
+            if ( getArguments() != null ) {
+                Bundle bundle = getArguments();
+                getLocationDataBasedOnPreference( bundle );
+                Coordinates_getCurrentWeatherData();
+            }
+
         } else {
             throw new RuntimeException( context.toString()
                     + " must implement OnListFragmentInteractionListener" );
         }
     }
 
-//    /*overload, if no args are provided then default to uwt location*/
-//    private void Coordinates_getCurrentWeatherData() {
-//        this.Coordinates_getCurrentWeatherData(47.2446, 122.4376);
-//    }
-
     /* When weather is opened on onCreate will make a post request to the server for current weather*/
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        getAndUpdateLocationDeterminantPref();
-        getAndUpdateMetricPreferences();
-        // Send request for weather data
-        if ( getArguments() != null ) {
-            Bundle bundle = getArguments();
-            getLocationDataBasedOnPreference( bundle );
-            Coordinates_getCurrentWeatherData();
-        }
+
     }
 
     /*Executed after on create, we set the adapter if the current weather data has already been retrieved*/
@@ -310,13 +314,8 @@ public class WeatherDateFragment extends Fragment {
         myRV = view.findViewById( R.id.weatherlist ); //retrieve the list contained within the fragment
         // Set the adapter and layout manager
         if ( myRV != null ) {
-            Context context      = myRV.getContext();
-            int     mColumnCount = 1;
-            if ( mColumnCount <= 1 ) {
-                myRV.setLayoutManager( new LinearLayoutManager( context ) );
-            } else {
-                myRV.setLayoutManager( new GridLayoutManager( context, mColumnCount ) );
-            }
+            Context context = myRV.getContext();
+            myRV.setLayoutManager( new LinearLayoutManager( context ) );
             if ( currentWeatherData != null ) {
                 myRV.setAdapter( new MyWeatherDateRecyclerViewAdapter( currentWeatherData, mListener ) );
             }

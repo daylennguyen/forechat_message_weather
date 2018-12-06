@@ -164,18 +164,26 @@ public class HomeFragment extends Fragment {
                     break;
             }
             /*DEFAULT UNIT IS CELSIUS*/
-            if ( !Objects.requireNonNull( myMetricPref.getString( DETERMINANT_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
+            if ( !Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
                 switch ( Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ) ) {
                     case SettingsNode.FAHRENHEIT:
-                        request.put( "units", myMetricPref.getString( METRIC_PREF, "C" ) );
+                        request.put( "units", "I" );
                         break;
                     case SettingsNode.KELVIN:
-                        request.put( "units", myMetricPref.getString( METRIC_PREF, "C" ) );
+                        request.put( "units", "S" );
                         break;
                 }
             }
         } catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
+            try {
+                request.put( "units", "I" );
+                request.put( "lon", -122.465973 );
+                request.put( "lat", 47.258728 );
+            } catch ( JSONException e1 ) {
+                e1.printStackTrace();
+            }
+
         }
         return request;
     }
@@ -202,6 +210,7 @@ public class HomeFragment extends Fragment {
      */
     private void PostWeatherRequest( String result ) {
         try {
+            Log.w( "dayday", result );
             // This is the result from the web service
             JSONObject res = new JSONObject( result );
             Log.i( "Daylen", String.valueOf( res ) );

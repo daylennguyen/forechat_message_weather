@@ -12,14 +12,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.*;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Connections.content.Connection;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.utils.SendPostAsyncTask;
@@ -66,10 +61,9 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
     private SearchView                        mSearchView;
 
     private MenuItem mSearch;
-    private       String                      mPreviousQuery;
+    private String   mPreviousQuery;
 
     private int mMemberId;
-
 
 
     /**
@@ -186,18 +180,18 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
                 since global adapter was previously initialized and that list
                 contains the text query, check if it can be reused.
              */
-            if ( mGlobalAdapter != null) {
-                if (mGlobalAdapter.filter( text )) { // reuse old global adapter
+            if ( mGlobalAdapter != null ) {
+                if ( mGlobalAdapter.filter( text ) ) { // reuse old global adapter
                     Log.d( getClass().getSimpleName(), "I am setting mGlobalAdapter to be my adapter" );
                     mRecyclerView.setAdapter( mGlobalAdapter );
                     sendRequest = false;
                 }
                 // display no connections found and don't send new post request
-                else if(mPreviousQuery.contains(text) || text.contains(mPreviousQuery)) {
+                else if ( mPreviousQuery.contains( text ) || text.contains( mPreviousQuery ) ) {
                     mGlobalAdapter.setEmptyConnections();
-                    mRecyclerView.setAdapter(mGlobalAdapter);
+                    mRecyclerView.setAdapter( mGlobalAdapter );
                     sendRequest = false;
-                    Log.d(getClass().getSimpleName(), "Not making Requests");
+                    Log.d( getClass().getSimpleName(), "Not making Requests" );
                 }
 
             }
@@ -206,7 +200,7 @@ public class ConnectionListFragment extends Fragment implements SearchView.OnQue
                 otherwise, make post request to search through database
                 that current user is not connected with
              */
-           if (sendRequest) {
+            if ( sendRequest ) {
 
                 Log.d( getClass().getSimpleName(), "I'm sending a post request" );
                 requestForAllContacts( text );

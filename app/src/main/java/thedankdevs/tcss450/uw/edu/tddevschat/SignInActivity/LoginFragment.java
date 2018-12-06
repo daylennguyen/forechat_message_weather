@@ -40,7 +40,7 @@ import java.util.Objects;
  * to handle interaction events.
  *
  * @author Michelle Brown, Bryan Santos, Emmett Kang
- * @version 11/05/2018
+ * @version 1 December 2018
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
@@ -369,7 +369,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Get firebase token and insert to the database, then do login operations.
-     * @param email user's email
+     *
+     * @param email    user's email
      * @param password user's pasword
      * @author Charles Bryan, Emmett Kang
      */
