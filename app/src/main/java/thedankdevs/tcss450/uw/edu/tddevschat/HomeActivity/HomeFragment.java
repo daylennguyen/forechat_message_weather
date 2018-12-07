@@ -152,8 +152,8 @@ public class HomeFragment extends Fragment {
                     request.put( getString( R.string.weather_lat_json ), mLat );
                     break;
                 case SettingsNode.SELECT_FROM_MAP:
-                    mLat = myWeatherPref.getFloat( MAP_LAT_KEY, 0 );
-                    mLon = myWeatherPref.getFloat( MAP_LON_KEY, 0 );
+                    mLat = Double.parseDouble( Objects.requireNonNull( myWeatherPref.getString( MAP_LAT_KEY, "47.258728" ) ) );
+                    mLon = Double.parseDouble( Objects.requireNonNull( myWeatherPref.getString( MAP_LON_KEY, "-122.465973" ) ) );
                     Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mLat + " mlatlon " + mLon );
                     request.put( getString( R.string.weather_lon_json ), mLon );
                     request.put( getString( R.string.weather_lat_json ), mLat );
@@ -169,14 +169,12 @@ public class HomeFragment extends Fragment {
 
         } catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
-            try {
-                /*Set the default values if the location data is unknown*/
-                //request.put( "units", "I" );
-                request.put( "lon", -122.465973 );
-                request.put( "lat", 47.258728 );
-            } catch ( JSONException e1 ) {
-                e1.printStackTrace();
-            }
+                e.printStackTrace();
+
+            /*Set the default values if the location data is unknown*/
+            //request.put( "units", "I" );
+//                request.put( "lon", -122.465973 );
+//                request.put( "lat", 47.258728 );
 
         }
 
