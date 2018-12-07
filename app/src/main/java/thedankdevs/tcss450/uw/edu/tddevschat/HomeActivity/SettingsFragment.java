@@ -156,14 +156,14 @@ public class SettingsFragment extends Fragment {
                 locate_spinner.setSelection( SettingsNode.SELECT_FROM_MAP );
                 break;
             case SettingsNode.POSTAL_CODE:
-                mZipView.setText( sp.getString( ZIP_KEY, "Ex. 98422" ), TextView.BufferType.EDITABLE );
+                mZipView.setText( sp.getString( ZIP_KEY, "98422" ), TextView.BufferType.EDITABLE );
                 locate_spinner.setSelection( SettingsNode.POSTAL_CODE );
                 break;
             case SettingsNode.CITY_STATE:
                 //if they've already made a prefered city+state, set it in the field as the hint
                 locate_spinner.setSelection( SettingsNode.CITY_STATE );
-                mStateView.setText( sp.getString( STATE_KEY, "Ex. Tacoma" ), TextView.BufferType.EDITABLE );
-                mCityView.setText( sp.getString( CITY_KEY, "Ex. WA" ), TextView.BufferType.EDITABLE );
+                mStateView.setText( sp.getString( STATE_KEY, "WA" ), TextView.BufferType.EDITABLE );
+                mCityView.setText( sp.getString( CITY_KEY, "Tacoma" ), TextView.BufferType.EDITABLE );
                 break;
             default:
                 Log.d( "DAYLENTEST", String.valueOf( determin_pref ) );

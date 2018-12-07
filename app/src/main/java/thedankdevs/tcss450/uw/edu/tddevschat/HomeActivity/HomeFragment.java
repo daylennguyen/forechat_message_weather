@@ -97,7 +97,7 @@ public class HomeFragment extends Fragment {
         description = Objects.requireNonNull( v ).findViewById( R.id.forecast_home );
         city_state = Objects.requireNonNull( v ).findViewById( R.id.city_state_home );
         current_LocationDeterminant = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
-
+        current_WeatherMetric = getContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.FAHRENHEIT );
     }
 
     /**
@@ -163,20 +163,19 @@ public class HomeFragment extends Fragment {
             }
             /*DEFAULT UNIT IS CELSIUS*/
 
-                switch ( Objects.requireNonNull( myWeatherPref.getString( METRIC_PREF, "C" ) ) ) {
-                    case SettingsNode.FAHRENHEIT:
-                        request.put( "units", "I" );
-                        break;
-                    case SettingsNode.KELVIN:
-                        request.put( "units", "S" );
-                        break;
-                    case SettingsNode.CELSIUS:
-                        request.put( "units", "M" );
-                        break;
-
-                }
+            switch (Objects.requireNonNull(myWeatherPref.getString(METRIC_PREF, "F"))) {
+                case SettingsNode.CELSIUS:
+                    request.put("units", "M");
+                    break;
+                case SettingsNode.FAHRENHEIT:
+                    request.put("units", "I");
+                    break;
+                case SettingsNode.KELVIN:
+                    request.put("units", "S");
+                    break;
             }
-             catch ( Exception e ) {
+
+        } catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
             try {
                 /*Set the default values if the location data is unknown*/
@@ -243,7 +242,6 @@ public class HomeFragment extends Fragment {
             //apply the weather data to the user interface
             description.setText( weathDesc );
             city_state.setText( String.format( "in %s, %s, The forcast calls for ", mCity, mState ) );
-            current_WeatherMetric=Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.CELSIUS );
             low.setText( MessageFormat.format( "{0}°{1}", String.valueOf( min ), current_WeatherMetric ) );
             high.setText( MessageFormat.format( "{0}°{1}", String.valueOf( max ), current_WeatherMetric ) );
         } catch ( JSONException e ) {

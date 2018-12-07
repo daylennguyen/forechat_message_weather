@@ -179,11 +179,6 @@ public class HomeActivity extends AppCompatActivity
                     mConnectionsNode.loadConnections( new ConnectionListFragment() );
                 }
             }
-            if ( findViewById( R.id.frame_home_container ) != null ) {
-                HomeFragment home = new HomeFragment();
-                fm.beginTransaction().add( R.id.frame_home_container, home, HomeFragment.class.getSimpleName() ).addToBackStack( null ).commit();
-                loadFragment( home );
-            }
         }
 
         /*INITIALIZE THE NODES CONTAINING FUNCTIONALITY CORRESPONDING TO SPECIFIC FEATURES*/
@@ -281,7 +276,8 @@ public class HomeActivity extends AppCompatActivity
             Fragment currentFragment = getSupportFragmentManager().findFragmentById( R.id.frame_home_container );
             if ( currentFragment instanceof ChatFragment ) {
                 mChatNode.loadAllChats();
-            } else {
+            }
+            else if ( !(currentFragment instanceof HomeFragment) ) {
                 int i = 1;
                 while ( i < backstackCount ) {
                     getSupportFragmentManager().popBackStackImmediate();
@@ -291,6 +287,7 @@ public class HomeActivity extends AppCompatActivity
             backstackCount = getSupportFragmentManager().getBackStackEntryCount();
             Log.d( "BRYAN", "backstack after popping: " + backstackCount );
             if ( backstackCount == 1 ) {
+                setTitle( "Main Page" );
                 loadFragmentWithoutBackStack( new HomeFragment() );
             }
             super.onBackPressed();
@@ -416,6 +413,7 @@ public class HomeActivity extends AppCompatActivity
                 loadingFromDifferentMethods = true;
                 break;
             case R.id.nav_settings:
+                setTitle( "Weather Settings" );
                 fragment = new SettingsFragment();
                 break;
             case R.id.nav_member_settings:
@@ -425,10 +423,11 @@ public class HomeActivity extends AppCompatActivity
                 fragment.setArguments( args );
                 break;
             case R.id.nav_connectionRequests:
+                setTitle( "Connection Requests" );
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
-                return false;
+                return false; // do nothing, it's a switch view
             default:
         }
         if ( !loadingFromDifferentMethods ) {
@@ -503,9 +502,9 @@ public class HomeActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
-        if ( fm.getBackStackEntryCount() < 1 ) {
-            transaction.addToBackStack( null );
-        }
+//        if ( fm.getBackStackEntryCount() < 1 ) {
+//            transaction.addToBackStack( null );
+//        }
         // Commit the transaction
         transaction.commit();
     }
