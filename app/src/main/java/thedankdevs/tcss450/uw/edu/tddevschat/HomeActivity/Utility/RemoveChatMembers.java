@@ -17,7 +17,9 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import java.util.ArrayList;
 
 /**
- * A simple {@link Fragment} subclass.
+ * This fragment shows the members to be deleted and gives the option for
+ * the user to submit the chat members to be deleted.
+ * @author Emmett Kang
  */
 public class RemoveChatMembers extends Fragment implements View.OnClickListener {
 
@@ -36,8 +38,8 @@ public class RemoveChatMembers extends Fragment implements View.OnClickListener 
             switch ( v.getId() ) {
                 case R.id.btn_remove_chatMem:
                     for ( CheckBox cb : checkBoxes ) {
-                        if ( cb.isChecked() ) {
-                            Log.wtf( "out", cb.getText().toString() );
+                        if ( cb.isChecked() ) { // if check box is checked
+                            //Add to the list to be removed.
                             usersToRemove.add( cb.getText().toString() );
                         }
                     }
@@ -64,15 +66,16 @@ public class RemoveChatMembers extends Fragment implements View.OnClickListener 
         View v = inflater.inflate( R.layout.fragment_remove_chat_members, container, false );
 
         if ( getArguments() != null ) {
-            Log.wtf( "EMMETT", "checkbox list is loaded" );
+            //collections of usernames to be removed from the group chat.
             usersToRemove = new ArrayList<>();
             LinearLayout cbContainter = v.findViewById( R.id.remove_cb_container );
+            //Grab the arrarylist of checkBoxes
             checkBoxes = ( ArrayList<CheckBox> ) getArguments().getSerializable( "ArrayList" );
             mChatID = ( int ) getArguments().getSerializable( "chatID" );
+
+            //Add the checkboxes of username to the view.
             for ( CheckBox cb : checkBoxes ) {
                 cbContainter.addView( cb );
-                Log.w( "Running", cb.getText().toString() );
-
             }
         }
         Button removeMemberButton = v.findViewById( R.id.btn_remove_chatMem );

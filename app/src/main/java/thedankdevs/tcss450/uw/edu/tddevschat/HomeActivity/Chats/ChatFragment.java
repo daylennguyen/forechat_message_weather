@@ -197,7 +197,6 @@ public class ChatFragment extends Fragment {
 
     /**
      * This method creates the bubble UI by intaking the sender and the message that the sender sent
-     *
      * @param sender Person who sent the message
      * @param msg    content of the message
      */

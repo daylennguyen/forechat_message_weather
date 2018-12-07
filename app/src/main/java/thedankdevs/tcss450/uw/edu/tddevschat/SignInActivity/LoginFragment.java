@@ -196,9 +196,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    private void doLogin(/*String email, String password*/ ) {
+    /**
+     *  Helper method to validate the login and start the login post request.
+     */
+    private void doLogin() {
         Boolean valid = isLoginValid( mEmail, mPassword );
-        if ( valid ) {
+        if ( valid ) { // if valid, start building credentials.
             buildLoginServerCredentials( mEmail, mPassword );
         } else {
             Log.w( "Login Valid", "It ain't valid fam" );
