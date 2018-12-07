@@ -133,6 +133,7 @@ public class HomeFragment extends Fragment {
     private JSONObject constructRequestJSON() {
         JSONObject request = new JSONObject();
         double mLat, mLon;
+        boolean setDefault = false;
         try {
             switch ( myWeatherPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
                 case SettingsNode.CITY_STATE:
@@ -165,21 +166,22 @@ public class HomeFragment extends Fragment {
                     break;
             }
             /*DEFAULT UNIT IS CELSIUS*/
-
-
-        } catch ( Exception e ) {
+        }
+        catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
-                e.printStackTrace();
-
+            e.printStackTrace();
+            setDefault = true;
             /*Set the default values if the location data is unknown*/
             //request.put( "units", "I" );
-//                request.put( "lon", -122.465973 );
-//                request.put( "lat", 47.258728 );
 
-        }
-
-
-        try {
+        } if( setDefault ) {
+            try {
+                request.put( "lon", -122.465973 );
+                request.put( "lat", 47.258728 );
+            } catch ( JSONException e ) {
+                e.printStackTrace();
+            }
+        } try {
             Log.d("Bryan", "current metric: " + current_WeatherMetric);
             switch (current_WeatherMetric) {
                 case SettingsNode.CELSIUS:
