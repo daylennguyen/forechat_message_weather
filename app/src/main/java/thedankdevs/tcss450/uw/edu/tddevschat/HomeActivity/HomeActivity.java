@@ -791,7 +791,8 @@ public class HomeActivity extends AppCompatActivity
         protected Void doInBackground( Void... voids ) {
             //since we are already doing stuff in the background, go ahead
             //and remove the credentials from shared prefs here.
-            SharedPreferences prefs = mMaster.getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
+            //SharedPreferences prefs = mMaster.getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
+            SharedPreferences prefs = mMaster.getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
             prefs.edit().putBoolean( ( getString( reload_member_settings ) ), false ).apply();

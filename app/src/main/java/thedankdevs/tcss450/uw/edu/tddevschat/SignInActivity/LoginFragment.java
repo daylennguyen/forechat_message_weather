@@ -434,13 +434,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             Log.e( "JSON_PARSE_ERROR", result
                     + System.lineSeparator()
                     + e.getMessage() );
-            mListener.onWaitFragmentInteractionHide();
+
             ( ( TextView ) Objects.requireNonNull( getView() ).findViewById( R.id.et_login_email ) )
                     .setError( "Login Unsuccessful" );
         } catch ( Exception e ) {
             Log.d( "Debug Bryan", "Not sure what this runtime exception is: " + e );
             e.printStackTrace();
         }
+        mListener.onWaitFragmentInteractionHide();
     }
 
     /**
