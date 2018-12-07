@@ -402,8 +402,8 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_weather:
                 setTitle( "Weather" );
                 if ( mLocationNode.getmCurrentLocation() != null ) {
-                    args.putDouble( LATITUDE_KEY, mLocationNode.getmCurrentLocation().getLatitude() );
-                    args.putDouble( LONGITUDE_KEY, mLocationNode.getmCurrentLocation().getLongitude() );
+                    args.putString( LATITUDE_KEY, String.valueOf( mLocationNode.getmCurrentLocation().getLatitude() ) );
+                    args.putString( LONGITUDE_KEY, String.valueOf( mLocationNode.getmCurrentLocation().getLongitude() ) );
                 }
                 fragment = new WeatherDateFragment();
                 fragment.setArguments( args );

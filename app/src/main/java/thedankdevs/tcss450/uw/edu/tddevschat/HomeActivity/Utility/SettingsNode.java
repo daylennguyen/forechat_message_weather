@@ -61,7 +61,7 @@ public class SettingsNode {
                 editor.putString( METRIC_PREF, FAHRENHEIT );
                 break;
             default:
-                editor.putString( METRIC_PREF, FAHRENHEIT );
+//                editor.putString( METRIC_PREF, FAHRENHEIT );
         }
         editor.apply();
     }

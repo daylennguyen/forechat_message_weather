@@ -120,7 +120,7 @@ public class LocationNode implements Serializable {
                         // Update UI with location data
 
                         SharedPreferences sp = myNodeMaster.getSharedPreferences( Weather_Preference, 0 );
-                        sp.edit().putLong( LATITUDE_KEY, ( long ) location.getLatitude() ).putLong( LATITUDE_KEY, ( long ) location.getLongitude() ).apply();
+                        sp.edit().putString( LATITUDE_KEY, String.valueOf( location.getLatitude() ) ).putString( LATITUDE_KEY, String.valueOf( location.getLongitude() ) ).apply();
 
 
                         Log.d( "LOCATION", "LATITUDE: " + String.valueOf( location.getLatitude() ) );
