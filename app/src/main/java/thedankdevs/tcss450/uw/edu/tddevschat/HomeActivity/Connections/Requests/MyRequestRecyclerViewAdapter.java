@@ -20,9 +20,18 @@ import java.util.List;
  */
 public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestRecyclerViewAdapter.ViewHolder> {
 
+    /**
+     * The list of connection requests (both send and received)*/
     private final List<Request>                     mRequests;
+
     private final OnListFragmentInteractionListener mListener;
 
+    /**
+     * The constructor
+     *
+     * @param items the list of requests
+     * @param listener the class that will respond when something happens here
+     */
     public MyRequestRecyclerViewAdapter( List<Request> items, OnListFragmentInteractionListener listener ) {
         mRequests = items;
         mListener = listener;
@@ -35,6 +44,12 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
         return new ViewHolder( view );
     }
 
+    /**
+     * Called to display data at the specified position.
+     *
+     * @param holder represents the contents of the item at the given position in the data set
+     * @param position position of the item within the adapter's data set
+     */
     @Override
     public void onBindViewHolder( final ViewHolder holder, int position ) {
         holder.mItem = mRequests.get( position );
@@ -51,11 +66,17 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
         }
     }
 
+    /**
+     * @return the number of requests in the list
+     */
     @Override
     public int getItemCount() {
         return mRequests.size();
     }
 
+    /**
+     * Describes a Request item view and data about its place in the RecyclerView
+     */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View     mView;
         public final TextView mUsernameView;
@@ -78,6 +99,10 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
             //}
         }
 
+        /**
+         * When the user clicks the button, we make the listener respond to the user accepting the connection
+         * @param v
+         */
         @Override
         public void onClick( View v ) {
             mAcceptButton.setEnabled( false );

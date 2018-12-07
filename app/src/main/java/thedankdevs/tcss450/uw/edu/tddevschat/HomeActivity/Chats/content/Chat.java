@@ -29,18 +29,34 @@ public class Chat implements Serializable {
         this.mChatName = builder.mChatName;
     }
 
+    /**
+     * Gets the name of the chat
+     *
+     * @return the name of the chat
+     */
     public String getChatName() {
         return mChatName;
     }
 
+    /**
+     * Gets the int ID of the chat
+     * @return the ID of the chat
+     */
     public int getChatID() {
         return mChatID;
     }
 
+    /**
+     * Gets the names of the members of this chat
+     * @return the names of the members of this chat
+     */
     public String getChatMembers() {
         return mChatMembers;
     }
 
+    /**
+     * Gets the name of the chat plus a marker to notify the user of an event in the chat.
+     */
     public void notifiedChat() {
         this.mChatName = "*" + this.getChatName();
     }
@@ -70,18 +86,6 @@ public class Chat implements Serializable {
             this.mMemberusernames = userNames;
             this.mChatID = chatID;
         }
-
-
-
-        /*
-         * Add an optional something to the connection.
-         * @param val an optional something for the connection
-         * @return the Builder of this Connection
-         */
-/*        public Builder addSomething(final String val) {
-            mSomething = val;
-            return this;
-        }*/
 
         public Chat build() {
             return new Chat( this );

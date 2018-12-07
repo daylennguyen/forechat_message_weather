@@ -14,15 +14,28 @@ import java.io.Serializable;
  */
 public class Connection implements Serializable {
 
+    /**
+     * Information about the Connection, which is really another user of the app*/
     private final String  mEmail;
     private final String  mUsername;
     private final String  mFirstName;
     private final String  mLastName;
+    /**
+     * The ID of the one-on-one chat that the current user, and this connection share.
+     * will be -1 if uninitialized*/
     private       int     mChatID;
+    /**
+     * Boolean representation of if this user is registered as a connection/contact of the other user*/
     private       boolean mIsMine;
+    /**
+     * Will be true if the list of connections is empty*/
     private       boolean mIsEmpty;
 
-
+    /**
+     * Constructs a Connection internally from a builder.
+     *
+     * @param builder the builder used to construct this object
+     */
     private Connection( final Builder builder ) {
         this.mEmail = builder.mEmail;
         this.mUsername = builder.mUsername;
@@ -33,30 +46,64 @@ public class Connection implements Serializable {
         this.mIsEmpty = builder.mIsEmpty;
     }
 
+    /**
+     * Gets the email
+     *
+     * @return the email
+     */
     public String getEmail() {
         return mEmail;
     }
 
+    /**
+     * Gets the username
+     *
+     * @return the username
+     */
     public String getUsername() {
         return mUsername;
     }
 
+    /**
+     * Gets the first name
+     *
+     * @return the first name
+     */
     public String getFirstName() {
         return mFirstName;
     }
 
+    /**
+     * Gets the last name
+     *
+     * @return the last name
+     */
     public String getLastName() {
         return mLastName;
     }
 
+    /**
+     * Get the ID of the individual chat that the two users are in
+     *
+     * @return the ID of the individual chat that the two users are in
+     */
     public int getChatID() {
         return mChatID;
     }
 
+    /**
+     * Sets the ID of the individual chat that the two users are in
+     *
+     * @param chatID
+     */
     public void setChatID( int chatID ) {
         mChatID = chatID;
     }
 
+    /**
+     * Gets the boolean representation of if this user is registered as a connection/contact of the other user
+     * @return
+     */
     public boolean getIsMine() {
         return mIsMine;
     }
@@ -157,16 +204,6 @@ public class Connection implements Serializable {
             mIsEmpty = true;
             return this;
         }
-
-        /*
-         * Add an optional something to the connection.
-         * @param val an optional something for the connection
-         * @return the Builder of this Connection
-         */
-/*        public Builder addSomething(final String val) {
-            mSomething = val;
-            return this;
-        }*/
 
         public Connection build() {
             return new Connection( this );
