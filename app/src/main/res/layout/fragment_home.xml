@@ -10,23 +10,23 @@
 
 
 	<ImageView
-		android:id="@+id/imageView"
-		android:layout_width="0dp"
-		android:layout_height="0dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="20dp"
-		android:layout_marginEnd="8dp"
-		android:layout_marginBottom="80dp"
-		android:background="@drawable/sunset"
-		android:contentDescription="@string/home_forechat_logo"
-		android:padding="11dp"
-		android:scaleType="fitCenter"
-		android:src="@drawable/ic_logo_full_appname"
-		app:layout_constraintBottom_toTopOf="@+id/cardView2"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.75" />
+		android:id = "@+id/imageView"
+		android:layout_width = "0dp"
+		android:layout_height = "0dp"
+		android:layout_marginStart = "8dp"
+		android:layout_marginTop = "20dp"
+		android:layout_marginEnd = "8dp"
+		android:layout_marginBottom = "80dp"
+		android:background = "@drawable/sunset"
+		android:contentDescription = "@string/home_forechat_logo"
+		android:padding = "11dp"
+		android:scaleType = "fitCenter"
+		android:src = "@drawable/ic_logo_full_appname"
+		app:layout_constraintBottom_toTopOf = "@+id/cardView2"
+		app:layout_constraintEnd_toEndOf = "parent"
+		app:layout_constraintStart_toStartOf = "parent"
+		app:layout_constraintTop_toTopOf = "parent"
+		app:layout_constraintVertical_bias = "0.75" />
 
 	<LinearLayout
 		android:id = "@+id/cardView2"

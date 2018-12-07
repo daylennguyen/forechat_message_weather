@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +56,7 @@ public class ConnectionsNode {
     /**
      * Creates a post request, asynchronously, to retrieve the
      * connection data from the application server
+     *
      * @author Michelle Brown
      */
     public void loadConnections( Fragment frag ) {
@@ -171,8 +171,8 @@ public class ConnectionsNode {
      * Send a request to our web service to delete the connection between the current user and
      * the user with the supplied email
      *
-     * @param memberID the member ID of the current user
-     * @param email the email of the connection to be deleted
+     * @param memberID  the member ID of the current user
+     * @param email     the email of the connection to be deleted
      * @param ourChatID the ID of the shared chat between the surrent user and the user about to be deleted
      * @author Michelle Brown
      */
@@ -233,6 +233,7 @@ public class ConnectionsNode {
 
     /**
      * Send a request to our web service to load all of our pending connection requests
+     *
      * @author Michelle Brown
      */
     public void loadRequests() {

@@ -14,21 +14,24 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
 
-/*Contains much of the functionality regarding weather preferences. Usually initialized by home activity*/
+/**
+ * Contains much of the functionality regarding weather preferences. Usually initialized by home activity
+ *
+ * @author Daylen Nguyen
+ */
 public class SettingsNode {
-
+    public static final String Weather_Preference = "WEATHER";
     /******************[CONSTANTS]******************/
     /*Weather Temp. Metric*/
-    public static final String KELVIN     = "K";
-    public static final String CELSIUS    = "C";
-    public static final String FAHRENHEIT = "F";
+    public static final String KELVIN             = "K";
+    public static final String CELSIUS            = "C";
+    public static final String FAHRENHEIT         = "F";
 
     /*Location Determinant*/
     public static final int          GPS_DATA        = 0;
     public static final int          SELECT_FROM_MAP = 1;
     public static final int          POSTAL_CODE     = 2;
     public static final int          CITY_STATE      = 3;
-    public static final String       LOCATIONPREF    = "GPSSK";
     private             HomeActivity master;
 
     /************************************************/
@@ -42,7 +45,7 @@ public class SettingsNode {
      * The Static method, of which is called when the weather metric setting is changed
      */
     public static void onRadioButtonSelection( RadioGroup rg, int state ) {
-        SharedPreferences        settings = rg.getContext().getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE );
+        SharedPreferences        settings = rg.getContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
         SharedPreferences.Editor editor   = settings.edit();
         switch ( state ) {
             case R.id.radio_kelvin:
@@ -63,7 +66,9 @@ public class SettingsNode {
         editor.apply();
     }
 
-    /*STATIC listener assigned to the dropdown for location determinant*/
+    /**
+     * STATIC listener assigned to the dropdown for location determinant
+     */
     public static class LocationDeterminantDropdownListener implements AdapterView.OnItemSelectedListener {
         View view;
 
@@ -73,7 +78,7 @@ public class SettingsNode {
 
         @Override
         public void onItemSelected( AdapterView<?> parent, View aview, int position, long id ) {
-            SharedPreferences        settings     = aview.getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+            SharedPreferences        settings     = aview.getContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
             SharedPreferences.Editor editor       = settings.edit();
             Button                   locateButton = view.findViewById( R.id.select_location_button );
             View                     zippy        = view.findViewById( R.id.setting_section_zip );

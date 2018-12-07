@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="primaryEnabledColor" format="reference"/>
-    <attr name="primaryDisabledColor" format="reference"/>
-    <attr name="primaryBorderColor" format="reference"/>
-    <attr name="primaryDarkTextColor" format="reference"/>
-    <attr name="primaryLightTextColor" format="reference"/>
-    <attr name="primaryDarkBackground" format="reference"/>
-    <attr name="primaryMediumBackground" format="reference"/>
-    <attr name="primaryLightBackground" format="reference"/>
-    <attr name="navigationBarColor" format="reference"/>
-    <attr name="statusBarColor" format="reference"/>
-    <attr name="appBarColor" format="reference"/>
-    <attr name="colorBackground" format="reference"/>
+	<attr format = "reference" name = "primaryEnabledColor" />
+	<attr format = "reference" name = "primaryDisabledColor" />
+	<attr format = "reference" name = "primaryBorderColor" />
+	<attr format = "reference" name = "primaryDarkTextColor" />
+	<attr format = "reference" name = "primaryLightTextColor" />
+	<attr format = "reference" name = "primaryDarkBackground" />
+	<attr format = "reference" name = "primaryMediumBackground" />
+	<attr format = "reference" name = "primaryLightBackground" />
+	<attr format = "reference" name = "navigationBarColor" />
+	<attr format = "reference" name = "statusBarColor" />
+	<attr format = "reference" name = "appBarColor" />
+	<attr format = "reference" name = "colorBackground" />
 
 </resources>

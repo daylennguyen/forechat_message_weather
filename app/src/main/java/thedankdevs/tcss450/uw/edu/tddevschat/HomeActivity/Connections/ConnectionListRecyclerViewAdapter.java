@@ -25,17 +25,17 @@ import java.util.Objects;
  */
 public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionListRecyclerViewAdapter.ViewHolder> {
 
-    /**
-     * The list of Connections (can be both personal, and potential ones from the database)*/
-    private       List<Connection>                  mConnections;
     private final List<Connection>                  mCopyConnections;
-
     private final OnListFragmentInteractionListener mListener;
+    /**
+     * The list of Connections (can be both personal, and potential ones from the database)
+     */
+    private       List<Connection>                  mConnections;
 
     /**
      * The constructor
      *
-     * @param items the list of connectiosn
+     * @param items    the list of connectiosn
      * @param listener the class that will respond when something happens here
      */
     ConnectionListRecyclerViewAdapter( List<Connection> items, OnListFragmentInteractionListener listener ) {
@@ -58,7 +58,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
     /**
      * Called to display data at the specified position.
      *
-     * @param holder represents the contents of the item at the given position in the data set
+     * @param holder   represents the contents of the item at the given position in the data set
      * @param position position of the item within the adapter's data set
      */
     @Override
@@ -123,7 +123,7 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
      * sequence of the text passed in
      */
 
-    public boolean filter( String text ) {
+    boolean filter( String text ) {
 
         /*
             Clearing the list each time is needed because of the way that the logic

@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="32dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginRight="32dp"
-    android:background="@color/colorLightestGrey">
+<android.support.v7.widget.CardView xmlns:android = "http://schemas.android.com/apk/res/android"
+	xmlns:app = "http://schemas.android.com/apk/res-auto"
+	android:layout_width = "match_parent"
+	android:layout_height = "wrap_content"
+	android:layout_marginLeft = "32dp"
+	android:layout_marginTop = "16dp"
+	android:layout_marginRight = "32dp"
+	android:background = "@color/colorLightestGrey">
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+	<android.support.constraint.ConstraintLayout
+		android:layout_width = "match_parent"
+		android:layout_height = "wrap_content">
 
-        <TextView
-            android:id="@+id/tv_conectionRequest_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:layout_marginTop="8dp"
-            android:text="@string/date_sampl_weath"
-            android:textAppearance="?attr/textAppearanceListItem"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+		<TextView
+			android:id = "@+id/tv_conectionRequest_username"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:layout_margin = "@dimen/text_margin"
+			android:layout_marginTop = "8dp"
+			android:text = "@string/date_sampl_weath"
+			android:textAppearance = "?attr/textAppearanceListItem"
+			app:layout_constraintStart_toStartOf = "parent"
+			app:layout_constraintTop_toTopOf = "parent" />
 
-        <Button
-            android:id="@+id/btn_connectionRequest_accept"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/connection_acceptrequest"
-            app:layout_constraintEnd_toEndOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+		<Button
+			android:id = "@+id/btn_connectionRequest_accept"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:text = "@string/connection_acceptrequest"
+			app:layout_constraintEnd_toEndOf = "parent" />
+	</android.support.constraint.ConstraintLayout>
 
 </android.support.v7.widget.CardView>

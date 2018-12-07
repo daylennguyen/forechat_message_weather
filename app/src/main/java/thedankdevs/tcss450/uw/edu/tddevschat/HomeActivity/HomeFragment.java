@@ -24,6 +24,7 @@ import java.util.Objects;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.Weather_Preference;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,9 +43,9 @@ public class HomeFragment extends Fragment {
 
     /*Textview to which we will display the weather data*/
     private TextView high, low, city_state;
-    private SharedPreferences myLocationPref, myMetricPref, myDeterminPref;
-    private TextView description;
-    private TextView date;
+    private SharedPreferences myWeatherPref;
+    private TextView          description;
+    private TextView          date;
 
     public HomeFragment() {
     }
@@ -79,11 +80,9 @@ public class HomeFragment extends Fragment {
      */
     private void getSharedPrefAndValue() {
         mHome = ( HomeActivity ) getActivity();
-        myMetricPref = Objects.requireNonNull( getContext() ).getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE );
-        myDeterminPref = getContext().getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-        myLocationPref = Objects.requireNonNull( getContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
-        current_WeatherMetric = myMetricPref.getString( METRIC_PREF, "C" );
-        current_LocationDeterminant = myLocationPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
+        myWeatherPref = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
+        current_WeatherMetric = myWeatherPref.getString( METRIC_PREF, "F" );
+        current_LocationDeterminant = myWeatherPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
         Log.d( "DAYY", current_WeatherMetric + current_LocationDeterminant );
     }
 
@@ -97,15 +96,15 @@ public class HomeFragment extends Fragment {
         date = Objects.requireNonNull( v ).findViewById( R.id.weather_dateview );
         description = Objects.requireNonNull( v ).findViewById( R.id.forecast_home );
         city_state = Objects.requireNonNull( v ).findViewById( R.id.city_state_home );
-        current_LocationDeterminant = Objects.requireNonNull( getContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE ).getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
-        current_WeatherMetric = getContext().getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.FAHRENHEIT );
+        current_LocationDeterminant = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
+        current_WeatherMetric = getContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.FAHRENHEIT );
     }
 
     /**
      * Helper method to Generate a URI string dependant on location determinant
      */
     private String constructRequestLocation() {
-        SharedPreferences myDeterPref = Objects.requireNonNull( getContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+        SharedPreferences myDeterPref = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
         Uri.Builder uri_builder = new Uri.Builder()
                 .scheme( "https" )
                 .appendPath( getString( R.string.base_url ) )
@@ -131,13 +130,12 @@ public class HomeFragment extends Fragment {
     /*returns a json object, dependent on the location determinant*/
     private JSONObject constructRequestJSON() {
         JSONObject request = new JSONObject();
-        myDeterminPref = Objects.requireNonNull( getContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
-        myMetricPref = Objects.requireNonNull( getContext() ).getSharedPreferences( METRIC_PREF, 0 );
+
         try {
-            switch ( myDeterminPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
+            switch ( myWeatherPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
                 case SettingsNode.CITY_STATE:
-                    mCity = myLocationPref.getString( CITY_KEY, "TACOMA" );
-                    mState = myLocationPref.getString( STATE_KEY, "WA" );
+                    mCity = myWeatherPref.getString( CITY_KEY, "TACOMA" );
+                    mState = myWeatherPref.getString( STATE_KEY, "WA" );
                     Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mCity + mState );
                     request.put( getString( R.string.weather_lcase_city ), mCity );
                     request.put( getString( R.string.weather_lcase_state ), mState );
@@ -151,21 +149,21 @@ public class HomeFragment extends Fragment {
                     request.put( getString( R.string.weather_lat_json ), mLat );
                     break;
                 case SettingsNode.SELECT_FROM_MAP:
-                    mLat = myLocationPref.getFloat( MAP_LAT_KEY, 0 );
-                    mLon = myLocationPref.getFloat( MAP_LON_KEY, 0 );
+                    mLat = myWeatherPref.getFloat( MAP_LAT_KEY, 0 );
+                    mLon = myWeatherPref.getFloat( MAP_LON_KEY, 0 );
                     Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mLat + " mlatlon " + mLon );
                     request.put( getString( R.string.weather_lon_json ), mLon );
                     request.put( getString( R.string.weather_lat_json ), mLat );
                     break;
                 case SettingsNode.POSTAL_CODE:
-                    String mZip = myLocationPref.getString( ZIP_KEY, "98422" );
+                    String mZip = myWeatherPref.getString( ZIP_KEY, "98422" );
                     request.put( getString( R.string.weather_json_postal ), mZip );
                     Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mZip + " MZIP " );
                     break;
             }
             /*DEFAULT UNIT IS CELSIUS*/
-            if ( !Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
-                switch ( Objects.requireNonNull( myMetricPref.getString( METRIC_PREF, "C" ) ) ) {
+            if ( !Objects.requireNonNull( myWeatherPref.getString( METRIC_PREF, "C" ) ).equals( SettingsNode.CELSIUS ) ) {
+                switch ( Objects.requireNonNull( myWeatherPref.getString( METRIC_PREF, "C" ) ) ) {
                     case SettingsNode.FAHRENHEIT:
                         request.put( "units", "I" );
                         break;
@@ -177,6 +175,7 @@ public class HomeFragment extends Fragment {
         } catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
             try {
+                /*Set the default values if the location data is unknown*/
                 request.put( "units", "I" );
                 request.put( "lon", -122.465973 );
                 request.put( "lat", 47.258728 );

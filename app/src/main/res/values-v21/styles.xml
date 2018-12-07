@@ -1,10 +1,10 @@
 <resources>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@color/colorMedPurple</item>
-        <item name="android:navigationBarColor">@color/colorLightPurple</item>
+	<style name = "AppTheme.NoActionBar">
+		<item name = "windowActionBar">false</item>
+		<item name = "windowNoTitle">true</item>
+		<item name = "android:statusBarColor">@color/colorMedPurple</item>
+		<item name = "android:navigationBarColor">@color/colorLightPurple</item>
 
-    </style>
+	</style>
 </resources>

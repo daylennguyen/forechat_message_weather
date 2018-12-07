@@ -42,7 +42,6 @@ import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDate;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather.WeatherDateFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.MemberSettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
-import thedankdevs.tcss450.uw.edu.tddevschat.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.SignInActivity.SignInActivity;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.model.Credentials;
@@ -55,17 +54,23 @@ import java.util.Objects;
 
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LATITUDE_KEY;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.LONGITUDE_KEY;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.Weather_Preference;
+import static thedankdevs.tcss450.uw.edu.tddevschat.R.string.reload_member_settings;
 
 /**
+ * One of the ONLY activities contained within this application. why?
+ * Because we are individuals whom learn from our mistakes.
  *
- *
+ * @author TEAM DANK DEVS HOO RAA!
+ * go dawgs wooh :>
+ * @version 12/6/2018
  */
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ConnectionListFragment.OnListFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
         WeatherDateFragment.OnListFragmentInteractionListener,
-        ChatsFragment.OnChatsListFragmentInteractionListener,
+        ChatsFragment.OnChatsListFragmentInteractionListener,//HOLY MOLLY LOOK AT ALL THOSE INTERFACES
         ConnectionFragment.OnConnectionFragmentInteractionListener,
         CreateNewChatFragment.OnCreateNewChatButtonListener,
         WaitFragment.OnFragmentInteractionListener,
@@ -88,31 +93,59 @@ public class HomeActivity extends AppCompatActivity
     /*Chat Field variables*/
     private FirebaseMessageReciever mFirebaseMessageReciever;
     private ArrayList<Integer>      notifiedChats = new ArrayList<>();
-    /*Used to toggle the opened/closed state of the nav drawer*/
-    private ActionBarDrawerToggle   toggle;
 
-    private Switch mSwitch;
+    /*Used to toggle the opened/closed state of the nav drawer*/
+    private ActionBarDrawerToggle toggle;
+    private Switch                mSwitch;
 
     /* ******** CONSTRUCTOR AND METHOD CALLS **************/
+
+    /**
+     * Mandatory default constructor; because whoever said rules are meant to be broken is dumb.
+     *
+     * @author Daylen Nguyen
+     */
     public HomeActivity() {
     }
 
+    /**
+     * @author Daylen Nguyen
+     * Tell location node to stop with the GPS updates....yo
+     */
     public void stopGPS() {
         mLocationNode.stopLocationUpdates();
     }
 
+    /**
+     * @author Daylen Nguyen
+     * Ask nicely, for the location node to give the latitude, please and thank you
+     */
     public double getCurrentLat() {
         return mLocationNode.getmCurrentLocation().getLatitude();
     }
 
+    /**
+     * @author Daylen Nguyen
+     * Ask nicely, for the location node to give the user's longitude, please and thank you
+     */
     public double getCurrentLon() {
         return mLocationNode.getmCurrentLocation().getLongitude();
     }
 
+    /**
+     * @author Daylen Nguyen
+     * Tell location node to start up those GPS updates....yo
+     */
     public void startGPS() {
         mLocationNode.startLocationUpdates();
     }
 
+    /**
+     * Method which is called on creation
+     * sets the title, initial view and initializes the nodes.
+     *
+     * @param savedInstanceState the user's state which was previously saved when the user visited the app
+     */
     //  LIFE CYCLE METHODS///////////////////////////
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -134,12 +167,11 @@ public class HomeActivity extends AppCompatActivity
         Log.d( "Debug Bryan", "initializing drawer" );
         initializeActionDrawerToggle( drawer, toolbar );
         Log.d( "Debug Bryan", "drawer initialized, starting location updates" );
-
         Log.d( "Debug Bryan", "location updates successful" );
         if ( savedInstanceState == null ) {
-            FragmentManager fm                     = getSupportFragmentManager();
+            FragmentManager fm = getSupportFragmentManager();
             //handle connection notifications
-            String          connectionNotification = getIntent().getStringExtra( getString( R.string.keys_intent_notification_connections ) );
+            String connectionNotification = getIntent().getStringExtra( getString( R.string.keys_intent_notification_connections ) );
             if ( connectionNotification != null ) {
                 if ( connectionNotification.equals( getString( R.string.notification_requested ) ) ) {
                     mConnectionsNode.loadRequests();
@@ -150,18 +182,15 @@ public class HomeActivity extends AppCompatActivity
             if ( findViewById( R.id.frame_home_container ) != null ) {
                 HomeFragment home = new HomeFragment();
                 fm.beginTransaction().add( R.id.frame_home_container, home, HomeFragment.class.getSimpleName() ).addToBackStack( null ).commit();
-//                this.setContentView( home.getView() );
                 loadFragment( home );
             }
-
         }
+
+        /*INITIALIZE THE NODES CONTAINING FUNCTIONALITY CORRESPONDING TO SPECIFIC FEATURES*/
         initializeNodes();
-
         mLocationNode.startLocationUpdates();
-
-
         // reload member Settings fragment
-        if ( getIntent().getBooleanExtra( getString( R.string.reload_member_settings ), false ) ) {
+        if ( getIntent().getBooleanExtra( getString( reload_member_settings ), false ) ) {
             setTitle( getString( R.string.member_settings_header ) );
             Bundle                 args = new Bundle();
             MemberSettingsFragment frag = new MemberSettingsFragment();
@@ -177,7 +206,10 @@ public class HomeActivity extends AppCompatActivity
         super.onStart();
     }
 
-    /*Enables toggling of the nav drawer and displays with username within said drawer as well*/
+    /**
+     * Enables toggling of the nav drawer and displays with username within said drawer as well
+     * as initializes the navigation and menu. Furthermore, reinitializes the theme if it has been previously set
+     */
     private void initializeActionDrawerToggle( DrawerLayout drawer, Toolbar toolbar ) {
         Log.d( "BRYAN", "Credentials during intializeDrawer: " + mCredential.getUsername() );
         toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
@@ -192,23 +224,22 @@ public class HomeActivity extends AppCompatActivity
         Menu     settingsMenu = mainMenu.findItem( R.id.settings_menu_item ).getSubMenu();
         MenuItem switchItem   = settingsMenu.findItem( R.id.nav_theme );
         mSwitch = switchItem.getActionView().findViewById( R.id.view_switch_theme );
+
+
+        /*Depending on whether the user has changed theme preferences; set the preference*/
         SharedPreferences sharedPref = getSharedPreferences( getString( R.string.current_theme ), Context.MODE_PRIVATE );
-        mSwitch.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View v ) {
-                Log.d( "Paolo", "I hit the switch" );
-                Switch switchView = ( Switch ) v;
-                String theme      = ThemeUtils.THEME_CLASSIC;
-                if ( switchView.isChecked() ) {
-                    theme = ThemeUtils.THEME_MINT;
-                }
-
-                sharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
-                sharedPref.edit().putBoolean( getString( R.string.reload_theme_switch ), switchView.isChecked() ).commit();
-                onChangeTheme( theme );
+        mSwitch.setOnClickListener( v -> {
+            Log.d( "Paolo", "I hit the switch" );
+            Switch switchView = ( Switch ) v;
+            String theme      = ThemeUtils.THEME_CLASSIC;
+            if ( switchView.isChecked() ) {
+                theme = ThemeUtils.THEME_MINT;
             }
-        } );
 
+            sharedPref.edit().putString( getString( R.string.current_theme ), theme ).apply();
+            sharedPref.edit().putBoolean( getString( R.string.reload_theme_switch ), switchView.isChecked() ).apply();
+            onChangeTheme();
+        } );
         String theme = sharedPref.getString( getString( R.string.current_theme ), ThemeUtils.THEME_CLASSIC );
         assert theme != null;
         switch ( theme ) {
@@ -221,15 +252,10 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    private void reinitializeNavigationDrawer() {
-        NavigationView navigationView = findViewById( R.id.nav_view );
-        View           hView          = navigationView.getHeaderView( 0 );
-        navigationView.setNavigationItemSelectedListener( this );
-        TextView nav_user = hView.findViewById( R.id.tv_drawerheader_username );
-        nav_user.setText( mCredential.getUsername() ); //Set the header username.
-    }
-
-    /*Helper class to create node objects*/
+    /**
+     * Helper class to create node objects which contain functionality pertaining
+     * to various features
+     */
     private void initializeNodes() {
         /*Retrieve user settings*/
         mSettingsNode = new SettingsNode( this );
@@ -241,7 +267,9 @@ public class HomeActivity extends AppCompatActivity
         mChatNode = new ChatNode( this, mCredential );
     }
 
-
+    /**
+     * When the back button is pressed update the backstack
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer         = findViewById( R.id.drawer_layout );
@@ -269,6 +297,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * When the activity is paused, tell fire base and pause gps updates
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -278,6 +309,9 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.stopLocationUpdates();
     }
 
+    /**
+     * when the activity resumes, tell firebase the user received the message
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -289,11 +323,26 @@ public class HomeActivity extends AppCompatActivity
         mLocationNode.stopLocationUpdates();
     }
 
+
+    /**
+     * Listener method to which is called in response to user input to the permissions request
+     *
+     * @param requestCode  Request code corresponding to the specific permissions requested
+     * @param permissions  permissions being requested
+     * @param grantResults user's response to the permission request
+     */
     @Override
     public void onRequestPermissionsResult( int requestCode, @NonNull String permissions[], @NonNull int[] grantResults ) {
-        mLocationNode.onRequestPermissionsResult( requestCode, permissions, grantResults );
+        mLocationNode.onRequestPermissionsResult( requestCode, grantResults );
     }
 
+    /**
+     * Method which is executed when the options menu is created; inflates the option view and hides the search view
+     * contained within the connections tab
+     *
+     * @param menu the menu which is being created
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu( Menu menu ) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -303,6 +352,12 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Conditionally displays a fragment depending on which menu item is selected
+     *
+     * @param item the menu item which was selected
+     * @return the the return of the overridden method
+     */
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
         // Handle action bar item clicks here. The action bar will
@@ -311,7 +366,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if ( id == R.id.action_settings ) {
-            loadFragment( new SettingsFragment() );
+            loadFragment( new thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment() );
             return true;
         } else if ( id == R.id.action_logout ) {
             logout();
@@ -320,6 +375,13 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected( item );
     }
 
+
+    /**
+     * Conditionally displays a fragment depending on the which menu item is selected within the nav drawer
+     *
+     * @param item the menu item which was selected
+     * @return whether the method has executed successfully
+     */
     @Override
     public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
         // Handle navigation view item clicks here.
@@ -333,12 +395,10 @@ public class HomeActivity extends AppCompatActivity
                 setTitle( "Main Page" );
                 fragment = new HomeFragment();
                 break;
-
             case R.id.nav_connections:
                 Fragment frag = new ConnectionListFragment();
                 mConnectionsNode.loadConnections( frag );
                 break;
-
             case R.id.nav_weather:
                 setTitle( "Weather" );
                 if ( mLocationNode.getmCurrentLocation() != null ) {
@@ -348,7 +408,6 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new WeatherDateFragment();
                 fragment.setArguments( args );
                 break;
-
             case R.id.nav_chat:
                 setTitle( "Chat" );
                 mChatNode.loadAllChats();
@@ -356,26 +415,21 @@ public class HomeActivity extends AppCompatActivity
                 onWaitFragmentInteractionShow();
                 loadingFromDifferentMethods = true;
                 break;
-
             case R.id.nav_settings:
                 fragment = new SettingsFragment();
                 break;
-
             case R.id.nav_member_settings:
                 setTitle( getString( R.string.member_settings_header ) );
                 fragment = new MemberSettingsFragment();
                 args.putSerializable( getString( R.string.nav_membersettings ), mCredential );
                 fragment.setArguments( args );
                 break;
-
             case R.id.nav_connectionRequests:
                 mConnectionsNode.loadRequests();
                 break;
             case R.id.nav_theme:
                 return false;
-
             default:
-
         }
         if ( !loadingFromDifferentMethods ) {
             /*Send the args to the fragment before displaying*/
@@ -390,6 +444,10 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Displays the wait fragment usually used during async tasks.
+     * Furthermore, may be removed with the use of the backbutton
+     */
     @Override
     public void onWaitFragmentInteractionShow() {
         /*displays the wait fragment to the user, meaning that something is loading*/
@@ -400,6 +458,10 @@ public class HomeActivity extends AppCompatActivity
                 .commit();
     }
 
+    /**
+     * Hides the wait fragment usually used during async tasks.
+     * Furthermore, may be removed with the use of the backbutton
+     */
     @Override
     public void onWaitFragmentInteractionHide() {
         /*remove the wait fragment that is displayed; meaning that something is done loading*/
@@ -407,15 +469,18 @@ public class HomeActivity extends AppCompatActivity
                 .beginTransaction()
                 .remove( Objects.requireNonNull( getSupportFragmentManager().findFragmentByTag( "WAIT" ) ) )
                 .commit();
-
     }
 
-    /**Signs the user out of the current account*/
+    /**
+     * Signs the user out of the current account
+     */
     private void logout() {
         new DeleteTokenAsyncTask( this ).execute();
     }
 
-    /**Helper method to load an instance of the given fragment into the current activity*/
+    /**
+     * Helper method to load an instance of the given fragment into the current activity
+     */
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
@@ -423,7 +488,6 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack( null );
         // Commit the transaction
         transaction.commit();
-//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
     /**
@@ -439,22 +503,20 @@ public class HomeActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction()
                 .replace( R.id.frame_home_container, frag, frag.getClass().getSimpleName() );
-        //.addToBackStack(null);
-
-
         if ( fm.getBackStackEntryCount() < 1 ) {
             transaction.addToBackStack( null );
         }
-
-
         // Commit the transaction
         transaction.commit();
-//        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
+    /**
+     * Unused listener method. Responds to a press on the weather list items within the weather fragment.
+     *
+     * @param item the weather list item which was selected
+     */
     @Override
     public void onWeatherListItemFragmentInteraction( WeatherDate item ) {
-
     }
 
     @Override
@@ -463,7 +525,7 @@ public class HomeActivity extends AppCompatActivity
         Log.d( "Debug Bryan", "creating new intent" );
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.keys_credential_member_settings ), mCredential );
-        intent.putExtra( getString( R.string.reload_member_settings ), true );
+        intent.putExtra( getString( reload_member_settings ), true );
         Log.d( "Debug Bryan", "intent created" );
         Log.d( "Debug Bryan", "starting new activity" );
         startActivity( intent );
@@ -473,17 +535,31 @@ public class HomeActivity extends AppCompatActivity
 //        this.overridePendingTransition( android.R.anim.fade_in, android.R.anim.fade_out );
     }
 
-
+    /**
+     * Responds to when the connections list is interacted with.
+     *
+     * @param item the connections which was chosen
+     */
     @Override
     public void onConnectionsListFragmentInteraction( Connection item ) {
         mConnectionsNode.onListFragmentInteraction( item );
     }
 
+    /**
+     * Responds to when the connections list is interacted with.
+     *
+     * @param item the connections which was chosen
+     */
     @Override
     public void onConnectionsListFragmentLongInteraction( Connection item ) {
         mConnectionsNode.onConnectionsListFragmentLongInteraction( item );
     }
 
+    /**
+     * Responds to when the user would like to send a connection request
+     *
+     * @param theirUsername the user which was selected to receive a request
+     */
     @Override
     public void onRequestListFragmentInteraction( String theirUsername ) {
         mConnectionsNode.onRequestListFragmentInteraction( theirUsername );
@@ -621,7 +697,6 @@ public class HomeActivity extends AppCompatActivity
     public void updateNotifiedChats( int openedChatID ) {
         //User read, so remove the chatroom that was notified from the list.
         notifiedChats.remove( openedChatID );
-
     }
 
 
@@ -662,7 +737,7 @@ public class HomeActivity extends AppCompatActivity
         mChatNode.RemoveMembersFromChat( users, theChatID );
     }
 
-    public void onChangeTheme( String theme ) {
+    public void onChangeTheme() {
         Intent intent = new Intent( this, HomeActivity.class );
         intent.putExtra( getString( R.string.key_credential ), mCredential );
 
@@ -678,10 +753,9 @@ public class HomeActivity extends AppCompatActivity
      * Will display an alert dialog to the user that lets the user know
      * some connection request action happened and gives them the option to respond.
      *
-     * @param msg the message to display in the notification
+     * @param msg      the message to display in the notification
      * @param positive the message representing the positive/affirmative action for the user to choose
-     * @param action the Runnable that we want to execute when the user chooses the positive action
-     *
+     * @param action   the Runnable that we want to execute when the user chooses the positive action
      * @author Michelle Brown
      */
     private void ShowConnectionRequestAlert( String msg, String positive, final Runnable action ) {
@@ -717,24 +791,23 @@ public class HomeActivity extends AppCompatActivity
         protected Void doInBackground( Void... voids ) {
             //since we are already doing stuff in the background, go ahead
             //and remove the credentials from shared prefs here.
-            SharedPreferences prefs = mMaster.getSharedPreferences( mMaster.getString( R.string.keys_shared_prefs ), Context.MODE_PRIVATE );
+            SharedPreferences prefs = mMaster.getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_password ) ).apply();
             prefs.edit().remove( mMaster.getString( R.string.keys_prefs_email ) ).apply();
-            prefs.edit().putBoolean( ( getString( R.string.reload_member_settings ) ), false );
-            prefs.edit().putBoolean( getString( R.string.reload_theme_switch ), false );
-//            prefs.edit().putBoolean()
+            prefs.edit().putBoolean( ( getString( reload_member_settings ) ), false ).apply();
+
+            prefs.edit().putBoolean( getString( R.string.reload_theme_switch ), false ).apply();
             try {
                 //this call must be done asynchronously.
                 FirebaseInstanceId.getInstance().deleteInstanceId();
             } catch ( IOException e ) {
-
                 Log.e( "FCM", "Delete error!" );
                 e.printStackTrace();
-
             } catch ( Exception e ) {
                 Log.e( "ERROR", "MAJOR ERROR" );
                 e.printStackTrace();
             }
+
             return null;
         }
 
@@ -747,8 +820,6 @@ public class HomeActivity extends AppCompatActivity
         @Override
         protected void onPostExecute( Void aVoid ) {
             super.onPostExecute( aVoid );
-            //close the app
-
             Intent intent = new Intent( mMaster, SignInActivity.class );
             mMaster.startActivity( intent );
             mMaster.finish();

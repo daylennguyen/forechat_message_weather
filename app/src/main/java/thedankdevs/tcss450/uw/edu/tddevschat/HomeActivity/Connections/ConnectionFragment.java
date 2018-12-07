@@ -32,19 +32,21 @@ import java.util.Objects;
 public class ConnectionFragment extends Fragment implements View.OnClickListener {
 
     /**
-     * the button that lets you request a connection or open a new chat with an existing one*/
+     * the button that lets you request a connection or open a new chat with an existing one
+     */
     Button mChatButton;
     /*
      * Connection information*/
-    private String                                  mTheirEmail;
-    private String                                  mTheirUsername;
-    private String                                  mTheirFirstName;
-    private String                                  mTheirLastName;
-    private int                                     mOurChatID;
-    private boolean                                 mIsMine = false;
+    private String      mTheirEmail;
+    private String      mTheirUsername;
+    private String      mTheirFirstName;
+    private String      mTheirLastName;
+    private int         mOurChatID;
+    private boolean     mIsMine = false;
     /**
-     * The current user's credentials*/
-    private Credentials                             mCredentials;
+     * The current user's credentials
+     */
+    private Credentials mCredentials;
 
     private OnConnectionFragmentInteractionListener mListener;
 
@@ -200,12 +202,12 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
             if ( res.has( "success" ) && res.getBoolean( "success" ) ) {
                 toastMsg = getString( R.string.connection_requestsent );
             } else {
-                JSONObject row = res.getJSONObject("row");
+                JSONObject row = res.getJSONObject( "row" );
                 if ( row.has( "verified" ) ) {
-                    mChatButton.setText(R.string.connection_pendingrequest);
-                    toastMsg = getString(R.string.connection_requestfailedpending);
+                    mChatButton.setText( R.string.connection_pendingrequest );
+                    toastMsg = getString( R.string.connection_requestfailedpending );
                 } else {
-                    toastMsg = getString(R.string.connection_requestfailed);
+                    toastMsg = getString( R.string.connection_requestfailed );
                 }
             }
             Toast toast = Toast.makeText( Objects.requireNonNull( getActivity() ).getApplicationContext(),

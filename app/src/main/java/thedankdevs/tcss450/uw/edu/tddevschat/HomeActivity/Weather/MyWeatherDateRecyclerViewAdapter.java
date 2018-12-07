@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link WeatherDate} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
+ * @author Daylen Nguyen
  */
 public class MyWeatherDateRecyclerViewAdapter extends RecyclerView.Adapter<MyWeatherDateRecyclerViewAdapter.ViewHolder> {
     private final List<WeatherDate>                 mValues;

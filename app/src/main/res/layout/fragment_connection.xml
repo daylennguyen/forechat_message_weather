@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout5"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="32dp"
-    tools:context=".HomeActivity.Connections.ConnectionFragment">
+<android.support.constraint.ConstraintLayout xmlns:android = "http://schemas.android.com/apk/res/android"
+	xmlns:app = "http://schemas.android.com/apk/res-auto"
+	xmlns:tools = "http://schemas.android.com/tools"
+	android:id = "@+id/frameLayout5"
+	android:layout_width = "match_parent"
+	android:layout_height = "match_parent"
+	android:layout_margin = "32dp"
+	tools:context = ".HomeActivity.Connections.ConnectionFragment">
 
 
-    <ImageView
-        android:id="@+id/img_connection_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/c02d"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+	<ImageView
+		android:id = "@+id/img_connection_icon"
+		android:layout_width = "wrap_content"
+		android:layout_height = "wrap_content"
+		android:layout_marginTop = "32dp"
+		android:src = "@drawable/c02d"
+		app:layout_constraintEnd_toEndOf = "parent"
+		app:layout_constraintStart_toStartOf = "parent"
+		app:layout_constraintTop_toTopOf = "parent" />
 
-    <TextView
-        android:id="@+id/tv_connection_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Username"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_connection_icon" />
+	<TextView
+		android:id = "@+id/tv_connection_username"
+		android:layout_width = "wrap_content"
+		android:layout_height = "wrap_content"
+		android:layout_marginTop = "32dp"
+		android:text = "@string/username"
+		android:textSize = "24sp"
+		app:layout_constraintEnd_toEndOf = "parent"
+		app:layout_constraintStart_toStartOf = "parent"
+		app:layout_constraintTop_toBottomOf = "@+id/img_connection_icon" />
 
-    <LinearLayout
-        android:id="@+id/ll_connection_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_connection_username"
-        app:layout_constraintVertical_bias="0.0">
+	<LinearLayout
+		android:id = "@+id/ll_connection_name"
+		android:layout_width = "wrap_content"
+		android:layout_height = "wrap_content"
+		android:layout_marginTop = "8dp"
+		android:orientation = "horizontal"
+		app:layout_constraintBottom_toBottomOf = "parent"
+		app:layout_constraintEnd_toEndOf = "parent"
+		app:layout_constraintStart_toStartOf = "parent"
+		app:layout_constraintTop_toBottomOf = "@+id/tv_connection_username"
+		app:layout_constraintVertical_bias = "0.0">
 
-        <TextView
-            android:id="@+id/tv_connection_firstname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="First" />
+		<TextView
+			android:id = "@+id/tv_connection_firstname"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:text = "@string/first" />
 
-        <TextView
-            android:id="@+id/tv_connection_lastname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:text="Last" />
-    </LinearLayout>
+		<TextView
+			android:id = "@+id/tv_connection_lastname"
+			android:layout_width = "wrap_content"
+			android:layout_height = "wrap_content"
+			android:layout_marginStart = "32dp"
+			android:text = "@string/last" />
+	</LinearLayout>
 
-    <Button
-        android:id="@+id/btn_connection_openchat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+	<Button
+		android:id = "@+id/btn_connection_openchat"
+		android:layout_width = "wrap_content"
+		android:layout_height = "wrap_content"
+		android:layout_marginBottom = "16dp"
+		android:text = "@string/button"
+		app:layout_constraintBottom_toBottomOf = "parent"
+		app:layout_constraintEnd_toEndOf = "parent"
+		app:layout_constraintStart_toStartOf = "parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -21,15 +21,16 @@ import java.util.List;
 public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestRecyclerViewAdapter.ViewHolder> {
 
     /**
-     * The list of connection requests (both send and received)*/
-    private final List<Request>                     mRequests;
+     * The list of connection requests (both send and received)
+     */
+    private final List<Request> mRequests;
 
     private final OnListFragmentInteractionListener mListener;
 
     /**
      * The constructor
      *
-     * @param items the list of requests
+     * @param items    the list of requests
      * @param listener the class that will respond when something happens here
      */
     public MyRequestRecyclerViewAdapter( List<Request> items, OnListFragmentInteractionListener listener ) {
@@ -47,7 +48,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
     /**
      * Called to display data at the specified position.
      *
-     * @param holder represents the contents of the item at the given position in the data set
+     * @param holder   represents the contents of the item at the given position in the data set
      * @param position position of the item within the adapter's data set
      */
     @Override
@@ -83,7 +84,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
         public final Button   mAcceptButton;
         public       Request  mItem;
 
-        public ViewHolder( View view ) {
+        ViewHolder( View view ) {
             super( view );
             mView = view;
             mUsernameView = view.findViewById( R.id.tv_conectionRequest_username );
@@ -101,6 +102,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
 
         /**
          * When the user clicks the button, we make the listener respond to the user accepting the connection
+         *
          * @param v
          */
         @Override

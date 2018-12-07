@@ -10,33 +10,91 @@ import android.util.Log;
 import com.google.android.gms.location.*;
 
 import java.io.Serializable;
+import java.util.Objects;
+
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.Weather_Preference;
 
 /**
  * The Location Node; contains the primary functionality pertaining to retrieving Location Data
  * from the application database/server. Later passed to the Weather fragment.
+ *
+ * @author Daylen Nguyen
+ * @version 12/6/2018
  */
 public class LocationNode implements Serializable {
-
+    /**
+     * Key to which is used to retrieve the ZIPCODE through the location preferences
+     */
     public static final String ZIP_KEY     = "ZIP";
+    /**
+     * Key to which is used to retrieve the CITY through the location preferences
+     */
     public static final String CITY_KEY    = "CITY";
+    /**
+     * Key to which is used to retrieve the STATE through the location preferences
+     */
     public static final String STATE_KEY   = "STATE";
+    /**
+     * Key to which is used to retrieve the map Longitude through the location preferences
+     */
     public static final String MAP_LON_KEY = "MLON";
-    public static final String MAP_LAT_KEY = "MLAT";
-
-    public static final  String                      LONGITUDE_KEY                           = "LONGITUDE";
-    public static final  String                      LATITUDE_KEY                            = "LATITUDE";
-    public static final  int                         MY_PERMISSIONS_LOCATIONS                = 8414;
-    /*Location Services*/
-    private static final long                        UPDATE_INTERVAL_IN_MILLISECONDS         = 10000;
-    private static final long                        FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    private              AppCompatActivity           myNodeMaster;
-    private              LocationRequest             mLocationRequest;
-    private              Location                    mCurrentLocation;
-    private              FusedLocationProviderClient mFusedLocationClient;
-    private              LocationCallback            mLocationCallback;
 
     /**
-     * @param MasterActivity
+     * Key to which is used to retrieve the MAP latitude through the location preferences
+     */
+    public static final String MAP_LAT_KEY = "MLAT";
+
+    /**
+     * Key to which is used to retrieve the Longitude through the location preferences
+     */
+    public static final  String LONGITUDE_KEY                           = "LONGITUDE";
+    /**
+     * Key to which is used to retrieve the latitude through the location preferences
+     */
+    public static final  String LATITUDE_KEY                            = "LATITUDE";
+    /**
+     * The permission code to which is handled by: onPermissionsResults
+     */
+    private static final int    MY_PERMISSIONS_LOCATIONS                = 8414;
+    /*Location Services*/
+    /**
+     * The interval to which the location will be update (ms)
+     */
+    private static final long   UPDATE_INTERVAL_IN_MILLISECONDS         = 10000;
+    /**
+     * The upper-bound on the interval to which the location will be updated
+     */
+    private static final long   FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    /**
+     * The master node to which this is attached
+     */
+    private              AppCompatActivity           myNodeMaster;
+    /**
+     * used to request a quality of service for location updates from the FusedLocationProviderApi
+     */
+    private              LocationRequest             mLocationRequest;
+    /**
+     * The current location of the user, as given by the fused location provider
+     */
+    private              Location                    mCurrentLocation;
+    /**
+     * of type, FusedLocationProviderClient which acts
+     * as the main entry point for interacting with the fused location provider
+     */
+    private              FusedLocationProviderClient mFusedLocationClient;
+    /**
+     * The callback method which is used on post location retrieval
+     */
+    private              LocationCallback            mLocationCallback;
+    private              String                      GPSISON;
+
+    /**
+     * The default constructor to which initializes all location functionality for the application
+     *
+     * @param MasterActivity the activity to which it is attached {@AppCompatActivity}
+     * @author Daylen Nguyen
      */
     public LocationNode( AppCompatActivity MasterActivity ) {
         setMyNodeMaster( MasterActivity );
@@ -46,8 +104,6 @@ public class LocationNode implements Serializable {
         if ( ActivityCompat.checkSelfPermission( MasterActivity, Manifest.permission.ACCESS_FINE_LOCATION )
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission( MasterActivity, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-
             ActivityCompat.requestPermissions( MasterActivity, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSIONS_LOCATIONS );
         } else {
             //The user has already allowed the use of Locations. Get the current location.
@@ -63,7 +119,7 @@ public class LocationNode implements Serializable {
                     for ( Location location : locationResult.getLocations() ) {
                         // Update UI with location data
 
-                        SharedPreferences sp = myNodeMaster.getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
+                        SharedPreferences sp = myNodeMaster.getSharedPreferences( Weather_Preference, 0 );
                         sp.edit().putLong( LATITUDE_KEY, ( long ) location.getLatitude() ).putLong( LATITUDE_KEY, ( long ) location.getLongitude() ).apply();
 
 
@@ -79,6 +135,8 @@ public class LocationNode implements Serializable {
 
     /**
      * Requests location updates from the FusedLocationApi.
+     *
+     * @author Daylen Nguyen
      */
     public void startLocationUpdates() {
         if ( ActivityCompat.checkSelfPermission( getMyNodeMaster(), Manifest.permission.ACCESS_FINE_LOCATION )
@@ -92,6 +150,8 @@ public class LocationNode implements Serializable {
 
     /**
      * Removes location updates from the FusedLocationApi.
+     *
+     * @author Daylen Nguyen
      */
     public void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates( mLocationCallback );
@@ -99,6 +159,8 @@ public class LocationNode implements Serializable {
 
     /**
      * Create and configure a Location Request used when retrieving location updates
+     *
+     * @author Daylen Nguyen
      */
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
@@ -108,13 +170,20 @@ public class LocationNode implements Serializable {
     }
 
     /**
-     * @param location
+     * Sets the location of this object
+     *
+     * @param location the location to be set
+     * @author Daylen Nguyen
      */
     private void setLocation( final Location location ) {
         mCurrentLocation = location;
     }
 
-    /*Method to request the location permissions from the user*/
+    /**
+     * Method to request the location permissions from the user
+     *
+     * @author Daylen Nguyen
+     */
     private void requestLocation() {
         if ( ActivityCompat.checkSelfPermission( getMyNodeMaster(), Manifest.permission.ACCESS_FINE_LOCATION )
                 != PackageManager.PERMISSION_GRANTED
@@ -135,11 +204,17 @@ public class LocationNode implements Serializable {
     }
 
     /**
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
+     * Code which is conditionally executed depending on which code is
+     * executed and whether the permissions corresponding to the request code, were accepted.
+     *
+     * @param requestCode  corresponds to the permission request which was made
+     * @param grantResults user's response to the permission request
      */
-    public void onRequestPermissionsResult( int requestCode, String permissions[], int[] grantResults ) {
+    public void onRequestPermissionsResult( int requestCode, int[] grantResults ) {
+        SharedPreferences sp = Objects.requireNonNull( myNodeMaster )
+                .getSharedPreferences( Weather_Preference, 0 );
+        SharedPreferences.Editor e = sp.edit();
+
         switch ( requestCode ) {
             case MY_PERMISSIONS_LOCATIONS: {
                 // If request is cancelled, the result arrays are empty.
@@ -147,46 +222,55 @@ public class LocationNode implements Serializable {
                         && grantResults[ 0 ] == PackageManager.PERMISSION_GRANTED ) {
                     // permission was granted
                     requestLocation();
-                } else {
-                    Log.d( "PERMISSION DENIED", "Nothing to see or do here." );
+                    e.putBoolean( GPSISON, true );
 
-                    //Shut down the app. In production release, you would let the user
-                    //know why the app is shutting down...maybe ask for permission again?
-                    myNodeMaster.finishAndRemoveTask();
+                } else {
+                    e.putInt( DETERMINANT_PREF, SettingsNode.CITY_STATE );
+                    e.putString( METRIC_PREF, SettingsNode.FAHRENHEIT );
+                    e.putBoolean( GPSISON, false );
                 }
+                e.apply();
             }
         }
     }
 
     /**
-     * @return
+     * retrieves the master node referenced by this object
+     *
+     * @return the master node, usually of type {@HomeActivity}
+     * @author Daylen Nguyen
      */
     private AppCompatActivity getMyNodeMaster() {
         return myNodeMaster;
     }
 
     /**
-     * @param myNodeMaster
+     * Sets the master node (usually of type HomeActivity) for this object
+     *
+     * @param homeactivity the Master Node
+     * @author Daylen Nguyen
      */
-    private void setMyNodeMaster( AppCompatActivity myNodeMaster ) {
-        this.myNodeMaster = myNodeMaster;
+    private void setMyNodeMaster( AppCompatActivity homeactivity ) {
+        this.myNodeMaster = homeactivity;
     }
 
     /**
-     * @return
+     * Retrieves the current location object
+     *
+     * @return the current location of this object
+     * @author Daylen Nguyen
      */
     public Location getmCurrentLocation() {
         return mCurrentLocation;
     }
 
     /**
-     * @param mCurrentLocation
+     * Sets the current location for this object
+     *
+     * @param location the location to be set
+     * @author Daylen Nguyen
      */
-    public void setmCurrentLocation( Location mCurrentLocation ) {
-        this.mCurrentLocation = mCurrentLocation;
+    public void setmCurrentLocation( Location location ) {
+        this.mCurrentLocation = location;
     }
-
-    /*^^^^^^^^^^^^^LOCATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
 }

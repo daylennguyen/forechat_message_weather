@@ -16,6 +16,8 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.HomeActivity;
+import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment;
 import thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode;
 import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import thedankdevs.tcss450.uw.edu.tddevschat.WaitFragment;
@@ -28,10 +30,16 @@ import java.util.Objects;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.Weather_Preference;
 
 /**
  * A weather date fragment contains much of the client functionality corresponding to weather.
  * Interacts with a list fragment containing all of the weather data
+ *
+ * @author Daylen Nguyen
+ * believe it WEATHER or not! HAHAHAHAHAH!
+ * <p>
+ * note: Shows not 1 but 10 days worth of weather forcast! WAoW!
  */
 public class WeatherDateFragment extends Fragment {
     /*  UNITS OF MEASUREMENT  */
@@ -48,7 +56,8 @@ public class WeatherDateFragment extends Fragment {
     */
 
     private String mState, mCity, mZip;
-    private double mLon, mLat;
+    private String                            mLon;
+    private String                            mLat;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView                      myRV;
 
@@ -67,7 +76,7 @@ public class WeatherDateFragment extends Fragment {
      * Retrieves the user's location data based on preference settings
      */
     private void getLocationDataBasedOnPreference( Bundle bundle ) {
-        SharedPreferences sp = Objects.requireNonNull( this.getContext() ).getSharedPreferences( SettingsNode.LOCATIONPREF, 0 );
+        SharedPreferences sp = Objects.requireNonNull( this.getContext() ).getSharedPreferences( Weather_Preference, 0 );
 //        SharedPreferences.Editor e = sp.edit();
         switch ( current_LocationDeterminant ) {
             case SettingsNode.CITY_STATE:
@@ -76,12 +85,12 @@ public class WeatherDateFragment extends Fragment {
                 Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mCity + mState );
                 break;
             case SettingsNode.GPS_DATA:
-                mLat = bundle.getDouble( LATITUDE_KEY, 0 );
-                mLon = bundle.getDouble( LONGITUDE_KEY, 0 );
+                mLat = bundle.getString( LATITUDE_KEY, "47.24515" );
+                mLon = bundle.getString( LONGITUDE_KEY, "-122.437456" );
                 break;
             case SettingsNode.SELECT_FROM_MAP:
-                mLat = sp.getFloat( MAP_LAT_KEY, 0 );
-                mLon = sp.getFloat( MAP_LON_KEY, 0 );
+                mLat = sp.getString( MAP_LAT_KEY, "47.24515");
+                mLon = sp.getString( MAP_LON_KEY, "-122.437456" );
                 break;
             case SettingsNode.POSTAL_CODE:
                 mZip = sp.getString( ZIP_KEY, "98422" );
@@ -89,13 +98,19 @@ public class WeatherDateFragment extends Fragment {
         }
     }
 
+    /**
+     * retrieves the user's weather metric preference
+     */
     public void getAndUpdateMetricPreferences() {
-        SharedPreferences settings = Objects.requireNonNull( getContext() ).getApplicationContext().getSharedPreferences( METRIC_PREF, Context.MODE_PRIVATE );
+        SharedPreferences settings = Objects.requireNonNull( getContext() ).getApplicationContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
         current_WeatherMetric = settings.getString( METRIC_PREF, "C" );
     }
 
+    /**
+     * updates the user's determinant location preference
+     */
     public void getAndUpdateLocationDeterminantPref() {
-        SharedPreferences settings = Objects.requireNonNull( getContext() ).getSharedPreferences( DETERMINANT_PREF, Context.MODE_PRIVATE );
+        SharedPreferences settings = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE );
         current_LocationDeterminant = settings.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
     }
 
@@ -107,6 +122,11 @@ public class WeatherDateFragment extends Fragment {
 
     }
 
+    /**
+     * Called once the weather async task is completed
+     *
+     * @param result the response from the server; in regards to our request
+     */
     private void PostWeatherRequest( final String result ) {
         Log.i( "DAYLEN_WEATH_DATE_FRAG", "LOCATIONDETERMINANT = ".concat( String.valueOf( current_LocationDeterminant ) ) );
         Log.i( "DAYLEN_WEATH_DATE_FRAG", "WEATHER METRIC = ".concat( String.valueOf( current_WeatherMetric ) ) );
@@ -299,7 +319,9 @@ public class WeatherDateFragment extends Fragment {
         }
     }
 
-    /* When weather is opened on onCreate will make a post request to the server for current weather*/
+    /**
+     * When weather is opened on onCreate will make a post request to the server for current weather
+     */
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -320,10 +342,18 @@ public class WeatherDateFragment extends Fragment {
                 myRV.setAdapter( new MyWeatherDateRecyclerViewAdapter( currentWeatherData, mListener ) );
             }
         }
-
+        View mFAB = view.findViewById( R.id.weather_fab );
+        mFAB.setOnClickListener( ( View v ) -> {
+            if ( getFragmentManager() != null ) {
+                ( ( HomeActivity ) Objects.requireNonNull( this.getActivity() ) ).loadFragment( new SettingsFragment() );
+            }
+        } );
         return view;
     }
 
+    /**
+     * Method called at the end of a fragments life. Rest in peace mr.weather date fragment
+     */
     @Override
     public void onDetach() {
         super.onDetach();

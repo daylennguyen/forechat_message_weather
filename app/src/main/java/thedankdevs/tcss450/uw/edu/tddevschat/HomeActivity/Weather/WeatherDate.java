@@ -9,7 +9,6 @@ package thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Weather;
  * To which is passed to the { @WeatherDateFragment }
  */
 public class WeatherDate {
-    /**/
     public final int    id;
     public final String icon;
     final        String mDateTxtView;

@@ -40,6 +40,7 @@ public class Chat implements Serializable {
 
     /**
      * Gets the int ID of the chat
+     *
      * @return the ID of the chat
      */
     public int getChatID() {
@@ -48,6 +49,7 @@ public class Chat implements Serializable {
 
     /**
      * Gets the names of the members of this chat
+     *
      * @return the names of the members of this chat
      */
     public String getChatMembers() {

@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<resources tools:ignore="ExtraTranslation" xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools = "http://schemas.android.com/tools" tools:ignore = "ExtraTranslation">
 
-    <!--________________Base url________________________________-->
-    <string name="base_url">forechat-backend.herokuapp.com</string>
+	<!--________________Base url________________________________-->
+	<string name = "base_url">forechat-backend.herokuapp.com</string>
 
-    <!--________________Member Stuff________________-->
-    <string name="ep_member">member</string>
-    <string name="ep_getID">getID</string>
+	<!--________________Member Stuff________________-->
+	<string name = "ep_member">member</string>
+	<string name = "ep_getID">getID</string>
 
-    <!--________________User Registration and login________________-->
-    <string name="ep_login">login</string>
-    <string name="ep_register">register</string>
-    <string name="ep_verify">verify</string>
-    <string name="ep_reverify">reverify</string>
-    <string name="ep_resend_vericode">resendvericode</string>
+	<!--________________User Registration and login________________-->
+	<string name = "ep_login">login</string>
+	<string name = "ep_register">register</string>
+	<string name = "ep_verify">verify</string>
+	<string name = "ep_reverify">reverify</string>
+	<string name = "ep_resend_vericode">resendvericode</string>
 
-    <!--________________Connections________________-->
-    <string name="ep_connections">connections</string>
-    <string name="ep_getConnections">getAll</string>
-    <string name="ep_requestConnection">initiateContact</string>
-    <string name="ep_verifyConnection">verifyContact</string>
-    <string name="ep_getRequests">getRequests</string>
-    <string name="ep_removeConnection">remove</string>
+	<!--________________Connections________________-->
+	<string name = "ep_connections">connections</string>
+	<string name = "ep_getConnections">getAll</string>
+	<string name = "ep_requestConnection">initiateContact</string>
+	<string name = "ep_verifyConnection">verifyContact</string>
+	<string name = "ep_getRequests">getRequests</string>
+	<string name = "ep_removeConnection">remove</string>
 
-    <!--________________Messaging________________-->
-    <string name="ep_messaging">messaging</string>
-    <string name="ep_messaging_send">send</string>
-    <string name="ep_messaging_new_group">newGroup</string>
-    <string name="ep_messaging_new_individual">newIndividual</string>
-    <string name="ep_messaging_add">add</string>
-    <string name="ep_messaging_remove_members">remove</string>
-    <string name="ep_messaging_end_chat">endChat</string>
-    <string name="ep_getAllChats">getAllChats</string>
-    <string name="ep_getOthersinGC">getOthersInGroup</string>
-    <string name="ep_getOthers">getGroupMembers</string>
-    <string name="ep_with_token">with_token</string>
-    <string name="ep_getAllMessages">getAllMessages</string>
+	<!--________________Messaging________________-->
+	<string name = "ep_messaging">messaging</string>
+	<string name = "ep_messaging_send">send</string>
+	<string name = "ep_messaging_new_group">newGroup</string>
+	<string name = "ep_messaging_new_individual">newIndividual</string>
+	<string name = "ep_messaging_add">add</string>
+	<string name = "ep_messaging_remove_members">remove</string>
+	<string name = "ep_messaging_end_chat">endChat</string>
+	<string name = "ep_getAllChats">getAllChats</string>
+	<string name = "ep_getOthersinGC">getOthersInGroup</string>
+	<string name = "ep_getOthers">getGroupMembers</string>
+	<string name = "ep_with_token">with_token</string>
+	<string name = "ep_getAllMessages">getAllMessages</string>
 
-    <!--________________Weather________________-->
-    <string name="ep_weather">weather</string>
-    <string name="ep_weather_icon">https://www.weatherbit.io/static/img/icons/</string>
-    <string name="ep_weather_icon_file_ext">.png/</string>
-    <string name="ep_weather_citystate">citystate</string>
-    <string name="ep_weather_postalcode">postalcode</string>
+	<!--________________Weather________________-->
+	<string name = "ep_weather">weather</string>
+	<string name = "ep_weather_icon">https://www.weatherbit.io/static/img/icons/</string>
+	<string name = "ep_weather_icon_file_ext">.png/</string>
+	<string name = "ep_weather_citystate">citystate</string>
+	<string name = "ep_weather_postalcode">postalcode</string>
 
-    <!--_______________Search_________________-->
-    <string name="ep_search">search</string>
-    <string name="ep_contacts">contacts</string>
-    <string name="ep_weather_bycoordinate">coord</string>
+	<!--_______________Search_________________-->
+	<string name = "ep_search">search</string>
+	<string name = "ep_contacts">contacts</string>
+	<string name = "ep_weather_bycoordinate">coord</string>
 
-    <!--_______________Settings_______________-->
-    <string name="ep_settings">settings</string>
-    <string name="ep_update_info">update_info</string>
+	<!--_______________Settings_______________-->
+	<string name = "ep_settings">settings</string>
+	<string name = "ep_update_info">update_info</string>
 
 
 </resources>

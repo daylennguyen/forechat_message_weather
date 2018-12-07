@@ -45,7 +45,7 @@
 					android:layout_marginTop = "15dp"
 					android:layout_marginBottom = "10dp"
 					android:text = "@string/weather_settings"
-                    android:textColor="?attr/primaryDarkTextColor"
+					android:textColor = "?attr/primaryDarkTextColor"
 					android:textSize = "24sp" />
 
 				<TextView
@@ -54,7 +54,7 @@
 					android:layout_height = "wrap_content"
 					android:text = "@string/weather_metric"
 					android:textAlignment = "textStart"
-                    android:textColor="?attr/primaryDarkTextColor"
+					android:textColor = "?attr/primaryDarkTextColor"
 					android:textSize = "14sp" />
 
 				<RadioGroup
@@ -116,15 +116,15 @@
 					android:orientation = "vertical"
 					android:visibility = "gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/city"
-                    android:textAlignment="textStart"
-                    android:textColor="?attr/primaryDarkTextColor"
-                    android:textSize="18sp" />
+					<TextView
+						android:layout_width = "wrap_content"
+						android:layout_height = "0dp"
+						android:layout_marginTop = "10dp"
+						android:layout_weight = "1"
+						android:text = "@string/city"
+						android:textAlignment = "textStart"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textSize = "18sp" />
 
 					<EditText
 						android:id = "@+id/city_txtvjew"
@@ -140,15 +140,15 @@
 						android:textColorHint = "?attr/primaryLightTextColor"
 						tools:targetApi = "o" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/state_abbreviation"
-                    android:textAlignment="textStart"
-                    android:textColor="?attr/primaryDarkTextColor"
-                    android:textSize="18sp" />
+					<TextView
+						android:layout_width = "match_parent"
+						android:layout_height = "0dp"
+						android:layout_marginTop = "10dp"
+						android:layout_weight = "1"
+						android:text = "@string/state_abbreviation"
+						android:textAlignment = "textStart"
+						android:textColor = "?attr/primaryDarkTextColor"
+						android:textSize = "18sp" />
 
 					<EditText
 						android:id = "@+id/state_txtentry"
@@ -187,7 +187,7 @@
 						android:layout_marginTop = "10dp"
 						android:text = "@string/zip_code"
 						android:textAlignment = "textStart"
-                        android:textColor="?attr/primaryDarkTextColor"
+						android:textColor = "?attr/primaryDarkTextColor"
 						android:textColorHint = "@color/colorLightBluePurple"
 						android:textSize = "14sp" />
 

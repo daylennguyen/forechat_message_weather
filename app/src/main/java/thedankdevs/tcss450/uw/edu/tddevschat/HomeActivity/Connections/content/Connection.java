@@ -15,20 +15,24 @@ import java.io.Serializable;
 public class Connection implements Serializable {
 
     /**
-     * Information about the Connection, which is really another user of the app*/
+     * Information about the Connection, which is really another user of the app
+     */
     private final String  mEmail;
     private final String  mUsername;
     private final String  mFirstName;
     private final String  mLastName;
     /**
      * The ID of the one-on-one chat that the current user, and this connection share.
-     * will be -1 if uninitialized*/
+     * will be -1 if uninitialized
+     */
     private       int     mChatID;
     /**
-     * Boolean representation of if this user is registered as a connection/contact of the other user*/
+     * Boolean representation of if this user is registered as a connection/contact of the other user
+     */
     private       boolean mIsMine;
     /**
-     * Will be true if the list of connections is empty*/
+     * Will be true if the list of connections is empty
+     */
     private       boolean mIsEmpty;
 
     /**
@@ -102,6 +106,7 @@ public class Connection implements Serializable {
 
     /**
      * Gets the boolean representation of if this user is registered as a connection/contact of the other user
+     *
      * @return
      */
     public boolean getIsMine() {
