@@ -17,7 +17,6 @@ import java.util.Map;
  * Helper class to alleviate code from HomeActivity. Used in connection
  * with the Fragment interaction with MemberSettingsFragment.
  * Sends Post Request to an endpoint and sends the corresponding response.
- *
  * @author Bryan Santos
  * @version 12/05/2018
  */

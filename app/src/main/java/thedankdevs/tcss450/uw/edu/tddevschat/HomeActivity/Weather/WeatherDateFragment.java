@@ -30,12 +30,12 @@ import java.util.Objects;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.DETERMINANT_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.SettingsFragment.METRIC_PREF;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.LocationNode.*;
+import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.CELSIUS;
 import static thedankdevs.tcss450.uw.edu.tddevschat.HomeActivity.Utility.SettingsNode.Weather_Preference;
 
 /**
  * A weather date fragment contains much of the client functionality corresponding to weather.
  * Interacts with a list fragment containing all of the weather data
- *
  * @author Daylen Nguyen
  * believe it WEATHER or not! HAHAHAHAHAH!
  * <p>
@@ -230,6 +230,7 @@ public class WeatherDateFragment extends Fragment {
                     j.put( "units", "S" );
                     break;
                 case "C": /*default weather api field*/
+                    j.put( "units", "M" );
                     break;
             }
         } catch ( JSONException e ) {
@@ -268,6 +269,8 @@ public class WeatherDateFragment extends Fragment {
                         request.put( "units", SCIENTIFIC );
                         break;
                 }
+            } else {
+                request.put("units", CELSIUS);
             }
         } catch ( Exception e ) {
             Log.e( "WEATHER", String.valueOf( e ) );
