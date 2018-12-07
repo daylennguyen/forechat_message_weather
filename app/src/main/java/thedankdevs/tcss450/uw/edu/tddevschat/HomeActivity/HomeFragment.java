@@ -241,7 +241,7 @@ public class HomeFragment extends Fragment {
 
             //apply the weather data to the user interface
             description.setText( weathDesc );
-            city_state.setText( String.format( "in %s, %s, The forcast calls for ", mCity, mState ) );
+            city_state.setText( String.format( "In %s, %s, \nThe forecast calls for ", mCity, mState ) );
             low.setText( MessageFormat.format( "{0}°{1}", String.valueOf( min ), current_WeatherMetric ) );
             high.setText( MessageFormat.format( "{0}°{1}", String.valueOf( max ), current_WeatherMetric ) );
         } catch ( JSONException e ) {
