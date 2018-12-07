@@ -15,14 +15,17 @@ import thedankdevs.tcss450.uw.edu.tddevschat.R;
 import java.util.ArrayList;
 
 /**
- * A fragment representing a list of Items.
+ * A fragment representing a list of Requests.
  * <p/>
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
 public class RequestFragment extends Fragment {
-
+    /**
+     * Key to find the array list*/
     public static final String             ARG_REQUESTS_LIST = "chats list";
+    /**
+     * Array list that contains all connections*/
     private             ArrayList<Request> mRequests;
     private             int                mColumnCount      = 1;
 
@@ -34,16 +37,6 @@ public class RequestFragment extends Fragment {
      */
     public RequestFragment() {
     }
-
-    /*// TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static RequestFragment newInstance(int columnCount) {
-        RequestFragment fragment = new RequestFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }*/
 
     @Override
     public void onAttach( Context context ) {
@@ -64,6 +57,14 @@ public class RequestFragment extends Fragment {
         }
     }
 
+    /**
+     * The fragment instantiates its user interface view
+     *
+     * @param inflater view to be inflated
+     * @param container content container
+     * @param savedInstanceState any saved information.
+     * @return the inflated view
+     */
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
@@ -93,10 +94,6 @@ public class RequestFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
         void onRequestListFragmentInteraction( String theirUsername );

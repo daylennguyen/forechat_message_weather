@@ -261,7 +261,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
      * @param email    User input for email
      * @param password User input for password
      */
-
     private void buildLoginServerCredentials( String email, String password ) {
 
         //build the web service URL
@@ -286,7 +285,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
 
-
         //instantiate and execute the AsyncTask
         new SendPostAsyncTask.Builder( uri.toString(), msg )
                 .onPreExecute( this::handleLoginOnPre )
@@ -294,8 +292,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .onCancelled( this::handleErrorsInTask )
                 .build()
                 .execute();
-
-
     }
 
     @Override

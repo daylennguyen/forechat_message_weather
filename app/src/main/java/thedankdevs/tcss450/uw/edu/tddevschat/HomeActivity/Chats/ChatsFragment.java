@@ -32,7 +32,7 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
      */
     public static final String ARG_CHATS_LIST = "chats list";
     /**
-     * Adapter that sets the conent
+     * Adapter that sets the content
      */
     MyChatsRecyclerViewAdapter adapter;
     /**
@@ -158,10 +158,6 @@ public class ChatsFragment extends Fragment implements View.OnClickListener {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnChatsListFragmentInteractionListener {
         // TODO: Update argument type and name

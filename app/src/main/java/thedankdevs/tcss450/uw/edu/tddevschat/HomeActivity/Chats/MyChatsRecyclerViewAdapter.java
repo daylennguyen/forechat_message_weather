@@ -73,7 +73,9 @@ public class MyChatsRecyclerViewAdapter extends RecyclerView.Adapter<MyChatsRecy
         return mValues.size();
     }
 
-
+    /**
+     * Describes a Chat item view and data about its place in the RecyclerView
+     */
     class ViewHolder extends RecyclerView.ViewHolder {
         final View     mView;
         final TextView mChatName;

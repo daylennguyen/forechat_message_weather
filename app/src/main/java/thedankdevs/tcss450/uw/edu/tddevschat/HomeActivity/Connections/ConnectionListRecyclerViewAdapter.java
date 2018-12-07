@@ -25,16 +25,24 @@ import java.util.Objects;
  */
 public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Connection>                  mCopyConnections;
-    private final OnListFragmentInteractionListener mListener;
+    /**
+     * The list of Connections (can be both personal, and potential ones from the database)*/
     private       List<Connection>                  mConnections;
+    private final List<Connection>                  mCopyConnections;
 
+    private final OnListFragmentInteractionListener mListener;
+
+    /**
+     * The constructor
+     *
+     * @param items the list of connectiosn
+     * @param listener the class that will respond when something happens here
+     */
     ConnectionListRecyclerViewAdapter( List<Connection> items, OnListFragmentInteractionListener listener ) {
         mConnections = items;
         mListener = listener;
         mCopyConnections = new ArrayList<>();
         mCopyConnections.addAll( mConnections );
-
     }
 
 
@@ -47,6 +55,12 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         return new ViewHolder( view );
     }
 
+    /**
+     * Called to display data at the specified position.
+     *
+     * @param holder represents the contents of the item at the given position in the data set
+     * @param position position of the item within the adapter's data set
+     */
     @Override
     public void onBindViewHolder( @NonNull final ViewHolder holder, int position ) {
         holder.mItem = ( mConnections ).get( position );
@@ -60,7 +74,6 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         } catch ( Exception e ) {
             Log.e( "CONNECTION VIEW HOLDER", "my isMine value is weird!! " + e );
         }
-
         /*
             A Card View for when no connections are found during search.
             Early return call so that onClickListener won't be set.
@@ -69,7 +82,6 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
             holder.mUsername.setText( "No Connections Found" );
             return;
         }
-
         holder.mView.setOnClickListener( v -> {
             if ( null != mListener ) {
                 /* Notify the active callbacks interface (the activity, if the
@@ -85,6 +97,9 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         } );
     }
 
+    /**
+     * @return the number of connections in the list
+     */
     @Override
     public int getItemCount() {
         return mConnections.size();
@@ -189,6 +204,10 @@ public class ConnectionListRecyclerViewAdapter extends RecyclerView.Adapter<Conn
         return mConnections.equals( theOther.mCopyConnections );
     }
 
+
+    /**
+     * Describes a Connection item view and data about its place in the RecyclerView
+     */
     class ViewHolder extends RecyclerView.ViewHolder {
         final View     mView;
         final TextView mUsername;

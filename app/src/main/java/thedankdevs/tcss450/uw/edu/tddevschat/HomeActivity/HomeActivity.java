@@ -138,6 +138,7 @@ public class HomeActivity extends AppCompatActivity
         Log.d( "Debug Bryan", "location updates successful" );
         if ( savedInstanceState == null ) {
             FragmentManager fm                     = getSupportFragmentManager();
+            //handle connection notifications
             String          connectionNotification = getIntent().getStringExtra( getString( R.string.keys_intent_notification_connections ) );
             if ( connectionNotification != null ) {
                 if ( connectionNotification.equals( getString( R.string.notification_requested ) ) ) {
@@ -409,12 +410,12 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    /*Signs the user out of the current account*/
+    /**Signs the user out of the current account*/
     private void logout() {
         new DeleteTokenAsyncTask( this ).execute();
     }
 
-    /*Helper method to load an instance of the given fragment into the current activity*/
+    /**Helper method to load an instance of the given fragment into the current activity*/
     public void loadFragment( Fragment frag ) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
@@ -673,6 +674,16 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Will display an alert dialog to the user that lets the user know
+     * some connection request action happened and gives them the option to respond.
+     *
+     * @param msg the message to display in the notification
+     * @param positive the message representing the positive/affirmative action for the user to choose
+     * @param action the Runnable that we want to execute when the user chooses the positive action
+     *
+     * @author Michelle Brown
+     */
     private void ShowConnectionRequestAlert( String msg, String positive, final Runnable action ) {
         AlertDialog.Builder builder = new AlertDialog.Builder( this );
         builder.setMessage( msg )
@@ -749,7 +760,7 @@ public class HomeActivity extends AppCompatActivity
      * MyFirebaseMessagingService
      * that Android allows to run all the time.
      *
-     * @author Charles Bryan, Emmett kang, Michelle Brown
+     * @author Charles Bryan, Emmett Kang, Michelle Brown
      */
     private class FirebaseMessageReciever extends BroadcastReceiver {
         @Override

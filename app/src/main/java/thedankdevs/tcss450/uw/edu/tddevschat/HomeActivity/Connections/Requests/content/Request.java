@@ -17,15 +17,30 @@ public class Request implements Serializable {
     private       boolean mIReceived;
 
 
+    /**
+     * Constructs a Request internally from a builder.
+     *
+     * @param builder the builder used to construct this object
+     */
     private Request( final Builder builder ) {
         this.mUsername = builder.mUsername;
         this.mIReceived = builder.mIReceived;
     }
 
+    /**
+     * Get the Username.
+     *
+     * @return the username
+     */
     public String getUsername() {
         return mUsername;
     }
 
+    /**
+     * Get the boolean value representing if the user received this request (true) or sent it (false).
+     *
+     * @return mIReceived
+     */
     public boolean getIReceived() {
         return mIReceived;
     }
@@ -56,16 +71,6 @@ public class Request implements Serializable {
             this.mUsername = username;
             this.mIReceived = iReceived;
         }
-
-        /*
-         * Add an optional something to the connection.
-         * @param val an optional something for the connection
-         * @return the Builder of this Connection
-         */
-/*        public Builder addSomething(final String val) {
-            mSomething = val;
-            return this;
-        }*/
 
         public Request build() {
             return new Request( this );

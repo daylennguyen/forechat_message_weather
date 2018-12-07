@@ -25,6 +25,8 @@ import java.util.ArrayList;
 /**
  * The Connections Node; contains the primary functionality pertaining to retrieving connections
  * from the application database/server.
+ *
+ * @author Michelle Brown
  */
 public class ConnectionsNode {
 
@@ -55,6 +57,7 @@ public class ConnectionsNode {
     /**
      * Creates a post request, asynchronously, to retrieve the
      * connection data from the application server
+     * @author Michelle Brown
      */
     public void loadConnections( Fragment frag ) {
         loadingFragment = frag;
@@ -82,6 +85,7 @@ public class ConnectionsNode {
      * After retrieving the response from the server, extract the connection data from the json
      *
      * @param result the response in json format
+     * @author Michelle Brown
      */
     private void handleConnectionsOnPostExecute( String result ) {
         try {
@@ -131,6 +135,7 @@ public class ConnectionsNode {
      * that was clicked on in {@link ConnectionListFragment}
      *
      * @param item the connection selected
+     * @author Michelle Brown
      */
     public void onListFragmentInteraction( Connection item ) {
         ConnectionFragment connectionFragment = new ConnectionFragment();
@@ -143,6 +148,12 @@ public class ConnectionsNode {
         mMaster.loadFragment( connectionFragment );
     }
 
+    /**
+     * Creates a popup for the user to choose to delete the selected connection
+     *
+     * @param item the item in the Connections list that was clicked
+     * @author Michelle Brown
+     */
     public void onConnectionsListFragmentLongInteraction( Connection item ) {
         AlertDialog.Builder builder = new AlertDialog.Builder( mMaster );
         builder.setMessage( item.getUsername() + " Options" )
@@ -156,6 +167,15 @@ public class ConnectionsNode {
         dialog.show();
     }
 
+    /**
+     * Send a request to our web service to delete the connection between the current user and
+     * the user with the supplied email
+     *
+     * @param memberID the member ID of the current user
+     * @param email the email of the connection to be deleted
+     * @param ourChatID the ID of the shared chat between the surrent user and the user about to be deleted
+     * @author Michelle Brown
+     */
     private void removeConnection( int memberID, String email, int ourChatID ) {
         JSONObject removeJson = new JSONObject();
         try {
@@ -179,6 +199,13 @@ public class ConnectionsNode {
                 .build().execute();
     }
 
+    /**
+     * Handles events after we get a response from our web service
+     * after we try to delete a connection.
+     *
+     * @param result the String representation of the result from the web service
+     * @author Michelle Brown
+     */
     private void handleRemoveOnPostExecute( String result ) {
         try {
             Log.w( "REMOVE CONNECTION POST RESULT", result );
@@ -204,6 +231,10 @@ public class ConnectionsNode {
     //__________________________CONNECTION REQUESTS__________________________
 
 
+    /**
+     * Send a request to our web service to load all of our pending connection requests
+     * @author Michelle Brown
+     */
     public void loadRequests() {
         JSONObject memberInfo = new JSONObject();
         try {
@@ -225,6 +256,13 @@ public class ConnectionsNode {
                 .build().execute();
     }
 
+    /**
+     * Handles events after we get a response from our web service
+     * after we request all of our pending connection requests
+     *
+     * @param result the String representation of the result from the web service
+     * @author Michelle Brown
+     */
     private void handleRequestsOnPostExecute( String result ) {
         try {
             ArrayList<Request> myConnRequests       = new ArrayList<>();
@@ -258,6 +296,13 @@ public class ConnectionsNode {
         }
     }
 
+    /**
+     * Handles when the user accepts a connection request.
+     * Send a request to our web service to verify the connection
+     *
+     * @param theirUsername the username of the user that sent us the request
+     * @author Michelle Brown
+     */
     public void onRequestListFragmentInteraction( String theirUsername ) {
         JSONObject acceptJson = new JSONObject();
         try {
@@ -280,16 +325,18 @@ public class ConnectionsNode {
                 .build().execute();
     }
 
+    /**
+     * Handles events after we get a response from our web service
+     * after we accept a connection request
+     *
+     * @param result the String representation of the result from the web service.
+     * @author Michelle Brown
+     */
     private void handleAcceptRequestOnPostExecute( String result ) {
         try {
             Log.w( "ACCEPT CONNECTION POST RESULT", result );
             //This is the result from the web service
             JSONObject res = new JSONObject( result );
-            //TODO: let the user know properly in RequestFragment
-            Button acceptButton = mMaster.findViewById( R.id.btn_connectionRequest_accept );
-            //acceptButton.setText("Accepted!");
-            //acceptButton.setBackgroundColor(mMaster.getResources().getColor(R.color.colorBluePurple));
-            //acceptButton.setTextColor(Color.WHITE);
         } catch ( JSONException e ) {
             e.printStackTrace();
         }
