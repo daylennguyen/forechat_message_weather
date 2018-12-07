@@ -75,6 +75,7 @@ public class HomeFragment extends Fragment {
     }
     /* *********   HELPER METHODS    ***************************************************************/
 
+
     /**
      * Retrieves the activity and shared preferences relating to the data needed to display
      */
@@ -98,6 +99,7 @@ public class HomeFragment extends Fragment {
         city_state = Objects.requireNonNull( v ).findViewById( R.id.city_state_home );
         current_LocationDeterminant = Objects.requireNonNull( getContext() ).getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA );
         current_WeatherMetric = getContext().getSharedPreferences( Weather_Preference, Context.MODE_PRIVATE ).getString( METRIC_PREF, SettingsNode.FAHRENHEIT );
+        Log.d( "DAYY111", current_WeatherMetric + current_LocationDeterminant );
     }
 
     /**
@@ -130,7 +132,7 @@ public class HomeFragment extends Fragment {
     /*returns a json object, dependent on the location determinant*/
     private JSONObject constructRequestJSON() {
         JSONObject request = new JSONObject();
-
+        double mLat, mLon;
         try {
             switch ( myWeatherPref.getInt( DETERMINANT_PREF, SettingsNode.GPS_DATA ) ) {
                 case SettingsNode.CITY_STATE:
@@ -141,8 +143,9 @@ public class HomeFragment extends Fragment {
                     request.put( getString( R.string.weather_lcase_state ), mState );
                     break;
                 case SettingsNode.GPS_DATA:
-                    double mLat = mHome.getCurrentLat();
-                    double mLon = mHome.getCurrentLon();
+                    Log.d("Debug Bryan", "I am a GPS");
+                    mLat = mHome.getCurrentLat();
+                    mLon = mHome.getCurrentLon();
                     Log.w( "DAYLEN LOCATION BASED ON PREFERENCE", mLat + " mlatlon " + mLon );
 
                     request.put( getString( R.string.weather_lon_json ), mLon );
@@ -163,7 +166,24 @@ public class HomeFragment extends Fragment {
             }
             /*DEFAULT UNIT IS CELSIUS*/
 
-            switch (Objects.requireNonNull(myWeatherPref.getString(METRIC_PREF, "F"))) {
+
+        } catch ( Exception e ) {
+            Log.e( "WEATHER", String.valueOf( e ) );
+            try {
+                /*Set the default values if the location data is unknown*/
+                //request.put( "units", "I" );
+                request.put( "lon", -122.465973 );
+                request.put( "lat", 47.258728 );
+            } catch ( JSONException e1 ) {
+                e1.printStackTrace();
+            }
+
+        }
+
+
+        try {
+            Log.d("Bryan", "current metric: " + current_WeatherMetric);
+            switch (current_WeatherMetric) {
                 case SettingsNode.CELSIUS:
                     request.put("units", "M");
                     break;
@@ -174,18 +194,14 @@ public class HomeFragment extends Fragment {
                     request.put("units", "S");
                     break;
             }
-
-        } catch ( Exception e ) {
-            Log.e( "WEATHER", String.valueOf( e ) );
+        }catch ( Exception ex ) {
+            Log.e("WEATHER", String.valueOf(ex));
             try {
                 /*Set the default values if the location data is unknown*/
-                request.put( "units", "I" );
-                request.put( "lon", -122.465973 );
-                request.put( "lat", 47.258728 );
-            } catch ( JSONException e1 ) {
+                request.put("units", "I");
+            } catch (JSONException e1) {
                 e1.printStackTrace();
             }
-
         }
         return request;
     }
@@ -198,6 +214,9 @@ public class HomeFragment extends Fragment {
         getSharedPrefAndValue();
         JSONObject request  = constructRequestJSON();
         String     mSendUrl = constructRequestLocation();
+
+        Log.d("final debug", "request: " + request.toString());
+
         new SendPostAsyncTask.Builder( mSendUrl, request )
                 .onPreExecute( () -> {
                 } )
